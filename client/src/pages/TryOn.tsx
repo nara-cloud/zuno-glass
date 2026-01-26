@@ -1,58 +1,123 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import Webcam from 'react-webcam';
+import { FaceMesh, Results } from '@mediapipe/face_mesh';
+import { Camera } from '@mediapipe/camera_utils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { products } from '@/lib/products';
-import { Camera, RefreshCw, Move, Maximize2, Minimize2, AlertCircle } from 'lucide-react';
+import { Move, AlertCircle, Loader2, ScanFace } from 'lucide-react';
 
 export default function TryOn() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const webcamRef = useRef<Webcam>(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState(products[0]);
   
-  // Overlay controls
-  const [position, setPosition] = useState({ x: 50, y: 40 }); // Percentage
-  const [scale, setScale] = useState(1);
-  const [isDragging, setIsDragging] = useState(false);
+  // Glasses positioning state
+  const [glassesStyle, setGlassesStyle] = useState<React.CSSProperties>({
+    display: 'none',
+  });
 
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' } 
-      });
-      setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-      setError(null);
-    } catch (err) {
-      console.error("Error accessing camera:", err);
-      setError("Não foi possível acessar a câmera. Verifique as permissões do seu navegador.");
+  const onResults = useCallback((results: Results) => {
+    if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+      setGlassesStyle({ display: 'none' });
+      return;
     }
-  };
 
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
-  };
+    const landmarks = results.multiFaceLandmarks[0];
 
-  useEffect(() => {
-    return () => stopCamera();
+    // Key landmarks for glasses positioning
+    // 33: Left eye outer corner
+    // 263: Right eye outer corner
+    // 168: Nose bridge (center)
+    const leftEye = landmarks[33];
+    const rightEye = landmarks[263];
+    const noseBridge = landmarks[168];
+
+    if (!leftEye || !rightEye || !noseBridge) return;
+
+    // Calculate center point (nose bridge is usually good, but midpoint of eyes is safer for rotation center)
+    const centerX = noseBridge.x * 100;
+    const centerY = noseBridge.y * 100;
+
+    // Calculate angle for rotation (roll)
+    const dy = rightEye.y - leftEye.y;
+    const dx = rightEye.x - leftEye.x;
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+    // Calculate scale based on distance between eyes
+    // The distance in normalized coordinates needs to be scaled up
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    // Base scale factor - adjust this multiplier to fit the specific glasses assets
+    const scale = distance * 4.5; 
+
+    setGlassesStyle({
+      display: 'block',
+      position: 'absolute',
+      left: `${centerX}%`,
+      top: `${centerY}%`,
+      width: '100%', // Base width, scaled down by transform
+      transform: `translate(-50%, -50%) rotate(${angle}deg) scale(${scale})`,
+      transformOrigin: 'center center',
+      pointerEvents: 'none',
+      zIndex: 10,
+    });
   }, []);
 
-  // Drag logic
-  const handleMouseDown = () => setIsDragging(true);
-  const handleMouseUp = () => setIsDragging(false);
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isDragging) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      setPosition({ x, y });
+  useEffect(() => {
+    let camera: Camera | null = null;
+    let faceMesh: FaceMesh | null = null;
+
+    if (isCameraActive && webcamRef.current && webcamRef.current.video) {
+      setIsLoading(true);
+      
+      faceMesh = new FaceMesh({
+        locateFile: (file) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+        },
+      });
+
+      faceMesh.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+
+      faceMesh.onResults(onResults);
+
+      if (webcamRef.current.video) {
+        camera = new Camera(webcamRef.current.video, {
+          onFrame: async () => {
+            if (webcamRef.current?.video && faceMesh) {
+              await faceMesh.send({ image: webcamRef.current.video });
+              setIsLoading(false);
+            }
+          },
+          width: 1280,
+          height: 720,
+        });
+        
+        camera.start()
+          .catch(err => {
+            console.error("Camera start error:", err);
+            setError("Erro ao iniciar a câmera. Verifique permissões.");
+            setIsLoading(false);
+          });
+      }
     }
+
+    return () => {
+      if (camera) camera.stop();
+      if (faceMesh) faceMesh.close();
+    };
+  }, [isCameraActive, onResults]);
+
+  const startCamera = () => {
+    setIsCameraActive(true);
+    setError(null);
   };
 
   return (
@@ -62,25 +127,25 @@ export default function TryOn() {
       <div className="pt-32 pb-20 container">
         <div className="text-center mb-12">
           <h1 className="font-display font-bold text-5xl md:text-6xl text-white mb-4">
-            TRY-ON <span className="text-primary italic">VIRTUAL</span>
+            AI <span className="text-primary italic">TRY-ON</span>
           </h1>
           <p className="font-body text-gray-400 max-w-2xl mx-auto text-lg">
-            Experimente nossa tecnologia antes de comprar. Use sua câmera para ver como os modelos ZUNO se ajustam ao seu rosto.
+            Tecnologia de rastreamento facial em tempo real. A inteligência artificial ajusta os óculos ao seu rosto automaticamente.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
           {/* Camera Area */}
           <div className="lg:col-span-8 bg-black border border-white/10 relative aspect-video overflow-hidden clip-corner group">
-            {!stream ? (
+            {!isCameraActive ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/5">
-                <Camera className="w-16 h-16 text-gray-600 mb-4" />
-                <p className="font-display text-gray-400 mb-6">ATIVE A CÂMERA PARA COMEÇAR</p>
+                <ScanFace className="w-16 h-16 text-primary mb-4 animate-pulse" />
+                <p className="font-display text-gray-400 mb-6">ATIVE A CÂMERA PARA O RASTREAMENTO IA</p>
                 <Button 
                   onClick={startCamera}
                   className="bg-primary text-black hover:bg-white font-display font-bold px-8 py-6 clip-corner"
                 >
-                  INICIAR CÂMERA
+                  INICIAR EXPERIÊNCIA
                 </Button>
                 {error && (
                   <div className="mt-4 flex items-center gap-2 text-red-500 bg-red-500/10 px-4 py-2 rounded">
@@ -90,46 +155,47 @@ export default function TryOn() {
                 )}
               </div>
             ) : (
-              <div 
-                className="relative w-full h-full cursor-move"
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-              >
-                <video 
-                  ref={videoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
-                  className="w-full h-full object-cover transform scale-x-[-1]"
+              <div className="relative w-full h-full">
+                <Webcam
+                  ref={webcamRef}
+                  audio={false}
+                  mirrored={true}
+                  screenshotFormat="image/jpeg"
+                  className="w-full h-full object-cover"
+                  videoConstraints={{
+                    width: 1280,
+                    height: 720,
+                    facingMode: "user"
+                  }}
                 />
                 
+                {/* Loading Overlay */}
+                {isLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-50">
+                    <div className="flex flex-col items-center">
+                      <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+                      <p className="font-display text-white tracking-widest">CARREGANDO MODELO IA...</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Glasses Overlay */}
-                <div 
-                  className="absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto"
-                  style={{ 
-                    left: `${position.x}%`, 
-                    top: `${position.y}%`,
-                    width: `${40 * scale}%`
-                  }}
-                  onMouseDown={handleMouseDown}
-                >
+                <div style={glassesStyle}>
                   <img 
                     src={selectedProduct.image} 
                     alt="Glasses Overlay" 
                     className="w-full drop-shadow-2xl filter brightness-110 contrast-110"
                   />
-                  {/* Guides */}
-                  <div className="absolute inset-0 border-2 border-primary/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
                 </div>
 
-                {/* Controls Overlay */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4 bg-black/80 backdrop-blur px-6 py-3 rounded-full border border-white/10">
-                  <button onClick={() => setScale(s => Math.max(0.5, s - 0.1))} className="text-white hover:text-primary"><Minimize2 className="w-5 h-5" /></button>
-                  <span className="font-display text-xs text-gray-400 flex items-center">TAMANHO</span>
-                  <button onClick={() => setScale(s => Math.min(2, s + 0.1))} className="text-white hover:text-primary"><Maximize2 className="w-5 h-5" /></button>
-                  <div className="w-[1px] h-5 bg-white/20 mx-2"></div>
-                  <button onClick={() => setPosition({ x: 50, y: 40 })} className="text-white hover:text-primary"><RefreshCw className="w-5 h-5" /></button>
+                {/* Face Mesh Debug Grid (Optional - for visual tech feel) */}
+                <div className="absolute inset-0 pointer-events-none opacity-10 bg-[url('/grid-pattern.svg')]"></div>
+                
+                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur px-3 py-1 rounded border border-primary/30">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                    <span className="font-display text-xs text-primary">AI TRACKING ACTIVE</span>
+                  </div>
                 </div>
               </div>
             )}
