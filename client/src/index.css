@@ -4,10 +4,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-display: "Chakra Petch", sans-serif;
+  --font-body: "Rajdhani", sans-serif;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -40,77 +44,88 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  
+  --color-neon-yellow: #CCFF00;
+  --color-dark-bg: #111111;
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.015 65);
-  --secondary: oklch(0.98 0.001 286.375);
-  --secondary-foreground: oklch(0.4 0.015 65);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.141 0.005 285.823);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.235 0.015 65);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
+  /* Cyber-Sport Velocity Theme - Dark Mode Default */
+  --primary: #CCFF00; /* Neon Yellow */
+  --primary-foreground: #000000;
+  
+  --background: #111111; /* Deep Black */
+  --foreground: #F0F0F0;
+  
+  --card: #1A1A1A;
+  --card-foreground: #F0F0F0;
+  
+  --popover: #1A1A1A;
+  --popover-foreground: #F0F0F0;
+  
+  --secondary: #333333;
+  --secondary-foreground: #FFFFFF;
+  
+  --muted: #222222;
+  --muted-foreground: #888888;
+  
+  --accent: #CCFF00;
+  --accent-foreground: #000000;
+  
+  --destructive: #FF3333;
+  --destructive-foreground: #FFFFFF;
+  
+  --border: #333333;
+  --input: #222222;
+  --ring: #CCFF00;
+  
+  --radius: 0rem; /* Sharp edges for technical look */
+  
+  --chart-1: #CCFF00;
+  --chart-2: #AAFF00;
+  --chart-3: #88DD00;
+  --chart-4: #66BB00;
+  --chart-5: #449900;
+  
+  --sidebar: #0A0A0A;
+  --sidebar-foreground: #F0F0F0;
+  --sidebar-primary: #CCFF00;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #222222;
+  --sidebar-accent-foreground: #CCFF00;
+  --sidebar-border: #333333;
+  --sidebar-ring: #CCFF00;
 }
 
 .dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.85 0.005 65);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.85 0.005 65);
-  --secondary: oklch(0.24 0.006 286.033);
-  --secondary-foreground: oklch(0.7 0.005 65);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.488 0.243 264.376);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.85 0.005 65);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.488 0.243 264.376);
+  /* Same as root since we are dark-first */
+  --primary: #CCFF00;
+  --primary-foreground: #000000;
+  --background: #111111;
+  --foreground: #F0F0F0;
+  --card: #1A1A1A;
+  --card-foreground: #F0F0F0;
+  --popover: #1A1A1A;
+  --popover-foreground: #F0F0F0;
+  --secondary: #333333;
+  --secondary-foreground: #FFFFFF;
+  --muted: #222222;
+  --muted-foreground: #888888;
+  --accent: #CCFF00;
+  --accent-foreground: #000000;
+  --destructive: #FF3333;
+  --destructive-foreground: #FFFFFF;
+  --border: #333333;
+  --input: #222222;
+  --ring: #CCFF00;
+  --sidebar: #0A0A0A;
+  --sidebar-foreground: #F0F0F0;
+  --sidebar-primary: #CCFF00;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #222222;
+  --sidebar-accent-foreground: #CCFF00;
+  --sidebar-border: #333333;
+  --sidebar-ring: #CCFF00;
 }
 
 @layer base {
@@ -118,7 +133,10 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body antialiased selection:bg-primary selection:text-primary-foreground;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display uppercase tracking-wide;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -134,24 +152,11 @@
 }
 
 @layer components {
-  /**
-   * Custom container utility that centers content and adds responsive padding.
-   *
-   * This overrides Tailwind's default container behavior to:
-   * - Auto-center content (mx-auto)
-   * - Add responsive horizontal padding
-   * - Set max-width for large screens
-   *
-   * Usage: <div className="container">...</div>
-   *
-   * For custom widths, use max-w-* utilities directly:
-   * <div className="max-w-6xl mx-auto px-4">...</div>
-   */
   .container {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
+    padding-left: 1rem;
     padding-right: 1rem;
   }
 
@@ -159,19 +164,50 @@
     min-height: 0;
     min-width: 0;
   }
+  
+  /* Custom Utility Classes for Cyber-Sport Theme */
+  .clip-corner {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - 10px),
+      calc(100% - 10px) 100%,
+      0 100%
+    );
+  }
+  
+  .clip-corner-top-right {
+    clip-path: polygon(
+      0 0,
+      calc(100% - 20px) 0,
+      100% 20px,
+      100% 100%,
+      0 100%
+    );
+  }
+  
+  .text-stroke {
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+    color: transparent;
+  }
+  
+  .text-stroke-neon {
+    -webkit-text-stroke: 1px var(--color-neon-yellow);
+    color: transparent;
+  }
 
   @media (min-width: 640px) {
     .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      padding-left: 2rem; /* 32px - desktop padding */
+      padding-left: 2rem;
       padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+      max-width: 1400px; /* Wider container for immersive feel */
     }
   }
 }
