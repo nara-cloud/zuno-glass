@@ -29,14 +29,18 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Parallax */}
+        {/* Background Video with Parallax */}
         <div ref={heroRef} className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent z-10"></div>
-          <img 
-            src="/images/006.webp" 
-            alt="Zuno Hero" 
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
             className="w-full h-full object-cover opacity-60"
-          />
+          >
+            <source src="/images/hero-video.mp4" type="video/mp4" />
+          </video>
         </div>
 
         {/* Hero Content */}
