@@ -10,6 +10,7 @@ import ProductDetail from "./pages/ProductDetail";
 import TryOn from "./pages/TryOn";
 import Pulse from "./pages/Pulse";
 import Lab from "./pages/Lab";
+import Squad from "./pages/Squad";
 import Pro from "./pages/Pro";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
@@ -23,6 +24,7 @@ function Router() {
       <Route path={"/try-on"} component={TryOn} />
       <Route path={"/pulse"} component={Pulse} />
       <Route path={"/lab"} component={Lab} />
+      <Route path={"/squad"} component={Squad} />
       <Route path={"/pro"} component={Pro} />
       <Route path={"/about"} component={About} />
       <Route path={"/faq"} component={FAQ} />

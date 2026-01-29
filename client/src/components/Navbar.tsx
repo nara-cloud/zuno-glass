@@ -17,9 +17,9 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    
     { name: 'PULSE', path: '/pulse' },
     { name: 'LAB', path: '/lab' },
+    { name: 'SQUAD', path: '/squad' },
     { name: 'PRO', path: '/pro' },
     { name: 'TRY-ON VIRTUAL', path: '/try-on' },
     { name: 'SOBRE', path: '/about' },
