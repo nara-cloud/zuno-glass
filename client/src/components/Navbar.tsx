@@ -33,8 +33,7 @@ export default function Navbar() {
     >
       <div className="container flex items-center justify-between">
         {/* Logo */}
-        <Link href="/">
-          <a className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center gap-2 group">
             <div className="relative w-10 h-10 flex items-center justify-center bg-primary text-black font-display font-bold text-2xl clip-corner group-hover:bg-white transition-colors">
               Z
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full group-hover:bg-primary transition-colors"></div>
@@ -42,21 +41,22 @@ export default function Navbar() {
             <span className="font-display font-bold text-2xl tracking-wider text-white">
               ZUNO
             </span>
-          </a>
         </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link key={link.path} href={link.path}>
-              <a className={`font-display font-medium text-sm tracking-widest hover:text-primary transition-colors relative group ${
+            <Link 
+              key={link.path} 
+              href={link.path}
+              className={`font-display font-medium text-sm tracking-widest hover:text-primary transition-colors relative group ${
                 location === link.path ? 'text-primary' : 'text-white'
-              }`}>
+              }`}
+            >
                 {link.name}
                 <span className={`absolute -bottom-1 left-0 w-full h-[2px] bg-primary transform origin-left transition-transform duration-300 ${
                   location === link.path ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                 }`}></span>
-              </a>
             </Link>
           ))}
         </div>
@@ -86,13 +86,13 @@ export default function Navbar() {
         isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         {navLinks.map((link) => (
-          <Link key={link.path} href={link.path}>
-            <a 
-              className="font-display font-bold text-3xl text-white hover:text-primary hover:italic transition-all"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
+          <Link 
+            key={link.path} 
+            href={link.path}
+            className="font-display font-bold text-3xl text-white hover:text-primary hover:italic transition-all"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
               {link.name}
-            </a>
           </Link>
         ))}
         <div className="flex gap-6 mt-8">
