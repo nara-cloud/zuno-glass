@@ -33,7 +33,7 @@ export default function Home() {
         <div ref={heroRef} className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent z-10"></div>
           <img 
-            src="/images/003.webp" 
+            src="/images/006.webp" 
             alt="Zuno Hero" 
             className="w-full h-full object-cover opacity-60"
           />
