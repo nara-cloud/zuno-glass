@@ -3,6 +3,8 @@ import { Link } from 'wouter';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import CountdownTimer from '@/components/CountdownTimer';
+import LeadCapturePopup from '@/components/LeadCapturePopup';
 import { products } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Zap, Wind, Eye } from 'lucide-react';
@@ -26,6 +28,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Navbar />
+      <LeadCapturePopup />
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -60,6 +63,10 @@ export default function Home() {
               Óculos de alta performance projetados para quem vive em movimento constante. 
               Tecnologia ótica avançada para o atleta moderno.
             </p>
+
+            <div className="mb-12">
+              <CountdownTimer />
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-6 animate-in-up delay-300">
               <Link href="/products">
