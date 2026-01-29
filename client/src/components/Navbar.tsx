@@ -34,7 +34,7 @@ export default function Navbar() {
       <div className="container flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-            <img src="/images/logo-zuno.png" alt="ZUNO GLASS" className="h-12 w-auto object-contain brightness-0 invert" />
+            <img src="/images/logo-zuno.png" alt="ZUNO GLASS" className="h-20 w-auto object-contain brightness-0 invert" />
         </Link>
 
         {/* Desktop Nav */}
