@@ -83,7 +83,7 @@ export default function LeadCapturePopup() {
                   SEJA O PRIMEIRO A SABER
                 </h3>
                 <p className="font-body text-gray-400 mb-8 leading-relaxed">
-                  Cadastre-se para receber o link de compra 24h antes do lançamento oficial em 03/03. Estoque limitado.
+                  Cadastre-se para receber o link de compra 24h antes do lançamento oficial. Estoque limitado.
                 </p>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">

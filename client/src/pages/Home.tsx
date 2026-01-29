@@ -51,7 +51,7 @@ export default function Home() {
           <div className="max-w-4xl">
             <div className="inline-flex items-center gap-2 border border-primary/30 bg-black/50 backdrop-blur-sm px-4 py-2 mb-6 clip-corner">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-              <span className="font-display text-primary text-sm tracking-widest">LANÇAMENTO 03/03</span>
+              <span className="font-display text-primary text-sm tracking-widest">EM BREVE</span>
             </div>
             
             <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl leading-[0.9] text-white mb-8 animate-in-up delay-100">
@@ -65,15 +65,15 @@ export default function Home() {
             </p>
 
             <div className="mb-12">
-              <CountdownTimer />
+              {/* <CountdownTimer /> */}
             </div>
             
             <div className="flex flex-col sm:flex-row gap-6 animate-in-up delay-300">
-              <Link href="/products">
+              {/* <Link href="/products">
                 <Button size="lg" className="bg-primary text-black hover:bg-white font-display font-bold text-lg px-10 h-14 clip-corner tracking-wider">
                   EXPLORAR COLEÇÃO
                 </Button>
-              </Link>
+              </Link> */}
               <Link href="/try-on">
                 <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black font-display font-bold text-lg px-10 h-14 clip-corner tracking-wider">
                   TRY-ON VIRTUAL
@@ -109,9 +109,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* Featured Products - HIDDEN FOR TEASER MODE */}
+      {/* 
       <section className="py-32 bg-background relative overflow-hidden">
-        {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/5 to-transparent pointer-events-none"></div>
         <div className="absolute top-20 right-20 font-display font-bold text-[20rem] text-white/5 leading-none pointer-events-none select-none">
           ZUNO
@@ -137,6 +137,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      */}
 
       {/* Big Image Section */}
       <section className="h-[80vh] relative flex items-center overflow-hidden">

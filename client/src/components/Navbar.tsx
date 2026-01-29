@@ -17,7 +17,7 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'ÓCULOS', path: '/products' },
+    
     { name: 'PULSE', path: '/pulse' },
     { name: 'LAB', path: '/lab' },
     { name: 'PRO', path: '/pro' },
@@ -61,8 +61,8 @@ export default function Navbar() {
             <Search className="w-5 h-5" />
           </Button>
           <Button variant="ghost" size="icon" className="text-white hover:text-primary hover:bg-white/5 relative">
-            <ShoppingBag className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+            
+            
           </Button>
         </div>
 
@@ -94,7 +94,7 @@ export default function Navbar() {
             BUSCAR
           </Button>
           <Button variant="default" size="lg" className="bg-primary text-black hover:bg-white font-display tracking-wider font-bold">
-            CARRINHO (0)
+            
           </Button>
         </div>
       </div>
