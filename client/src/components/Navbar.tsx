@@ -34,13 +34,7 @@ export default function Navbar() {
       <div className="container flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative w-10 h-10 flex items-center justify-center bg-primary text-black font-display font-bold text-2xl clip-corner group-hover:bg-white transition-colors">
-              Z
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full group-hover:bg-primary transition-colors"></div>
-            </div>
-            <span className="font-display font-bold text-2xl tracking-wider text-white">
-              ZUNO
-            </span>
+            <img src="/images/logo-zuno.png" alt="ZUNO GLASS" className="h-12 w-auto object-contain" />
         </Link>
 
         {/* Desktop Nav */}

@@ -16,10 +16,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="md:col-span-4 flex flex-col gap-6">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary clip-corner flex items-center justify-center">
-                <span className="font-display font-bold text-black">Z</span>
-              </div>
-              <span className="font-display font-bold text-3xl text-white tracking-wider">ZUNO</span>
+              <img src="/images/logo-zuno.png" alt="ZUNO GLASS" className="h-10 w-auto object-contain" />
             </div>
             <p className="font-body text-gray-400 max-w-xs text-lg leading-relaxed">
               PARA QUEM VIVE NO LIMITE DA LUZ.
