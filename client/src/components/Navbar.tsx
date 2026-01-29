@@ -18,7 +18,9 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'ÓCULOS', path: '/products' },
-    { name: 'COMUNIDADE', path: '/community' },
+    { name: 'PULSE', path: '/pulse' },
+    { name: 'LAB', path: '/lab' },
+    { name: 'PRO', path: '/pro' },
     { name: 'TRY-ON VIRTUAL', path: '/try-on' },
     { name: 'SOBRE', path: '/about' },
   ];

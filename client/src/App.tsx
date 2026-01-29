@@ -9,6 +9,9 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import TryOn from "./pages/TryOn";
 import Community from "./pages/Community";
+import Pulse from "./pages/Pulse";
+import Lab from "./pages/Lab";
+import Pro from "./pages/Pro";
 
 
 function Router() {
@@ -19,6 +22,9 @@ function Router() {
       <Route path={"/product/:id"} component={ProductDetail} />
       <Route path={"/try-on"} component={TryOn} />
       <Route path={"/community"} component={Community} />
+      <Route path={"/pulse"} component={Pulse} />
+      <Route path={"/lab"} component={Lab} />
+      <Route path={"/pro"} component={Pro} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
