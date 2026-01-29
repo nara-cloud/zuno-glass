@@ -3,6 +3,26 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer utilities {
+  .animate-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-500 { animation-delay: 500ms; }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
 @theme inline {
   --font-display: "Chakra Petch", sans-serif;
   --font-body: "Rajdhani", sans-serif;

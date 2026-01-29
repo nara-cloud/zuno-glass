@@ -12,6 +12,7 @@ import Pulse from "./pages/Pulse";
 import Lab from "./pages/Lab";
 import Pro from "./pages/Pro";
 import About from "./pages/About";
+import FAQ from "./pages/FAQ";
 
 function Router() {
   return (
@@ -24,6 +25,7 @@ function Router() {
       <Route path={"/lab"} component={Lab} />
       <Route path={"/pro"} component={Pro} />
       <Route path={"/about"} component={About} />
+      <Route path={"/faq"} component={FAQ} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

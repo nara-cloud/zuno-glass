@@ -51,17 +51,17 @@ export default function Home() {
               <span className="font-display text-primary text-sm tracking-widest">NOVA COLEÇÃO 2026</span>
             </div>
             
-            <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl leading-[0.9] text-white mb-8">
+            <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl leading-[0.9] text-white mb-8 animate-in-up delay-100">
               LIMITE <br/>
               <span className="text-transparent text-stroke-neon italic pr-4">DA LUZ</span>
             </h1>
             
-            <p className="font-body text-xl md:text-2xl text-gray-300 max-w-xl mb-10 leading-relaxed border-l-2 border-primary pl-6">
+            <p className="font-body text-xl md:text-2xl text-gray-300 max-w-xl mb-10 leading-relaxed border-l-2 border-primary pl-6 animate-in-up delay-200">
               Óculos de alta performance projetados para quem vive em movimento constante. 
               Tecnologia ótica avançada para o atleta moderno.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6">
+            <div className="flex flex-col sm:flex-row gap-6 animate-in-up delay-300">
               <Link href="/products">
                 <Button size="lg" className="bg-primary text-black hover:bg-white font-display font-bold text-lg px-10 h-14 clip-corner tracking-wider">
                   EXPLORAR COLEÇÃO

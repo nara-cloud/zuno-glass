@@ -53,9 +53,9 @@ export default function Footer() {
             <ul className="flex flex-col gap-4">
               {['FAQ', 'Envio e Devoluções', 'Garantia', 'Guia de Tamanhos', 'Contato'].map((item) => (
                 <li key={item}>
-                  <a href="#" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">
+                  <Link href={item === 'FAQ' ? '/faq' : '#'} className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">
                     {item}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
