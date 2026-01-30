@@ -47,7 +47,7 @@ export default function LeadCapturePopup() {
           {/* Image Side */}
           <div className="relative h-64 md:h-auto hidden md:block">
             <img 
-              src="/images/teaser-reveal.jpg" 
+              src="/images/uploads/foto3_sem_marca(1).png" 
               alt="ZUNO Teaser" 
               className="absolute inset-0 w-full h-full object-cover"
             />

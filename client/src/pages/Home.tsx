@@ -32,18 +32,14 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Video with Parallax */}
+        {/* Background Image with Parallax */}
         <div ref={heroRef} className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent z-10"></div>
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            playsInline
+          <img 
+            src="/images/uploads/IMG_0253(1).jpeg" 
+            alt="Hero Banner" 
             className="w-full h-full object-cover opacity-60"
-          >
-            <source src="/images/hero-video.mp4" type="video/mp4" />
-          </video>
+          />
         </div>
 
         {/* Hero Content */}
@@ -142,7 +138,7 @@ export default function Home() {
       {/* Big Image Section */}
       <section className="h-[80vh] relative flex items-center overflow-hidden">
         <img 
-          src="/images/004.webp" 
+          src="/images/uploads/IMG_3546(1).jpeg" 
           alt="Lifestyle" 
           className="absolute inset-0 w-full h-full object-cover"
         />
