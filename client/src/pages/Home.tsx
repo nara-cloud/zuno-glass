@@ -36,7 +36,7 @@ export default function Home() {
         <div ref={heroRef} className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent z-10"></div>
           <img 
-            src="/images/uploads/IMG_0253(1).jpeg" 
+            src="/images/uploads/IMG_3622(1).jpeg" 
             alt="Hero Banner" 
             className="w-full h-full object-cover opacity-60"
           />
