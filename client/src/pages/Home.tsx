@@ -40,14 +40,14 @@ export default function Home() {
         <div className="absolute inset-0 z-0 bg-gradient-to-r from-background via-background/95 to-background/40"></div>
 
         {/* Athlete image - positioned right side, below navbar */}
-        <div ref={heroRef} className="absolute right-0 top-[10%] w-full md:w-[55%] h-[90%] z-[1] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent z-10"></div>
+        <div ref={heroRef} className="absolute right-0 top-[15%] w-full md:w-[55%] h-[85%] z-[1] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent z-10"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
           <img 
-            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/WLLPQcKOEUJYwpso.png" 
-            alt="Atleta correndo com óculos ZUNO GLASS" 
+            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/NThazqDkGcYfJAgq.png" 
+            alt="Atleta com óculos ZUNO GLASS em close" 
             className="w-full h-full object-cover"
-            style={{ objectPosition: '50% 15%', transform: 'scale(3)', transformOrigin: '50% 15%' }}
+            style={{ objectPosition: 'center 30%' }}
           />
         </div>
 
