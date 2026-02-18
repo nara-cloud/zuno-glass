@@ -39,20 +39,20 @@ export default function Home() {
         {/* Dark background base */}
         <div className="absolute inset-0 z-0 bg-gradient-to-r from-background via-background/95 to-background/40"></div>
 
-        {/* Athlete image - positioned right side */}
-        <div ref={heroRef} className="absolute right-0 top-0 w-full md:w-[60%] h-full z-[1]">
+        {/* Athlete image - positioned right side, below navbar */}
+        <div ref={heroRef} className="absolute right-0 top-0 w-full md:w-[55%] h-full z-[1]">
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent z-10"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
           <img 
             src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/WLLPQcKOEUJYwpso.png" 
             alt="Atleta correndo com óculos ZUNO GLASS" 
             className="w-full h-full object-cover"
-            style={{ objectPosition: '60% 20%' }}
+            style={{ objectPosition: '70% 40%' }}
           />
         </div>
 
-        {/* Hero Content - left side */}
-        <div className="container relative z-20 pt-36 md:pt-40">
+        {/* Hero Content - left side, below navbar */}
+        <div className="container relative z-20 pt-44 md:pt-48">
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 border border-primary/30 bg-black/50 backdrop-blur-sm px-4 py-2 mb-6 clip-corner">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>

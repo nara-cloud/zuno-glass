@@ -31,3 +31,5 @@
 - [x] Corrigir SEO: título da página (30-60 caracteres)
 - [x] Corrigir SEO: adicionar meta description (50-160 caracteres)
 - [x] Corrigir SEO: adicionar palavras-chave relevantes
+- [x] Mover rosto da atleta mais para direita e mais para baixo (fora da barra de menu)
+- [x] Mover badge "EM BREVE" para baixo da barra de menu
