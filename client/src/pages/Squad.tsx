@@ -9,7 +9,7 @@ export default function Squad() {
       id: 1,
       name: "ALEXIA STORM",
       sport: "URBAN RUNNING",
-      image: "/images/uploads/ZUNO-FEEDOUTUBRO.zip-19(1).png",
+      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/QtcCXfLHxIsmKmbd.png",
       bio: "Recordista sul-americana de 10km de rua. Conhecida por treinar nas madrugadas de São Paulo.",
       achievements: ["10k Record Holder", "Night Run Champion"],
       social: "@alexiastorm"
@@ -18,7 +18,7 @@ export default function Squad() {
       id: 2,
       name: "KAI ZEN",
       sport: "PARKOUR / FREERUNNING",
-      image: "/images/uploads/ZUNO-FEEDOUTUBRO.zip-22(1).png",
+      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/qAwYpxOkXdUsEimU.png",
       bio: "Desafia a gravidade nos arranha-céus de Tóquio. Onde você vê um muro, ele vê um caminho.",
       achievements: ["Red Bull Art of Motion Finalist", "Urban Flow Master"],
       social: "@kaizen_flow"
@@ -27,7 +27,7 @@ export default function Squad() {
       id: 3,
       name: "LUNA V",
       sport: "TRIATHLON",
-      image: "/images/uploads/ZUNO-FEEDOUTUBRO.zip-24(1).png",
+      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ZprAYfUVQCGmhqRu.png",
       bio: "Ironman finisher. Especialista em resistência mental e performance sob pressão extrema.",
       achievements: ["Ironman World Championship", "Endurance Elite"],
       social: "@luna_tri"
@@ -36,7 +36,7 @@ export default function Squad() {
       id: 4,
       name: "JAX 'GHOST'",
       sport: "CYCLING",
-      image: "/images/uploads/ZUNO-FEEDOUTUBRO.zip-12(1).png",
+      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OUTBhbLkSAqYGkGd.png",
       bio: "Velocista de critério. Domina as curvas fechadas e sprints finais com precisão cirúrgica.",
       achievements: ["Crit King 2025", "Sprint Specialist"],
       social: "@jax_ghost"
@@ -51,7 +51,7 @@ export default function Squad() {
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black z-10"></div>
-          <img src="/images/uploads/IMG_0253(1).jpeg" alt="Squad Hero" className="w-full h-full object-cover opacity-50 filter grayscale contrast-125" />
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/LBanMBbEhWfbgidZ.jpeg" alt="Squad Hero" className="w-full h-full object-cover opacity-50 filter grayscale contrast-125" />
         </div>
 
         <div className="container relative z-20 text-center">

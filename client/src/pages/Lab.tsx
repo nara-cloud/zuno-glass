@@ -90,7 +90,7 @@ export default function Lab() {
             <div className="w-full md:w-1/2">
               <div className="relative aspect-square md:aspect-video bg-black border border-white/10 overflow-hidden group">
                 <img 
-                  src="/images/uploads/ÓculosdeSol.zip-13(1).png" 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/BLDpyGWjjvJWflJW.png" 
                   alt="Lens Technology" 
                   className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" 
                 />

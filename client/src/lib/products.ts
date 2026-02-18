@@ -19,7 +19,7 @@ export const products: Product[] = [
     price: 499.90,
     description: 'Projetado para corredores de elite. O Velocity X1 oferece campo de visão expandido e ventilação aerodinâmica para evitar embaçamento em alta intensidade.',
     features: ['Lentes Fotocromáticas', 'Armação Ultra-leve TR90', 'Ventilação Active-Flow', 'Grip Antiderrapante'],
-    image: '/images/001.webp',
+    image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/EMXsxYHHvPVwNiQM.webp',
     category: 'performance',
     colors: ['#CCFF00', '#000000', '#FF3333'],
     isNew: true

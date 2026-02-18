@@ -36,9 +36,10 @@ export default function Home() {
         <div ref={heroRef} className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent z-10"></div>
           <img 
-            src="/images/uploads/foto2_sem_marca(2).png" 
-            alt="Hero Banner" 
+            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/KitoJHItjkoQcnCL.png" 
+            alt="Atleta correndo com óculos ZUNO GLASS" 
             className="w-full h-full object-cover opacity-60"
+            style={{ objectPosition: 'center 15%' }}
           />
         </div>
 
@@ -138,7 +139,7 @@ export default function Home() {
       {/* Big Image Section */}
       <section className="h-[80vh] relative flex items-center overflow-hidden">
         <img 
-          src="/images/uploads/IMG_3546(1).jpeg" 
+          src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/HFMwSMSaZdghVUuB.jpeg" 
           alt="Lifestyle" 
           className="absolute inset-0 w-full h-full object-cover"
         />

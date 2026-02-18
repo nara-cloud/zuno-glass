@@ -134,7 +134,7 @@ export default function Pulse() {
           <div className="w-full md:w-1/2 flex justify-center">
             <div className="relative w-64 h-[500px] bg-black border-4 border-gray-800 rounded-[3rem] shadow-2xl shadow-primary/20 overflow-hidden">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-xl z-20"></div>
-              <img src="/images/uploads/IMG_3546(1).jpeg" alt="App Interface" className="w-full h-full object-cover opacity-80" />
+              <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/KApJbWzmgRZYRSqJ.jpeg" alt="Atleta correndo com óculos ZUNO" className="w-full h-full object-cover opacity-80" />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10 flex flex-col justify-end p-6">
                 <h4 className="font-display font-bold text-2xl text-white mb-1">RUNNING</h4>
                 <p className="text-primary font-mono text-xl">00:42:15</p>

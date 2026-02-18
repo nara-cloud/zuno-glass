@@ -15,7 +15,7 @@ export default function Community() {
       level: "AVANÇADO",
       duration: "16 SEMANAS",
       author: "Coach Alex Silva",
-      image: "/images/001.webp"
+      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/EMXsxYHHvPVwNiQM.webp"
     },
     {
       title: "COUCH TO 5K",
