@@ -17,3 +17,5 @@
 - [x] Entry animations
 - [x] Atualizar foto do banner principal para nova imagem (IMG_1279.PNG) com foco no rosto/óculos
 - [x] Substituir imagem do casal no elevador (Pulse) pela nova foto da atleta correndo na pista
+- [x] Ajustar posicionamento da imagem hero para focar nos óculos (especialmente mobile)
+- [x] Corrigir: conteúdo do hero (imagem e badge EM BREVE) não deve invadir o espaço do menu de navegação

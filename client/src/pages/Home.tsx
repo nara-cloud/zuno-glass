@@ -38,13 +38,13 @@ export default function Home() {
           <img 
             src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/KitoJHItjkoQcnCL.png" 
             alt="Atleta correndo com óculos ZUNO GLASS" 
-            className="w-full h-full object-cover opacity-60"
-            style={{ objectPosition: 'center 15%' }}
+            className="w-full h-full object-cover opacity-60 scale-[2.2] md:scale-[1.6] translate-y-[15%] md:translate-y-[10%]"
+            style={{ objectPosition: 'center top' }}
           />
         </div>
 
         {/* Hero Content */}
-        <div className="container relative z-20 pt-20">
+        <div className="container relative z-20 pt-36 md:pt-40">
           <div className="max-w-4xl">
             <div className="inline-flex items-center gap-2 border border-primary/30 bg-black/50 backdrop-blur-sm px-4 py-2 mb-6 clip-corner">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
