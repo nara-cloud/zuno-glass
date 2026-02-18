@@ -43,3 +43,5 @@
 - [x] Mover foto da atleta mais 2x para a direita, especialmente no mobile
 - [x] Trocar imagem de fundo da seção "DOMINE O CAOS" pela foto da caixa ZUNO
 - [x] Corrigir: texto "LAB" no título "ZUNO LAB" invisível (preto sobre fundo escuro)
+- [x] Corrigir texto "SQUAD" invisível na página Squad (mesmo problema do LAB)
+- [x] Trocar imagem de fundo da página Squad pela foto dos corredores com óculos ZUNO

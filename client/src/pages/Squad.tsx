@@ -51,7 +51,7 @@ export default function Squad() {
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black z-10"></div>
-          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/LBanMBbEhWfbgidZ.jpeg" alt="Squad Hero" className="w-full h-full object-cover opacity-50 filter grayscale contrast-125" />
+          <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/AAqJuzYIRTfbdrLS.jpeg" alt="Squad Hero" className="w-full h-full object-cover opacity-50 filter contrast-125" />
         </div>
 
         <div className="container relative z-20 text-center">
@@ -61,7 +61,7 @@ export default function Squad() {
           </div>
 
           <h1 className="font-display font-bold text-6xl md:text-9xl mb-6 tracking-tighter">
-            ZUNO <span className="text-transparent text-stroke-white">SQUAD</span>
+            ZUNO <span className="bg-primary text-black px-4">SQUAD</span>
           </h1>
           <p className="font-body text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed">
             Não patrocinamos apenas atletas. Patrocinamos obsessões. Conheça quem leva a nossa tecnologia ao limite.
