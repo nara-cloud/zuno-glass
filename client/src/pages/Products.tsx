@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/lib/products';
+import { products, categories as productCategories } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import { Filter, SlidersHorizontal } from 'lucide-react';
 
@@ -15,9 +15,10 @@ export default function Products() {
 
   const categories = [
     { id: 'all', label: 'TODOS' },
-    { id: 'performance', label: 'PERFORMANCE' },
-    { id: 'lifestyle', label: 'LIFESTYLE' },
-    { id: 'tech', label: 'TECH' },
+    { id: 'sport', label: productCategories.sport.label },
+    { id: 'urban', label: productCategories.urban.label },
+    { id: 'premium', label: productCategories.premium.label },
+    { id: 'lifestyle', label: productCategories.lifestyle.label },
   ];
 
   return (
@@ -32,6 +33,9 @@ export default function Products() {
             <p className="font-body text-gray-400 max-w-md">
               Equipamento ótico de precisão para cada momento do seu dia.
               Escolha sua arma.
+            </p>
+            <p className="font-display text-primary text-sm mt-2 tracking-wider">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'MODELO' : 'MODELOS'}
             </p>
           </div>
           

@@ -27,7 +27,7 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const featuredProducts = products.slice(0, 3);
+  const featuredProducts = products.filter(p => p.isNew).slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">

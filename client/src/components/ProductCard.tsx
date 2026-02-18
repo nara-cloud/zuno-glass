@@ -1,7 +1,6 @@
 import { Link } from 'wouter';
 import { Product } from '@/lib/products';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -47,18 +46,25 @@ export default function ProductCard({ product }: ProductCardProps) {
               {product.tagline}
             </p>
           </div>
-          <span className="font-display font-bold text-lg text-white">
-            R$ {product.price.toFixed(2)}
-          </span>
+          {product.price > 0 ? (
+            <span className="font-display font-bold text-lg text-white">
+              R$ {product.price.toFixed(2)}
+            </span>
+          ) : (
+            <span className="font-display font-bold text-sm text-primary tracking-wider">
+              EM BREVE
+            </span>
+          )}
         </div>
 
-        {/* Color Dots */}
+        {/* Color Dots from variants */}
         <div className="flex gap-2 mt-4">
-          {product.colors.map((color, i) => (
+          {product.variants.map((variant, i: number) => (
             <div 
               key={i} 
               className="w-3 h-3 rounded-full border border-white/20"
-              style={{ backgroundColor: color }}
+              style={{ backgroundColor: variant.color }}
+              title={variant.colorName}
             ></div>
           ))}
         </div>

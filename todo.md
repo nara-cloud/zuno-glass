@@ -33,3 +33,6 @@
 - [x] Corrigir SEO: adicionar palavras-chave relevantes
 - [x] Mover rosto da atleta mais para direita e mais para baixo (fora da barra de menu)
 - [x] Mover badge "EM BREVE" para baixo da barra de menu
+- [x] Upload dos 32 modelos de óculos do lançamento para CDN
+- [x] Atualizar catálogo de produtos (products.ts) com modelos reais ZUNO GLASS
+- [x] Atualizar páginas de produtos e home com novos modelos
