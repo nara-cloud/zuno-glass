@@ -20,3 +20,4 @@
 - [x] Ajustar posicionamento da imagem hero para focar nos óculos (especialmente mobile)
 - [x] Corrigir: conteúdo do hero (imagem e badge EM BREVE) não deve invadir o espaço do menu de navegação
 - [x] Posicionar rosto da atleta na área direita do hero (sem texto), texto fica à esquerda
+- [x] Reposicionar rosto da atleta para ficar à direita na mesma altura de "LIMITE DA LUZ"

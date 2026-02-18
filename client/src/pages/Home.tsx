@@ -31,21 +31,25 @@ export default function Home() {
       <LeadCapturePopup />
 
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Parallax */}
-        <div ref={heroRef} className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent z-10"></div>
+      <section className="relative h-screen flex items-center overflow-hidden bg-background">
+        {/* Dark background base */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-background via-background/95 to-background/40"></div>
+
+        {/* Athlete image - positioned right side */}
+        <div ref={heroRef} className="absolute right-0 top-0 w-full md:w-[60%] h-full z-[1]">
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
           <img 
             src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/KitoJHItjkoQcnCL.png" 
             alt="Atleta correndo com óculos ZUNO GLASS" 
-            className="w-full h-full object-cover opacity-60"
-            style={{ objectPosition: '80% 10%' }}
+            className="w-full h-full object-cover"
+            style={{ objectPosition: '50% 15%' }}
           />
         </div>
 
-        {/* Hero Content */}
+        {/* Hero Content - left side */}
         <div className="container relative z-20 pt-36 md:pt-40">
-          <div className="max-w-4xl">
+          <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 border border-primary/30 bg-black/50 backdrop-blur-sm px-4 py-2 mb-6 clip-corner">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
               <span className="font-display text-primary text-sm tracking-widest">EM BREVE</span>
@@ -56,7 +60,7 @@ export default function Home() {
               <span className="text-transparent text-stroke-neon italic pr-4">DA LUZ</span>
             </h1>
             
-            <p className="font-body text-xl md:text-2xl text-gray-300 max-w-xl mb-10 leading-relaxed border-l-2 border-primary pl-6 animate-in-up delay-200">
+            <p className="font-body text-xl md:text-2xl text-gray-300 max-w-md mb-10 leading-relaxed border-l-2 border-primary pl-6 animate-in-up delay-200">
               Óculos de alta performance projetados para quem vive em movimento constante. 
               Tecnologia ótica avançada para o atleta moderno.
             </p>
@@ -66,11 +70,6 @@ export default function Home() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-6 animate-in-up delay-300">
-              {/* <Link href="/products">
-                <Button size="lg" className="bg-primary text-black hover:bg-white font-display font-bold text-lg px-10 h-14 clip-corner tracking-wider">
-                  EXPLORAR COLEÇÃO
-                </Button>
-              </Link> */}
               <Link href="/try-on">
                 <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black font-display font-bold text-lg px-10 h-14 clip-corner tracking-wider">
                   TRY-ON VIRTUAL
