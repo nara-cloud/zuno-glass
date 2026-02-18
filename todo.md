@@ -38,3 +38,4 @@
 - [x] Atualizar páginas de produtos e home com novos modelos
 - [x] Ajustar foto da atleta no hero: mais para direita e mais para baixo, focar no rosto/óculos
 - [x] Corrigir SEO: reduzir palavras-chave de 9 para máximo 8
+- [x] Aumentar imagem da atleta no hero 3x (zoom no rosto/óculos)
