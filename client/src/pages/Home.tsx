@@ -141,7 +141,7 @@ export default function Home() {
       {/* Big Image Section */}
       <section className="h-[80vh] relative flex items-center overflow-hidden">
         <img 
-          src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/HFMwSMSaZdghVUuB.jpeg" 
+          src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ZRnyhYPsnkScXGDq.jpeg" 
           alt="Lifestyle" 
           className="absolute inset-0 w-full h-full object-cover"
         />
