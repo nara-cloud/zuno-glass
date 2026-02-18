@@ -40,3 +40,4 @@
 - [x] Corrigir SEO: reduzir palavras-chave de 9 para máximo 8
 - [x] Aumentar imagem da atleta no hero 3x (zoom no rosto/óculos)
 - [x] Mover foto da atleta 3x mais para a direita no hero banner (recortada focando nos óculos)
+- [x] Mover foto da atleta mais 2x para a direita, especialmente no mobile

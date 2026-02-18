@@ -46,8 +46,7 @@ export default function Home() {
           <img 
             src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/NThazqDkGcYfJAgq.png" 
             alt="Atleta com óculos ZUNO GLASS em close" 
-            className="w-full h-full object-cover"
-            style={{ objectPosition: 'center 30%' }}
+            className="w-full h-full object-cover object-[45%_25%] md:object-[55%_30%]"
           />
         </div>
 
