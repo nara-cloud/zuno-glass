@@ -45,3 +45,4 @@
 - [x] Corrigir: texto "LAB" no título "ZUNO LAB" invisível (preto sobre fundo escuro)
 - [x] Corrigir texto "SQUAD" invisível na página Squad (mesmo problema do LAB)
 - [x] Trocar imagem de fundo da página Squad pela foto dos corredores com óculos ZUNO
+- [x] Atualizar links das redes sociais com URLs reais (Instagram, Facebook, TikTok; X e LinkedIn como placeholder)

@@ -1,7 +1,32 @@
 import { Link } from 'wouter';
-import { Instagram, Twitter, Facebook, Youtube, ArrowRight } from 'lucide-react';
+import { Instagram, Facebook, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+
+// Custom TikTok icon (not available in lucide-react)
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.7a8.16 8.16 0 0 0 4.76 1.52v-3.4a4.85 4.85 0 0 1-1-.13z"/>
+    </svg>
+  );
+}
+
+// Custom X (Twitter) icon
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  );
+}
+
+const socialLinks = [
+  { Icon: Instagram, href: "https://www.instagram.com/zuno.glass/", label: "Instagram" },
+  { Icon: Facebook, href: "https://www.facebook.com/profile.php?id=61581944526033", label: "Facebook" },
+  { Icon: TikTokIcon, href: "https://www.tiktok.com/@zuno.glass", label: "TikTok" },
+  { Icon: XIcon, href: "#", label: "X (em breve)" },
+];
 
 export default function Footer() {
   return (
@@ -23,8 +48,15 @@ export default function Footer() {
               Performance ótica avançada para atletas que desafiam o impossível.
             </p>
             <div className="flex gap-4 mt-4">
-              {[Instagram, Twitter, Facebook, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-10 h-10 border border-white/20 flex items-center justify-center text-white hover:bg-primary hover:text-black hover:border-primary transition-all clip-corner">
+              {socialLinks.map(({ Icon, href, label }) => (
+                <a 
+                  key={label} 
+                  href={href} 
+                  target={href !== "#" ? "_blank" : undefined}
+                  rel={href !== "#" ? "noopener noreferrer" : undefined}
+                  title={label}
+                  className="w-10 h-10 border border-white/20 flex items-center justify-center text-white hover:bg-primary hover:text-black hover:border-primary transition-all clip-corner"
+                >
                   <Icon className="w-5 h-5" />
                 </a>
               ))}
