@@ -36,5 +36,5 @@
 - [x] Upload dos 32 modelos de óculos do lançamento para CDN
 - [x] Atualizar catálogo de produtos (products.ts) com modelos reais ZUNO GLASS
 - [x] Atualizar páginas de produtos e home com novos modelos
-- [ ] Ajustar foto da atleta no hero: mais para direita e mais para baixo, focar no rosto/óculos
+- [x] Ajustar foto da atleta no hero: mais para direita e mais para baixo, focar no rosto/óculos
 - [x] Corrigir SEO: reduzir palavras-chave de 9 para máximo 8
