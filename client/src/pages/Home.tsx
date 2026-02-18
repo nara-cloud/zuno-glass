@@ -13,6 +13,10 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    document.title = 'ZUNO GLASS | Óculos Esportivos de Alta Performance';
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       if (heroRef.current) {
         const scrolled = window.scrollY;

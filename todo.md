@@ -22,3 +22,12 @@
 - [x] Posicionar rosto da atleta na área direita do hero (sem texto), texto fica à esquerda
 - [x] Reposicionar rosto da atleta para ficar à direita na mesma altura de "LIMITE DA LUZ"
 - [x] Recortar imagem da atleta para focar no rosto/óculos e atualizar no hero banner
+- [x] Configurar infraestrutura Stripe (webdev_add_feature + secrets)
+- [ ] Implementar schema de base de dados para pedidos e pagamentos
+- [ ] Implementar rotas tRPC para checkout e webhooks Stripe
+- [ ] Implementar UI de carrinho e página de checkout
+- [ ] Implementar página de sucesso/cancelamento de pagamento
+- [ ] Escrever testes para a integração Stripe
+- [x] Corrigir SEO: título da página (30-60 caracteres)
+- [x] Corrigir SEO: adicionar meta description (50-160 caracteres)
+- [x] Corrigir SEO: adicionar palavras-chave relevantes
