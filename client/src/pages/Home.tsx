@@ -38,8 +38,8 @@ export default function Home() {
           <img 
             src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/KitoJHItjkoQcnCL.png" 
             alt="Atleta correndo com óculos ZUNO GLASS" 
-            className="w-full h-full object-cover opacity-60 scale-[2.2] md:scale-[1.6] translate-y-[15%] md:translate-y-[10%]"
-            style={{ objectPosition: 'center top' }}
+            className="w-full h-full object-cover opacity-60"
+            style={{ objectPosition: '80% 10%' }}
           />
         </div>
 
