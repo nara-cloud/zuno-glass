@@ -40,10 +40,10 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-transparent z-10"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10"></div>
           <img 
-            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/KitoJHItjkoQcnCL.png" 
+            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/WLLPQcKOEUJYwpso.png" 
             alt="Atleta correndo com óculos ZUNO GLASS" 
             className="w-full h-full object-cover"
-            style={{ objectPosition: '50% 15%' }}
+            style={{ objectPosition: '60% 20%' }}
           />
         </div>
 
