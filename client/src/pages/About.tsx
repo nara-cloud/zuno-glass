@@ -1,76 +1,86 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
-import { Zap, Shield, Eye, Activity, Target, Layers } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white selection:bg-primary selection:text-black">
       <Navbar />
-
-      {/* Hero Section - Manifesto */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-[url('/images/005.webp')] bg-cover bg-center opacity-20"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background"></div>
-        
-        <div className="container relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 border border-primary/30 bg-black/50 backdrop-blur-sm px-4 py-2 mb-8 clip-corner">
-              <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-              <span className="font-display text-primary text-sm tracking-widest">MANIFESTO ZUNO</span>
-            </div>
-            
-            <h1 className="font-display font-bold text-5xl md:text-7xl lg:text-8xl leading-none text-white mb-10">
-              NÃO SEGUIMOS <br/>
-              <span className="text-transparent text-stroke-neon italic">A LUZ.</span> <br/>
-              NÓS A <span className="text-primary">DOMINAMOS.</span>
-            </h1>
-            
-            <p className="font-body text-xl text-gray-300 leading-relaxed mb-12 max-w-2xl mx-auto">
-              A ZUNO nasceu de uma obsessão: eliminar a barreira entre o atleta e o ambiente. 
-              Acreditamos que a visão é o sentido primário da velocidade. Se você não pode ver o limite, 
-              você não pode quebrá-lo.
-            </p>
+      
+      {/* Hero */}
+      <section className="pt-32 pb-20 container">
+        <div className="max-w-4xl">
+          <div className="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-4 py-2 rounded-full mb-8">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+            <span className="font-display font-bold text-primary text-sm tracking-widest">SOBRE NÓS</span>
           </div>
+          
+          <h1 className="font-display font-bold text-5xl md:text-7xl text-white mb-8 leading-tight">
+            PARA QUEM VIVE <br/>
+            <span className="text-primary">NO LIMITE DA LUZ</span>
+          </h1>
         </div>
       </section>
 
-      {/* The Mission - Grid Layout */}
-      <section className="py-20 bg-black/50">
+      {/* Manifesto */}
+      <section className="py-20 border-t border-white/10">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div className="relative">
-              <div className="absolute -top-10 -left-10 w-40 h-40 border-t-2 border-l-2 border-primary/30"></div>
-              <img 
-                src="/images/003.webp" 
-                alt="Zuno Lab" 
-                className="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500 clip-corner"
-              />
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 border-b-2 border-r-2 border-primary/30"></div>
-            </div>
-            
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             <div>
-              <h2 className="font-display font-bold text-4xl text-white mb-6">
-                ENGENHARIA DO <span className="text-primary">CAOS</span>
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-white mb-8">
+                NOSSA <span className="text-primary">HISTÓRIA</span>
               </h2>
-              <p className="font-body text-gray-400 mb-6 leading-relaxed">
-                O mundo real é sujo, rápido e imprevisível. Nossos laboratórios não simulam apenas dias de sol; 
-                simulamos tempestades de areia, reflexos cegantes de asfalto molhado e a escuridão súbita de túneis.
-              </p>
-              <p className="font-body text-gray-400 mb-8 leading-relaxed">
-                Cada armação ZUNO é esculpida em Carbono Forjado ou TR-90 de grau aeroespacial. 
-                Leveza não é luxo, é necessidade.
-              </p>
-              
-              <div className="grid grid-cols-2 gap-6">
-                <div className="border-l-2 border-primary pl-4">
-                  <h3 className="font-display font-bold text-2xl text-white">40%</h3>
-                  <p className="text-sm text-gray-500">MAIS LEVE QUE O PADRÃO</p>
+              <div className="space-y-6 font-body text-gray-400 text-lg leading-relaxed">
+                <p>
+                  A ZUNO nasceu da necessidade real de atletas que não encontravam óculos esportivos 
+                  com a combinação certa de performance óptica, leveza e design. Óculos que aguentassem 
+                  o ritmo sem comprometer o estilo.
+                </p>
+                <p>
+                  Começamos ouvindo corredores, ciclistas e praticantes de beach tennis. Entendemos 
+                  suas frustrações: óculos que escorregam, lentes que embaçam, armações que pesam. 
+                  A partir daí, projetamos cada modelo para resolver problemas reais.
+                </p>
+                <p>
+                  Hoje, a ZUNO é uma marca que combina performance óptica com design esportivo premium. 
+                  Cada óculos é testado em condições reais de uso antes de chegar ao mercado.
+                </p>
+              </div>
+            </div>
+            <div>
+              <h2 className="font-display font-bold text-3xl md:text-4xl text-white mb-8">
+                NOSSOS <span className="text-primary">VALORES</span>
+              </h2>
+              <div className="space-y-8">
+                <div className="border-l-2 border-primary pl-6">
+                  <h3 className="font-display font-bold text-xl text-white mb-2">HONESTIDADE</h3>
+                  <p className="text-gray-400 leading-relaxed">
+                    Não prometemos o que não entregamos. Nossos óculos são projetados para performance 
+                    óptica e esportiva. Sem exageros técnicos, sem marketing enganoso.
+                  </p>
                 </div>
-                <div className="border-l-2 border-primary pl-4">
-                  <h3 className="font-display font-bold text-2xl text-white">0.02s</h3>
-                  <p className="text-sm text-gray-500">TEMPO DE REAÇÃO DA LENTE</p>
+                <div className="border-l-2 border-primary pl-6">
+                  <h3 className="font-display font-bold text-xl text-white mb-2">PERFORMANCE REAL</h3>
+                  <p className="text-gray-400 leading-relaxed">
+                    Cada modelo é testado por atletas reais em condições reais. Corrida, ciclismo, 
+                    beach tennis. Se não funciona no campo, não vai para a prateleira.
+                  </p>
+                </div>
+                <div className="border-l-2 border-primary pl-6">
+                  <h3 className="font-display font-bold text-xl text-white mb-2">COMUNIDADE</h3>
+                  <p className="text-gray-400 leading-relaxed">
+                    Acreditamos que o esporte é coletivo. A comunidade ZUNO é o coração da marca — 
+                    atletas que compartilham a mesma obsessão por performance e estilo.
+                  </p>
+                </div>
+                <div className="border-l-2 border-primary pl-6">
+                  <h3 className="font-display font-bold text-xl text-white mb-2">EVOLUÇÃO CONSTANTE</h3>
+                  <p className="text-gray-400 leading-relaxed">
+                    Estamos construindo um ecossistema. Os óculos são o começo. O app, a comunidade 
+                    e os desafios são os próximos passos. Evoluímos junto com nossos atletas.
+                  </p>
                 </div>
               </div>
             </div>
@@ -78,83 +88,61 @@ export default function About() {
         </div>
       </section>
 
-      {/* Technology - Cards */}
-      <section className="py-32 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
-        
-        <div className="container relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="font-display font-bold text-5xl text-white mb-4">TECNOLOGIA <span className="text-stroke-neon">Z-CORE</span></h2>
-            <p className="text-gray-400 max-w-xl mx-auto">O sistema proprietário que define cada par de óculos ZUNO.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { 
-                icon: Layers, 
-                title: "LENTES Z-POLAR", 
-                desc: "Polarização seletiva que filtra 99.9% do brilho horizontal sem apagar telas digitais ou painéis de instrumentos." 
-              },
-              { 
-                icon: Shield, 
-                title: "ESCUDO BALÍSTICO", 
-                desc: "Policarbonato injetado testado contra impactos de alta velocidade. Proteção ANSI Z87.1+ como padrão." 
-              },
-              { 
-                icon: Target, 
-                title: "FOCO ADAPTATIVO", 
-                desc: "Curvatura da lente otimizada para visão periférica sem distorção, essencial para ciclistas e corredores." 
-              },
-              { 
-                icon: Activity, 
-                title: "GRIP HIDROFÓBICO", 
-                desc: "Hastes e plaquetas em Unobtainium que aumentam a aderência quando você transpira." 
-              },
-              { 
-                icon: Zap, 
-                title: "REAÇÃO FOTÔNICA", 
-                desc: "Moléculas fotossensíveis que escurecem a lente instantaneamente sob UV e clareiam na sombra." 
-              },
-              { 
-                icon: Eye, 
-                title: "CONTRASTE AUMENTADO", 
-                desc: "Filtros de cor específicos que destacam buracos, raízes e relevo no asfalto ou trilha." 
-              }
-            ].map((tech, i) => (
-              <div key={i} className="bg-white/5 backdrop-blur-sm p-8 border border-white/10 hover:border-primary hover:bg-white/10 transition-all duration-300 group clip-corner">
-                <div className="w-14 h-14 bg-black flex items-center justify-center mb-6 group-hover:scale-110 transition-transform border border-white/20 group-hover:border-primary">
-                  <tech.icon className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="font-display font-bold text-xl text-white mb-3">{tech.title}</h3>
-                <p className="font-body text-gray-400 text-sm leading-relaxed">{tech.desc}</p>
-              </div>
-            ))}
+      {/* Ecossistema */}
+      <section className="py-20 bg-white/5 border-y border-white/10">
+        <div className="container text-center">
+          <h2 className="font-display font-bold text-4xl md:text-5xl mb-8 text-white">
+            ECOSSISTEMA <span className="text-primary">EM CONSTRUÇÃO</span>
+          </h2>
+          <p className="font-body text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed mb-12">
+            A ZUNO é mais do que óculos. Estamos construindo um ecossistema completo para atletas 
+            que vivem o esporte com intensidade.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            <div className="bg-black border border-primary/50 p-6 clip-corner">
+              <div className="text-primary font-display font-bold text-lg mb-2">ÓCULOS</div>
+              <p className="text-gray-500 text-sm">Performance óptica e design esportivo</p>
+              <div className="mt-4 text-primary text-xs font-mono">DISPONÍVEL</div>
+            </div>
+            <div className="bg-black border border-white/10 p-6 clip-corner">
+              <div className="text-white font-display font-bold text-lg mb-2">COMUNIDADE</div>
+              <p className="text-gray-500 text-sm">Desafios, eventos e conexão entre atletas</p>
+              <div className="mt-4 text-gray-500 text-xs font-mono">EM CONSTRUÇÃO</div>
+            </div>
+            <div className="bg-black border border-white/10 p-6 clip-corner">
+              <div className="text-white font-display font-bold text-lg mb-2">APP</div>
+              <p className="text-gray-500 text-sm">Treinos, ranking e gamificação</p>
+              <div className="mt-4 text-gray-500 text-xs font-mono">EM DESENVOLVIMENTO</div>
+            </div>
+            <div className="bg-black border border-white/10 p-6 clip-corner">
+              <div className="text-white font-display font-bold text-lg mb-2">SQUAD</div>
+              <p className="text-gray-500 text-sm">Embaixadores e atletas patrocinados</p>
+              <div className="mt-4 text-primary text-xs font-mono">ATIVO</div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-32 bg-primary text-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/noise.png')] opacity-10 mix-blend-overlay"></div>
-        <div className="container relative z-10 text-center">
-          <h2 className="font-display font-bold text-6xl md:text-8xl mb-8 tracking-tighter">
-            JUNTE-SE AO <br/> MOVIMENTO
-          </h2>
-          <p className="font-body font-bold text-xl mb-10 max-w-2xl mx-auto">
-            Não somos apenas uma marca de óculos. Somos uma comunidade de obcecados por performance.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <Link href="/products">
-              <Button size="lg" className="bg-black text-white hover:bg-white hover:text-black border-2 border-black font-display font-bold text-lg px-12 h-16 clip-corner">
-                COMPRAR AGORA
-              </Button>
-            </Link>
-            <Link href="/pulse">
-              <Button variant="outline" size="lg" className="bg-transparent text-black border-2 border-black hover:bg-black hover:text-white font-display font-bold text-lg px-12 h-16 clip-corner">
-                ACESSAR ZUNO PULSE
-              </Button>
-            </Link>
-          </div>
+      {/* CTA */}
+      <section className="py-32 container text-center">
+        <h2 className="font-display font-bold text-4xl md:text-6xl mb-6">
+          FAÇA PARTE DA <span className="text-primary">ZUNO</span>
+        </h2>
+        <p className="font-body text-gray-400 max-w-xl mx-auto mb-10 text-lg">
+          Descubra a coleção, junte-se à comunidade e evolua com a gente.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/products">
+            <Button className="bg-primary text-black hover:bg-white font-display font-bold px-10 h-14 tracking-wider text-lg clip-corner">
+              VER COLEÇÃO <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </Link>
+          <Link href="/community">
+            <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black font-display font-bold px-10 h-14 tracking-wider text-lg">
+              COMUNIDADE
+            </Button>
+          </Link>
         </div>
       </section>
 

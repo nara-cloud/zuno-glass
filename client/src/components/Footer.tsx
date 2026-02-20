@@ -45,7 +45,7 @@ export default function Footer() {
             </div>
             <p className="font-body text-gray-400 max-w-xs text-lg leading-relaxed">
               PARA QUEM VIVE NO LIMITE DA LUZ.
-              Performance ótica avançada para atletas que desafiam o impossível.
+              Óculos esportivos de alta performance. Design, proteção UV400 e leveza para o seu esporte.
             </p>
             <div className="flex gap-4 mt-4">
               {socialLinks.map(({ Icon, href, label }) => (
@@ -65,15 +65,13 @@ export default function Footer() {
 
           {/* Links Columns */}
           <div className="md:col-span-2">
-            <h4 className="font-display font-bold text-white text-lg mb-6">SHOP</h4>
+            <h4 className="font-display font-bold text-white text-lg mb-6">EXPLORAR</h4>
             <ul className="flex flex-col gap-4">
-              {['Lançamentos', 'Performance', 'Lifestyle', 'Tech', 'Acessórios'].map((item) => (
-                <li key={item}>
-                  <a href="#" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">
-                    {item}
-                  </a>
-                </li>
-              ))}
+              <li><Link href="/products" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">Coleção</Link></li>
+              <li><Link href="/lab" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">Lab</Link></li>
+              <li><Link href="/squad" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">Squad</Link></li>
+              <li><Link href="/community" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">Comunidade</Link></li>
+              <li><Link href="/app" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">App</Link></li>
             </ul>
           </div>
 
@@ -94,7 +92,7 @@ export default function Footer() {
           <div className="md:col-span-4">
             <h4 className="font-display font-bold text-white text-lg mb-6">FIQUE NO LOOP</h4>
             <p className="font-body text-gray-400 mb-6">
-              Receba atualizações sobre lançamentos exclusivos e tecnologia ótica.
+              Receba atualizações sobre lançamentos, desafios e novidades da comunidade ZUNO.
             </p>
             <div className="flex gap-2">
               <Input 

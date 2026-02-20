@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, X, ShoppingBag, Search } from 'lucide-react';
+import { Menu, X, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
@@ -17,12 +17,12 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'PULSE', path: '/pulse' },
+    { name: 'COLEÇÃO', path: '/products' },
     { name: 'LAB', path: '/lab' },
     { name: 'SQUAD', path: '/squad' },
-    { name: 'PRO', path: '/pro' },
-    { name: 'TRY-ON VIRTUAL', path: '/try-on' },
-    { name: 'SOBRE', path: '/about' },
+    { name: 'COMUNIDADE', path: '/community' },
+    { name: 'APP', path: '/app' },
+    { name: 'FAQ', path: '/faq' },
   ];
 
   return (
@@ -57,13 +57,11 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="text-white hover:text-primary hover:bg-white/5">
-            <Search className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="text-white hover:text-primary hover:bg-white/5 relative">
-            
-            
-          </Button>
+          <Link href="/try-on">
+            <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-black font-display font-bold text-xs tracking-wider">
+              TRY-ON
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -89,14 +87,11 @@ export default function Navbar() {
               {link.name}
           </Link>
         ))}
-        <div className="flex gap-6 mt-8">
-          <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-primary hover:text-black hover:border-primary font-display tracking-wider">
-            BUSCAR
+        <Link href="/try-on" onClick={() => setIsMobileMenuOpen(false)}>
+          <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-black font-display tracking-wider font-bold mt-4">
+            TRY-ON VIRTUAL
           </Button>
-          <Button variant="default" size="lg" className="bg-primary text-black hover:bg-white font-display tracking-wider font-bold">
-            
-          </Button>
-        </div>
+        </Link>
       </div>
     </nav>
   );

@@ -57,7 +57,7 @@ export default function LeadCapturePopup() {
                 ACESSO <span className="text-primary">VIP</span>
               </div>
               <p className="font-body text-gray-300 text-sm max-w-[200px]">
-                Garanta seu lugar na fila para o lançamento mais aguardado do ano.
+                Receba novidades e acesso antecipado ao lançamento.
               </p>
             </div>
           </div>
@@ -83,7 +83,7 @@ export default function LeadCapturePopup() {
                   SEJA O PRIMEIRO A SABER
                 </h3>
                 <p className="font-body text-gray-400 mb-8 leading-relaxed">
-                  Cadastre-se para receber o link de compra 24h antes do lançamento oficial. Estoque limitado.
+                  Cadastre-se para receber novidades sobre o lançamento e acesso antecipado à coleção.
                 </p>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -115,7 +115,7 @@ export default function LeadCapturePopup() {
                   VOCÊ ESTÁ DENTRO
                 </h3>
                 <p className="font-body text-gray-400">
-                  Fique atento ao seu email. O futuro chega em breve.
+                  Fique atento ao seu email. Vamos te avisar sobre o lançamento.
                 </p>
               </div>
             )}

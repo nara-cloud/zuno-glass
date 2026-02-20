@@ -7,7 +7,7 @@ import CountdownTimer from '@/components/CountdownTimer';
 import LeadCapturePopup from '@/components/LeadCapturePopup';
 import { products } from '@/lib/products';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Zap, Wind, Eye } from 'lucide-react';
+import { ArrowRight, Eye, Shield, Feather } from 'lucide-react';
 
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -55,7 +55,7 @@ export default function Home() {
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 border border-primary/30 bg-black/50 backdrop-blur-sm px-4 py-2 mb-6 clip-corner">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-              <span className="font-display text-primary text-sm tracking-widest">EM BREVE</span>
+              <span className="font-display text-primary text-sm tracking-widest">LANÇAMENTO 03/03</span>
             </div>
             
             <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl leading-[0.9] text-white mb-8 animate-in-up delay-100">
@@ -64,8 +64,8 @@ export default function Home() {
             </h1>
             
             <p className="font-body text-xl md:text-2xl text-gray-300 max-w-md mb-10 leading-relaxed border-l-2 border-primary pl-6 animate-in-up delay-200">
-              Óculos de alta performance projetados para quem vive em movimento constante. 
-              Tecnologia ótica avançada para o atleta moderno.
+              Óculos de alta performance projetados para quem vive em movimento. 
+              Proteção UV400, leveza extrema e design esportivo.
             </p>
 
             <div className="mb-12">
@@ -73,6 +73,11 @@ export default function Home() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-6 animate-in-up delay-300">
+              <Link href="/products">
+                <Button size="lg" className="bg-primary text-black hover:bg-white font-display font-bold text-lg px-10 h-14 clip-corner tracking-wider">
+                  VER COLEÇÃO
+                </Button>
+              </Link>
               <Link href="/try-on">
                 <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black font-display font-bold text-lg px-10 h-14 clip-corner tracking-wider">
                   TRY-ON VIRTUAL
@@ -94,9 +99,9 @@ export default function Home() {
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Zap, title: "VISÃO INSTANTÂNEA", desc: "Lentes fotocromáticas que reagem em milissegundos às mudanças de luz." },
-              { icon: Wind, title: "AERODINÂMICA PURA", desc: "Design testado em túnel de vento para zero resistência e estabilidade total." },
-              { icon: Eye, title: "CLAREZA HD", desc: "Polarização seletiva que elimina reflexos sem comprometer a leitura de telas." }
+              { icon: Shield, title: "PROTEÇÃO UV400", desc: "Bloqueio total de raios UVA e UVB. Proteção real para os seus olhos durante treinos e competições." },
+              { icon: Feather, title: "LEVEZA EXTREMA", desc: "Armações ultraeves que você esquece que está usando. Conforto absoluto em qualquer atividade." },
+              { icon: Eye, title: "CLAREZA ÓPTICA", desc: "Lentes de alta definição com tratamento anti-reflexo para visão nítida em todas as condições." }
             ].map((feature, i) => (
               <div key={i} className="bg-white/5 p-10 border border-white/10 hover:border-primary/50 transition-colors group clip-corner">
                 <feature.icon className="w-12 h-12 text-primary mb-6 group-hover:scale-110 transition-transform duration-300" />
@@ -108,41 +113,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Products - HIDDEN FOR TEASER MODE */}
-      {/* 
-      <section className="py-32 bg-background relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/5 to-transparent pointer-events-none"></div>
-        <div className="absolute top-20 right-20 font-display font-bold text-[20rem] text-white/5 leading-none pointer-events-none select-none">
-          ZUNO
-        </div>
-
-        <div className="container relative z-10">
-          <div className="flex justify-between items-end mb-16">
-            <div>
-              <h2 className="font-display font-bold text-5xl text-white mb-4">DESTAQUES</h2>
-              <div className="h-1 w-20 bg-primary"></div>
-            </div>
-            <Link href="/products">
-              <Button variant="link" className="text-white hover:text-primary font-display tracking-widest group">
-                VER TODOS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
-      */}
-
       {/* Big Image Section */}
       <section className="h-[80vh] relative flex items-center overflow-hidden">
         <img 
           src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ZRnyhYPsnkScXGDq.jpeg" 
-          alt="Lifestyle" 
+          alt="Embalagem ZUNO GLASS" 
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/40"></div>
@@ -150,15 +125,68 @@ export default function Home() {
         <div className="container relative z-10 flex justify-end">
           <div className="max-w-2xl bg-black/80 backdrop-blur-md p-12 border-l-4 border-primary clip-corner-top-right">
             <h2 className="font-display font-bold text-5xl text-white mb-6">
-              DOMINE O <span className="text-primary italic">CAOS</span>
+              FEITO PARA <span className="text-primary italic">DURAR</span>
             </h2>
             <p className="font-body text-xl text-gray-300 mb-8 leading-relaxed">
-              A cidade é imprevisível. Seus óculos não deveriam ser. 
-              A linha Urban Drift combina proteção de nível militar com estética streetwear.
+              Design esportivo premium com materiais resistentes e acabamento impecável. 
+              Cada detalhe pensado para quem exige o melhor.
             </p>
-            <Button className="bg-white text-black hover:bg-primary font-display font-bold px-8 py-6 clip-corner">
-              CONHEÇA A LINHA URBAN
-            </Button>
+            <Link href="/products">
+              <Button className="bg-white text-black hover:bg-primary font-display font-bold px-8 py-6 clip-corner">
+                EXPLORAR MODELOS
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Community Section */}
+      <section className="py-32 bg-black relative">
+        <div className="container">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-4 py-2 rounded-full mb-6">
+                <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                <span className="font-display font-bold text-primary text-sm tracking-widest">COMUNIDADE</span>
+              </div>
+              <h2 className="font-display font-bold text-4xl md:text-5xl text-white mb-6">
+                MAIS DO QUE <span className="text-primary">ÓCULOS</span>
+              </h2>
+              <p className="font-body text-gray-400 text-lg leading-relaxed mb-8">
+                A ZUNO é uma comunidade de atletas que vivem o esporte com intensidade. 
+                Desafios mensais, conexão real e evolução constante. Junte-se a nós.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/community">
+                  <Button className="bg-primary text-black hover:bg-white font-display font-bold px-8 h-12 tracking-wider clip-corner">
+                    CONHECER A COMUNIDADE
+                  </Button>
+                </Link>
+                <Link href="/app">
+                  <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black font-display font-bold px-8 h-12 tracking-wider">
+                    APP EM BREVE
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/5 border border-white/10 p-6 clip-corner">
+                <div className="text-primary font-display font-bold text-lg mb-2">DESAFIOS</div>
+                <p className="text-gray-500 text-sm">Desafios mensais de corrida, ciclismo e beach tennis</p>
+              </div>
+              <div className="bg-white/5 border border-white/10 p-6 clip-corner">
+                <div className="text-primary font-display font-bold text-lg mb-2">SQUAD</div>
+                <p className="text-gray-500 text-sm">Embaixadores que lideram e inspiram a comunidade</p>
+              </div>
+              <div className="bg-white/5 border border-white/10 p-6 clip-corner">
+                <div className="text-primary font-display font-bold text-lg mb-2">RANKING</div>
+                <p className="text-gray-500 text-sm">Acompanhe sua evolução e compare com outros atletas</p>
+              </div>
+              <div className="bg-white/5 border border-primary/30 p-6 clip-corner">
+                <div className="text-primary font-display font-bold text-lg mb-2">APP</div>
+                <p className="text-gray-500 text-sm">Em desenvolvimento — entre na lista de espera</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

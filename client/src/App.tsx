@@ -14,6 +14,8 @@ import Squad from "./pages/Squad";
 import Pro from "./pages/Pro";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
+import Community from "./pages/Community";
+import ZunoApp from "./pages/ZunoApp";
 
 function Router() {
   return (
@@ -28,6 +30,8 @@ function Router() {
       <Route path={"/pro"} component={Pro} />
       <Route path={"/about"} component={About} />
       <Route path={"/faq"} component={FAQ} />
+      <Route path={"/community"} component={Community} />
+      <Route path={"/app"} component={ZunoApp} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

@@ -46,3 +46,17 @@
 - [x] Corrigir texto "SQUAD" invisível na página Squad (mesmo problema do LAB)
 - [x] Trocar imagem de fundo da página Squad pela foto dos corredores com óculos ZUNO
 - [x] Atualizar links das redes sociais com URLs reais (Instagram, Facebook, TikTok; X e LinkedIn como placeholder)
+- [x] 1. Remover claims inexistentes (Bluetooth, dados, ajuste eletrônico, áudio, túnel de vento, balístico, etc.)
+- [x] 2. Reescrever página Lab (UV400, leveza, testes reais, tom honesto)
+- [x] 3. Ajustar página Squad (Performance vs Clássico, manifesto, mini bios)
+- [x] 4. Criar página Comunidade (desafios, integração Squad, lista de espera App)
+- [x] 5. Criar página ZUNO App (em desenvolvimento, lista de espera)
+- [x] 6. Página de Produto existente (ProductDetail) atualizada com benefícios, galeria, garantia
+- [x] 7. Atualizar FAQ (pergunta sobre tecnologia eletrônica)
+- [x] 8. Ajustar posicionamento geral (remover narrativa óculos inteligente, foco performance real)
+- [x] Atualizar Navbar com links: COLEÇÃO, LAB, SQUAD, COMUNIDADE, APP, FAQ
+- [x] Atualizar Footer com links corretos para novas páginas
+- [x] Adicionar rotas /community e /app no App.tsx
+- [x] Adicionar seção Comunidade na Home page
+- [x] Atualizar LeadCapturePopup com linguagem honesta
+- [x] Atualizar descrição da coleção na Products page

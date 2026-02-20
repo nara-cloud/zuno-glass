@@ -31,8 +31,8 @@ export default function Products() {
           <div>
             <h1 className="font-display font-bold text-6xl text-white mb-4">COLEÇÃO</h1>
             <p className="font-body text-gray-400 max-w-md">
-              Equipamento ótico de precisão para cada momento do seu dia.
-              Escolha sua arma.
+              Óculos esportivos de alta performance para cada modalidade.
+              Encontre o modelo ideal para o seu esporte.
             </p>
             <p className="font-display text-primary text-sm mt-2 tracking-wider">
               {filteredProducts.length} {filteredProducts.length === 1 ? 'MODELO' : 'MODELOS'}

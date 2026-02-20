@@ -1,7 +1,8 @@
+import { Link } from 'wouter';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Activity, Trophy, Flame, Target, Smartphone, Share2, Lock } from 'lucide-react';
+import { Activity, Trophy, Flame, Smartphone } from 'lucide-react';
 
 export default function Pulse() {
   return (
@@ -12,22 +13,21 @@ export default function Pulse() {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/80 to-black z-10"></div>
-          {/* Abstract data visualization background */}
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-30 filter grayscale contrast-125"></div>
         </div>
 
         <div className="container relative z-20 text-center">
           <div className="inline-flex items-center gap-2 border border-primary/50 bg-primary/10 px-4 py-2 rounded-full mb-8 backdrop-blur-md">
             <Activity className="w-4 h-4 text-primary" />
-            <span className="font-display font-bold text-primary tracking-widest text-sm">SISTEMA OPERACIONAL DO ATLETA</span>
+            <span className="font-display font-bold text-primary tracking-widest text-sm">ECOSSISTEMA EM CONSTRUÇÃO</span>
           </div>
 
           <h1 className="font-display font-bold text-6xl md:text-9xl mb-6 tracking-tighter">
             ZUNO <span className="text-transparent text-stroke-white">PULSE</span>
           </h1>
           <p className="font-body text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed mb-12">
-            Mais que um app. Um ecossistema digital que conecta seus óculos à sua performance. 
-            Gamificação, análise biométrica e comunidade global.
+            O futuro da comunidade ZUNO. Um ecossistema digital com desafios, ranking e gamificação 
+            para quem leva o esporte a sério. Em desenvolvimento.
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
@@ -35,7 +35,7 @@ export default function Pulse() {
               ENTRAR NA LISTA DE ESPERA
             </Button>
           </div>
-          <p className="mt-6 text-xs text-gray-500 font-display tracking-widest">LANÇAMENTO BETA: Q3 2026</p>
+          <p className="mt-6 text-xs text-gray-500 font-display tracking-widest">EM DESENVOLVIMENTO</p>
         </div>
       </section>
 
@@ -47,22 +47,23 @@ export default function Pulse() {
             <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
               <Trophy className="w-16 h-16 text-primary" />
             </div>
-            <h3 className="font-display font-bold text-2xl mb-4 text-white">LEADERBOARD GLOBAL</h3>
+            <h3 className="font-display font-bold text-2xl mb-4 text-white">RANKING COMUNITÁRIO</h3>
             <p className="text-gray-400 leading-relaxed mb-8">
-              Compita em tempo real com atletas de todo o mundo. Suba de nível, desbloqueie badges exclusivas e ganhe recompensas reais.
+              Participe de desafios mensais e acompanhe sua posição no ranking da comunidade ZUNO. 
+              Evolua junto com outros atletas.
             </p>
             <div className="bg-black/50 p-4 rounded border border-white/10">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-yellow-500 font-bold">#1</span>
                 <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
-                <span className="text-white text-sm">ALEXIA S.</span>
-                <span className="ml-auto text-primary text-xs">15.420 XP</span>
+                <span className="text-white text-sm">---</span>
+                <span className="ml-auto text-primary text-xs">EM BREVE</span>
               </div>
               <div className="flex items-center gap-3 opacity-50">
                 <span className="text-gray-500 font-bold">#2</span>
                 <div className="w-8 h-8 bg-gray-700 rounded-full"></div>
-                <span className="text-white text-sm">KAI Z.</span>
-                <span className="ml-auto text-primary text-xs">14.850 XP</span>
+                <span className="text-white text-sm">---</span>
+                <span className="ml-auto text-primary text-xs">EM BREVE</span>
               </div>
             </div>
           </div>
@@ -72,9 +73,10 @@ export default function Pulse() {
             <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
               <Flame className="w-16 h-16 text-orange-500" />
             </div>
-            <h3 className="font-display font-bold text-2xl mb-4 text-white">STREAK & EVOLUÇÃO</h3>
+            <h3 className="font-display font-bold text-2xl mb-4 text-white">CONSISTÊNCIA & EVOLUÇÃO</h3>
             <p className="text-gray-400 leading-relaxed mb-8">
-              A consistência é a chave. Mantenha sua sequência de treinos ativa para multiplicar seus pontos e acessar drops secretos.
+              A consistência é a chave. Mantenha sua sequência de treinos ativa, registre suas atividades 
+              e acompanhe sua evolução ao longo do tempo.
             </p>
             <div className="flex justify-between items-end h-20 gap-1">
               {[40, 60, 30, 80, 50, 90, 100].map((h, i) => (
@@ -86,20 +88,21 @@ export default function Pulse() {
           {/* Feature 3 */}
           <div className="bg-white/5 border border-white/10 p-8 hover:border-primary/50 transition-colors group relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
-              <Lock className="w-16 h-16 text-blue-500" />
+              <Smartphone className="w-16 h-16 text-blue-500" />
             </div>
-            <h3 className="font-display font-bold text-2xl mb-4 text-white">VAULT EXCLUSIVO</h3>
+            <h3 className="font-display font-bold text-2xl mb-4 text-white">APP DEDICADO</h3>
             <p className="text-gray-400 leading-relaxed mb-8">
-              Seus pontos Zuno Pulse valem produtos. Troque XP por descontos, acesso antecipado e experiências VIP.
+              Um aplicativo dedicado para a comunidade ZUNO está em desenvolvimento. 
+              Registro de treinos, desafios e conexão com outros atletas na palma da mão.
             </p>
             <div className="grid grid-cols-2 gap-2">
               <div className="bg-black/50 p-2 text-center border border-white/10">
-                <span className="text-xs text-gray-500 block">DESCONTO</span>
-                <span className="text-primary font-bold">20% OFF</span>
+                <span className="text-xs text-gray-500 block">IOS</span>
+                <span className="text-primary font-bold text-sm">EM BREVE</span>
               </div>
               <div className="bg-black/50 p-2 text-center border border-white/10">
-                <span className="text-xs text-gray-500 block">ACESSO</span>
-                <span className="text-white font-bold">EARLY BIRD</span>
+                <span className="text-xs text-gray-500 block">ANDROID</span>
+                <span className="text-primary font-bold text-sm">EM BREVE</span>
               </div>
             </div>
           </div>
@@ -118,8 +121,8 @@ export default function Pulse() {
               SEU TREINO NA <br/> PALMA DA MÃO
             </h2>
             <p className="font-body text-gray-400 text-lg leading-relaxed mb-8">
-              Sincronize seus óculos Zuno via Bluetooth para receber feedback de áudio em tempo real, 
-              ajustar a tonalidade das lentes e compartilhar suas rotas com o Squad.
+              O monitoramento e recursos digitais estarão disponíveis futuramente através do aplicativo Zuno, 
+              em desenvolvimento. Registro de treinos, desafios da comunidade e ranking — tudo num só lugar.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black font-display tracking-wider h-12">
