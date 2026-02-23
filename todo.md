@@ -76,3 +76,9 @@
 - [x] E-commerce: Página de sucesso de compra melhorada com detalhes do pedido
 - [x] E-commerce: Página "Meus Pedidos" para consultar histórico de compras
 - [x] E-commerce: Seletor de quantidade nos produtos e no carrinho
+- [x] Criar página Envio e Devoluções (/shipping)
+- [x] Criar página Garantia (/warranty)
+- [x] Criar página Guia de Tamanhos (/size-guide)
+- [x] Criar página Contato (/contact)
+- [x] Registar rotas no App.tsx para as 4 páginas de suporte
+- [x] Atualizar links no Footer para apontar para as novas páginas

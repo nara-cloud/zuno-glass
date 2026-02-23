@@ -78,13 +78,11 @@ export default function Footer() {
           <div className="md:col-span-2">
             <h4 className="font-display font-bold text-white text-lg mb-6">SUPORTE</h4>
             <ul className="flex flex-col gap-4">
-              {['FAQ', 'Envio e Devoluções', 'Garantia', 'Guia de Tamanhos', 'Contato'].map((item) => (
-                <li key={item}>
-                  <Link href={item === 'FAQ' ? '/faq' : '#'} className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">
-                    {item}
-                  </Link>
-                </li>
-              ))}
+              <li><Link href="/faq" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">FAQ</Link></li>
+              <li><Link href="/shipping" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">Envio e Devoluções</Link></li>
+              <li><Link href="/warranty" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">Garantia</Link></li>
+              <li><Link href="/size-guide" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">Guia de Tamanhos</Link></li>
+              <li><Link href="/contact" className="font-body text-gray-400 hover:text-primary transition-colors hover:pl-2 duration-300 block">Contato</Link></li>
             </ul>
           </div>
 

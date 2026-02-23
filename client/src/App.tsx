@@ -20,6 +20,10 @@ import Community from "./pages/Community";
 import ZunoApp from "./pages/ZunoApp";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Orders from "./pages/Orders";
+import Shipping from "./pages/Shipping";
+import Warranty from "./pages/Warranty";
+import SizeGuide from "./pages/SizeGuide";
+import Contact from "./pages/Contact";
 
 function Router() {
   return (
@@ -38,6 +42,10 @@ function Router() {
       <Route path={"/app"} component={ZunoApp} />
       <Route path={"/checkout/success"} component={CheckoutSuccess} />
       <Route path={"/orders"} component={Orders} />
+      <Route path={"/shipping"} component={Shipping} />
+      <Route path={"/warranty"} component={Warranty} />
+      <Route path={"/size-guide"} component={SizeGuide} />
+      <Route path={"/contact"} component={Contact} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
