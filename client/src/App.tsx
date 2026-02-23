@@ -4,6 +4,8 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { CartProvider } from "./contexts/CartContext";
+import CartDrawer from "./components/CartDrawer";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -17,6 +19,7 @@ import FAQ from "./pages/FAQ";
 import Community from "./pages/Community";
 import ZunoApp from "./pages/ZunoApp";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import Orders from "./pages/Orders";
 
 function Router() {
   return (
@@ -34,6 +37,7 @@ function Router() {
       <Route path={"/community"} component={Community} />
       <Route path={"/app"} component={ZunoApp} />
       <Route path={"/checkout/success"} component={CheckoutSuccess} />
+      <Route path={"/orders"} component={Orders} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -53,10 +57,13 @@ function App() {
         defaultTheme="dark"
         // switchable
       >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <Toaster />
+            <CartDrawer />
+            <Router />
+          </TooltipProvider>
+        </CartProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

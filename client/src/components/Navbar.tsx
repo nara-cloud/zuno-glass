@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, X, Search } from 'lucide-react';
+import { Menu, X, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/contexts/CartContext';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
+  const { totalItems, openCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,7 +58,21 @@ export default function Navbar() {
         </div>
 
         {/* Actions */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3">
+          {/* Cart Button */}
+          <button
+            onClick={openCart}
+            className="relative text-white hover:text-primary transition-colors p-2"
+            aria-label="Carrinho"
+          >
+            <ShoppingBag className="w-5 h-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-primary text-black font-display font-bold text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
+                {totalItems > 9 ? '9+' : totalItems}
+              </span>
+            )}
+          </button>
+
           <Link href="/try-on">
             <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-black font-display font-bold text-xs tracking-wider">
               TRY-ON
@@ -64,13 +80,30 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile Toggle */}
-        <button 
-          className="md:hidden text-white hover:text-primary transition-colors"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
-        </button>
+        {/* Mobile Actions */}
+        <div className="flex md:hidden items-center gap-2">
+          {/* Mobile Cart */}
+          <button
+            onClick={openCart}
+            className="relative text-white hover:text-primary transition-colors p-2"
+            aria-label="Carrinho"
+          >
+            <ShoppingBag className="w-6 h-6" />
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-primary text-black font-display font-bold text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
+                {totalItems > 9 ? '9+' : totalItems}
+              </span>
+            )}
+          </button>
+
+          {/* Mobile Toggle */}
+          <button 
+            className="text-white hover:text-primary transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -87,6 +120,11 @@ export default function Navbar() {
               {link.name}
           </Link>
         ))}
+        <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)}>
+          <span className="font-display font-bold text-3xl text-white hover:text-primary hover:italic transition-all">
+            MEUS PEDIDOS
+          </span>
+        </Link>
         <Link href="/try-on" onClick={() => setIsMobileMenuOpen(false)}>
           <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-black font-display tracking-wider font-bold mt-4">
             TRY-ON VIRTUAL

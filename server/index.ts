@@ -55,10 +55,9 @@ async function startServer() {
         case "checkout.session.completed": {
           const session = event.data.object as Stripe.Checkout.Session;
           console.log(`[Webhook] Checkout completed: ${session.id}`);
-          console.log(`[Webhook] Customer email: ${session.customer_email}`);
+          console.log(`[Webhook] Customer email: ${session.customer_email || session.customer_details?.email}`);
           console.log(`[Webhook] Amount: ${session.amount_total}`);
           console.log(`[Webhook] Metadata:`, session.metadata);
-          // Here you would update your order tracking, send confirmation emails, etc.
           break;
         }
         case "payment_intent.succeeded": {
@@ -77,56 +76,105 @@ async function startServer() {
   // JSON body parser for all other routes
   app.use(express.json());
 
-  // ─── Stripe Checkout Session ───
+  // ─── Stripe Checkout Session (Multi-item cart) ───
   app.post("/api/checkout", async (req, res) => {
     if (!stripe) {
       return res.status(503).json({ error: "Stripe not configured" });
     }
 
     try {
-      const { productId, variantColor, quantity = 1 } = req.body;
-
-      if (!productId) {
-        return res.status(400).json({ error: "productId is required" });
-      }
-
-      // Import product catalog dynamically
+      const { items, productId, variantColor, quantity = 1 } = req.body;
       const { getProductById } = await import("../shared/products.js");
-      const product = getProductById(productId);
+      const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
 
-      if (!product) {
-        return res.status(404).json({ error: "Product not found" });
+      let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+      let metadataItems: string[] = [];
+
+      // Multi-item cart checkout
+      if (items && Array.isArray(items) && items.length > 0) {
+        for (const item of items) {
+          const product = getProductById(item.productId);
+          if (!product) continue;
+
+          lineItems.push({
+            price_data: {
+              currency: "brl",
+              product_data: {
+                name: `ZUNO GLASS — ${product.name}`,
+                description: item.variantColor
+                  ? `Modelo ${product.name} — Cor: ${item.variantColor}`
+                  : `Modelo ${product.name}`,
+                images: [],
+              },
+              unit_amount: Math.round(product.price * 100),
+            },
+            quantity: item.quantity || 1,
+          });
+
+          metadataItems.push(
+            `${product.name}|${item.variantColor || "default"}|${item.quantity || 1}`
+          );
+        }
+      }
+      // Single item checkout (backward compatible)
+      else if (productId) {
+        const product = getProductById(productId);
+        if (!product) {
+          return res.status(404).json({ error: "Product not found" });
+        }
+
+        lineItems.push({
+          price_data: {
+            currency: "brl",
+            product_data: {
+              name: `ZUNO GLASS — ${product.name}`,
+              description: variantColor
+                ? `Modelo ${product.name} — Cor: ${variantColor}`
+                : `Modelo ${product.name}`,
+              images: [],
+            },
+            unit_amount: Math.round(product.price * 100),
+          },
+          quantity,
+        });
+
+        metadataItems.push(`${product.name}|${variantColor || "default"}|${quantity}`);
+      } else {
+        return res.status(400).json({ error: "items or productId is required" });
       }
 
-      const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
+      if (lineItems.length === 0) {
+        return res.status(400).json({ error: "No valid products found" });
+      }
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
         allow_promotion_codes: true,
-        line_items: [
+        shipping_address_collection: {
+          allowed_countries: ["BR"],
+        },
+        shipping_options: [
           {
-            price_data: {
-              currency: "brl",
-              product_data: {
-                name: `ZUNO GLASS — ${product.name}`,
-                description: variantColor
-                  ? `Modelo ${product.name} — Cor: ${variantColor}`
-                  : `Modelo ${product.name}`,
-                images: [],
+            shipping_rate_data: {
+              type: "fixed_amount",
+              fixed_amount: { amount: 0, currency: "brl" },
+              display_name: "Frete Grátis",
+              delivery_estimate: {
+                minimum: { unit: "business_day", value: 5 },
+                maximum: { unit: "business_day", value: 10 },
               },
-              unit_amount: Math.round(product.price * 100), // Stripe uses cents
             },
-            quantity,
           },
         ],
+        phone_number_collection: { enabled: true },
+        line_items: lineItems,
         metadata: {
-          product_id: product.id,
-          product_name: product.name,
-          variant_color: variantColor || "default",
+          items: metadataItems.join(";"),
+          item_count: String(lineItems.length),
         },
         success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/product/${productId}`,
+        cancel_url: `${origin}/products`,
       });
 
       res.json({ url: session.url });
@@ -147,6 +195,7 @@ async function startServer() {
         expand: ["line_items", "payment_intent"],
       });
 
+      const sessionAny = session as any;
       res.json({
         id: session.id,
         status: session.payment_status,
@@ -154,6 +203,8 @@ async function startServer() {
         currency: session.currency,
         customer_email: session.customer_details?.email || session.customer_email,
         customer_name: session.customer_details?.name,
+        customer_phone: session.customer_details?.phone,
+        shipping: sessionAny.shipping_details || null,
         metadata: session.metadata,
         created: session.created,
         line_items: session.line_items?.data.map((item) => ({
@@ -165,6 +216,58 @@ async function startServer() {
     } catch (err: any) {
       console.error("[Order] Error retrieving session:", err.message);
       res.status(500).json({ error: "Failed to retrieve order" });
+    }
+  });
+
+  // ─── List Orders by Customer Email ───
+  app.get("/api/orders", async (req, res) => {
+    if (!stripe) {
+      return res.status(503).json({ error: "Stripe not configured" });
+    }
+
+    try {
+      const { email } = req.query;
+
+      if (!email || typeof email !== "string") {
+        return res.status(400).json({ error: "email query parameter is required" });
+      }
+
+      // Search completed checkout sessions by customer email
+      const sessions = await stripe.checkout.sessions.list({
+        limit: 50,
+        expand: ["data.line_items"],
+      });
+
+      const customerOrders = sessions.data
+        .filter(
+          (s) =>
+            s.payment_status === "paid" &&
+            (s.customer_details?.email?.toLowerCase() === email.toLowerCase() ||
+              s.customer_email?.toLowerCase() === email.toLowerCase())
+        )
+        .map((s) => {
+          const sAny = s as any;
+          return {
+          id: s.id,
+          status: s.payment_status,
+          amount_total: s.amount_total,
+          currency: s.currency,
+          customer_email: s.customer_details?.email || s.customer_email,
+          customer_name: s.customer_details?.name,
+          shipping: sAny.shipping_details || null,
+          metadata: s.metadata,
+          created: s.created,
+          line_items: s.line_items?.data.map((item) => ({
+            name: item.description,
+            quantity: item.quantity,
+            amount: item.amount_total,
+          })),
+        }});
+
+      res.json({ orders: customerOrders });
+    } catch (err: any) {
+      console.error("[Orders] Error listing orders:", err.message);
+      res.status(500).json({ error: "Failed to list orders" });
     }
   });
 

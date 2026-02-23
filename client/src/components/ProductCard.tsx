@@ -1,6 +1,9 @@
 import { Link } from 'wouter';
 import { Product } from '@/lib/products';
 import { Button } from '@/components/ui/button';
+import { ShoppingBag } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   product: Product;
@@ -8,6 +11,27 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const installment = product.price > 0 ? (product.price / 3).toFixed(2) : null;
+  const { addItem } = useCart();
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const defaultVariant = product.variants[0];
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      variantColor: defaultVariant?.color || '#000',
+      variantColorName: defaultVariant?.colorName || 'Padrão',
+      category: product.category,
+    });
+
+    toast.success('Adicionado ao carrinho!', {
+      description: `${product.name} — ${defaultVariant?.colorName || 'Padrão'}`,
+    });
+  };
 
   return (
     <div className="group relative bg-card border border-white/5 hover:border-primary/50 transition-all duration-500 overflow-hidden">
@@ -27,13 +51,21 @@ export default function ProductCard({ product }: ProductCardProps) {
           className="w-full h-full object-contain transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-700 ease-out z-10 drop-shadow-2xl"
         />
         
-        {/* Quick Add Overlay */}
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20">
+        {/* Quick Actions Overlay */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 z-20">
           <Link href={`/product/${product.id}`}>
             <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-black font-display tracking-wider clip-corner">
               VER DETALHES
             </Button>
           </Link>
+          {product.price > 0 && (
+            <Button 
+              onClick={handleQuickAdd}
+              className="bg-primary text-black hover:bg-white font-display tracking-wider clip-corner"
+            >
+              <ShoppingBag className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
 

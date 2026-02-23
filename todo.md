@@ -68,3 +68,11 @@
 - [x] Criar countdown de lançamento 03/03 na Home page com destaque de preço
 - [x] Integrar pagamento Stripe (checkout session, webhook, página de sucesso)
 - [x] Endpoint /api/order/:sessionId para consultar pedidos via Stripe
+- [x] E-commerce: Criar contexto de carrinho de compras (CartContext) com persistência localStorage
+- [x] E-commerce: Criar componente CartDrawer (sidebar/drawer) com lista de itens, quantidades e total
+- [x] E-commerce: Integrar ícone de carrinho na Navbar com badge de quantidade
+- [x] E-commerce: Botão "Adicionar ao Carrinho" no ProductDetail e ProductCard
+- [x] E-commerce: Checkout Stripe com múltiplos itens do carrinho
+- [x] E-commerce: Página de sucesso de compra melhorada com detalhes do pedido
+- [x] E-commerce: Página "Meus Pedidos" para consultar histórico de compras
+- [x] E-commerce: Seletor de quantidade nos produtos e no carrinho

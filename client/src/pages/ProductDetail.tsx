@@ -4,14 +4,17 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { products } from '@/lib/products';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Check, Shield, Truck, RotateCcw, CreditCard, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, Shield, Truck, RotateCcw, CreditCard, Loader2, ShoppingBag, Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCart } from '@/contexts/CartContext';
 
 export default function ProductDetail() {
   const [, params] = useRoute('/product/:id');
   const product = products.find(p => p.id === params?.id);
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCart();
 
   if (!product) return <div>Produto não encontrado</div>;
 
@@ -20,7 +23,23 @@ export default function ProductDetail() {
   const installment = product.price > 0 ? (product.price / 3).toFixed(2).replace('.', ',') : null;
   const formattedPrice = product.price > 0 ? product.price.toFixed(2).replace('.', ',') : null;
 
-  const handleCheckout = async () => {
+  const handleAddToCart = () => {
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: currentImage,
+      variantColor: currentVariant?.color || '#000',
+      variantColorName: currentVariant?.colorName || 'Padrão',
+      category: product.category,
+    }, quantity);
+
+    toast.success('Adicionado ao carrinho!', {
+      description: `${product.name} — ${currentVariant?.colorName || 'Padrão'} (x${quantity})`,
+    });
+  };
+
+  const handleBuyNow = async () => {
     if (isCheckingOut) return;
     setIsCheckingOut(true);
 
@@ -31,7 +50,7 @@ export default function ProductDetail() {
         body: JSON.stringify({
           productId: product.id,
           variantColor: currentVariant?.colorName || 'default',
-          quantity: 1,
+          quantity,
         }),
       });
 
@@ -142,7 +161,7 @@ export default function ProductDetail() {
             </p>
 
             {/* Color/Variant Selection */}
-            <div className="mb-10">
+            <div className="mb-8">
               <label className="font-display font-bold text-white text-sm tracking-wider mb-4 block">
                 {currentVariant ? `COR: ${currentVariant.colorName.toUpperCase()}` : 'SELECIONE A COR'}
               </label>
@@ -169,34 +188,71 @@ export default function ProductDetail() {
               </div>
             </div>
 
+            {/* Quantity Selector */}
+            {product.price > 0 && (
+              <div className="mb-8">
+                <label className="font-display font-bold text-white text-sm tracking-wider mb-4 block">
+                  QUANTIDADE
+                </label>
+                <div className="inline-flex items-center border border-white/10">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="p-3 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="font-display font-bold text-lg text-white w-12 text-center">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => setQuantity(Math.min(10, quantity + 1))}
+                    className="p-3 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
               {product.price > 0 ? (
-                <Button 
-                  onClick={handleCheckout}
-                  disabled={isCheckingOut}
-                  className="flex-1 bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider disabled:opacity-70"
-                >
-                  {isCheckingOut ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      PROCESSANDO...
-                    </>
-                  ) : (
-                    'COMPRAR AGORA'
-                  )}
-                </Button>
+                <>
+                  <Button 
+                    onClick={handleAddToCart}
+                    className="flex-1 bg-white/10 text-white hover:bg-white/20 font-display font-bold text-lg h-14 clip-corner tracking-wider border border-white/20"
+                  >
+                    <ShoppingBag className="w-5 h-5 mr-2" />
+                    ADICIONAR AO CARRINHO
+                  </Button>
+                  <Button 
+                    onClick={handleBuyNow}
+                    disabled={isCheckingOut}
+                    className="flex-1 bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider disabled:opacity-70"
+                  >
+                    {isCheckingOut ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        PROCESSANDO...
+                      </>
+                    ) : (
+                      'COMPRAR AGORA'
+                    )}
+                  </Button>
+                </>
               ) : (
                 <Button className="flex-1 bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider">
                   AVISE-ME QUANDO DISPONÍVEL
                 </Button>
               )}
-              <Link href="/try-on">
-                <Button variant="outline" className="flex-1 border-white text-white hover:bg-white hover:text-black font-display font-bold text-lg h-14 clip-corner tracking-wider">
-                  EXPERIMENTAR AGORA
-                </Button>
-              </Link>
             </div>
+
+            {/* Try On */}
+            <Link href="/try-on">
+              <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white hover:text-black font-display font-bold h-12 tracking-wider mb-8">
+                EXPERIMENTAR AGORA (TRY-ON VIRTUAL)
+              </Button>
+            </Link>
 
             {/* Payment Methods Info */}
             <div className="bg-white/5 border border-white/10 p-4 mb-8 flex items-center gap-4">

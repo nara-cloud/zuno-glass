@@ -3,7 +3,8 @@ import { Link, useSearch } from 'wouter';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Package, ArrowRight, Loader2 } from 'lucide-react';
+import { CheckCircle, Package, ArrowRight, Loader2, MapPin, FileText } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
 
 interface OrderInfo {
   id: string;
@@ -12,11 +13,19 @@ interface OrderInfo {
   currency: string;
   customer_email: string;
   customer_name: string;
-  metadata: {
-    product_id: string;
-    product_name: string;
-    variant_color: string;
-  };
+  customer_phone: string;
+  shipping: {
+    name: string;
+    address: {
+      line1: string;
+      line2: string | null;
+      city: string;
+      state: string;
+      postal_code: string;
+      country: string;
+    };
+  } | null;
+  metadata: Record<string, string>;
   created: number;
   line_items: Array<{
     name: string;
@@ -32,6 +41,12 @@ export default function CheckoutSuccess() {
   const [order, setOrder] = useState<OrderInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { clearCart } = useCart();
+
+  useEffect(() => {
+    // Clear cart on successful checkout
+    clearCart();
+  }, [clearCart]);
 
   useEffect(() => {
     if (!sessionId) {
@@ -95,7 +110,7 @@ export default function CheckoutSuccess() {
             <div className="bg-white/5 border border-white/10 p-8 clip-corner space-y-6">
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <span className="font-display text-sm text-gray-500 tracking-wider">PEDIDO</span>
-                <span className="font-body text-sm text-gray-400">{order.id.slice(0, 20)}...</span>
+                <span className="font-display font-bold text-sm text-white">#{order.id.slice(-8).toUpperCase()}</span>
               </div>
 
               {order.line_items?.map((item, i) => (
@@ -124,6 +139,24 @@ export default function CheckoutSuccess() {
               )}
             </div>
 
+            {/* Shipping Address */}
+            {order.shipping && (
+              <div className="bg-white/5 border border-white/10 p-6 clip-corner">
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <h3 className="font-display font-bold text-sm text-gray-400 tracking-widest">ENDEREÇO DE ENTREGA</h3>
+                </div>
+                <div className="font-body text-sm text-gray-300 space-y-1">
+                  <p className="font-bold text-white">{order.shipping.name}</p>
+                  <p>{order.shipping.address.line1}</p>
+                  {order.shipping.address.line2 && <p>{order.shipping.address.line2}</p>}
+                  <p>
+                    {order.shipping.address.city}, {order.shipping.address.state} — CEP {order.shipping.address.postal_code}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Next Steps */}
             <div className="bg-white/5 border border-primary/20 p-8 clip-corner">
               <h3 className="font-display font-bold text-xl text-white mb-4">PRÓXIMOS PASSOS</h3>
@@ -135,6 +168,10 @@ export default function CheckoutSuccess() {
                 <li className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-primary rotate-45 mt-2 flex-shrink-0"></div>
                   <span className="font-body text-gray-400">O envio será processado em até 3 dias úteis.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-primary rotate-45 mt-2 flex-shrink-0"></div>
+                  <span className="font-body text-gray-400">Prazo de entrega: 5 a 10 dias úteis. Frete grátis para todo o Brasil.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-primary rotate-45 mt-2 flex-shrink-0"></div>
@@ -150,9 +187,10 @@ export default function CheckoutSuccess() {
                   CONTINUAR COMPRANDO <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
-              <Link href="/community">
+              <Link href="/orders">
                 <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black font-display font-bold tracking-wider px-8 h-12">
-                  JUNTE-SE À COMUNIDADE
+                  <FileText className="w-4 h-4 mr-2" />
+                  MEUS PEDIDOS
                 </Button>
               </Link>
             </div>
