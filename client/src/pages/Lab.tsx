@@ -9,22 +9,22 @@ export default function Lab() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black z-10"></div>
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-40 filter grayscale contrast-125"></div>
         </div>
 
-        <div className="container relative z-20 text-center">
+        <div className="container relative z-20 text-center pt-36 pb-16">
           <div className="inline-flex items-center gap-2 border border-primary/50 bg-primary/10 px-4 py-2 rounded-full mb-8 backdrop-blur-md">
             <FlaskConical className="w-4 h-4 text-primary" />
             <span className="font-display font-bold text-primary tracking-widest text-sm">PESQUISA & DESENVOLVIMENTO</span>
           </div>
 
-          <h1 className="font-display font-bold text-6xl md:text-8xl mb-6 tracking-tighter">
-            ZUNO <span className="bg-primary text-black px-4">LAB</span>
+          <h1 className="font-display font-bold text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6 tracking-tighter leading-[1.1]">
+            ZUNO <span className="bg-primary text-black px-3 md:px-4">LAB</span>
           </h1>
-          <p className="font-body text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="font-body text-gray-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Onde a performance encontra o design. Nossa divisão dedicada a desenvolver óculos que fazem diferença real no treino e na competição.
           </p>
         </div>
@@ -113,7 +113,7 @@ export default function Lab() {
                 <Layers className="w-5 h-5 text-primary" />
                 <span className="font-display font-bold text-primary tracking-widest text-sm">DESIGN COM PROPÓSITO</span>
               </div>
-              <h2 className="font-display font-bold text-4xl md:text-5xl mb-6">
+              <h2 className="font-display font-bold text-3xl md:text-5xl mb-6">
                 CADA DETALHE <br/>
                 TEM <span className="text-gray-500">FUNÇÃO</span>.
               </h2>
@@ -158,7 +158,7 @@ export default function Lab() {
       {/* CTA */}
       <section className="py-32 container text-center">
         <Shield className="w-16 h-16 text-primary mx-auto mb-8" />
-        <h2 className="font-display font-bold text-4xl md:text-6xl mb-6">
+        <h2 className="font-display font-bold text-3xl md:text-6xl mb-6">
           PERFORMANCE <span className="text-primary">REAL</span>
         </h2>
         <p className="font-body text-gray-400 max-w-xl mx-auto mb-10">

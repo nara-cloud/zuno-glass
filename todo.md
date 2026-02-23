@@ -60,3 +60,5 @@
 - [x] Adicionar seção Comunidade na Home page
 - [x] Atualizar LeadCapturePopup com linguagem honesta
 - [x] Atualizar descrição da coleção na Products page
+- [x] Corrigir layout da página Comunidade (texto cortado, badge sobrepondo navbar)
+- [x] Verificar e corrigir layout de todas as outras páginas (Lab, Squad, App, Home)

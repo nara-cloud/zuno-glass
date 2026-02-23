@@ -42,22 +42,22 @@ export default function ZunoApp() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/80 to-black z-10"></div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(163,230,53,0.1),transparent_70%)]"></div>
         </div>
 
-        <div className="container relative z-20 text-center">
+        <div className="container relative z-20 text-center pt-36 pb-16">
           <div className="inline-flex items-center gap-2 border border-primary/50 bg-primary/10 px-4 py-2 rounded-full mb-8 backdrop-blur-md">
             <Smartphone className="w-4 h-4 text-primary" />
             <span className="font-display font-bold text-primary tracking-widest text-sm">EM DESENVOLVIMENTO</span>
           </div>
 
-          <h1 className="font-display font-bold text-6xl md:text-9xl mb-6 tracking-tighter">
-            ZUNO <span className="bg-primary text-black px-4">APP</span>
+          <h1 className="font-display font-bold text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6 tracking-tighter leading-[1.1]">
+            ZUNO <span className="bg-primary text-black px-3 md:px-4">APP</span>
           </h1>
-          <p className="font-body text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed mb-4">
+          <p className="font-body text-gray-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-4">
             O App Zuno está em desenvolvimento. Uma plataforma dedicada para conectar a comunidade, 
             registrar treinos e participar de desafios exclusivos.
           </p>
@@ -121,7 +121,7 @@ export default function ZunoApp() {
           </div>
 
           <div className="w-full md:w-1/2">
-            <h2 className="font-display font-bold text-4xl md:text-5xl mb-6 text-white">
+            <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white">
               FUNCIONALIDADES <span className="text-primary">FUTURAS</span>
             </h2>
             <p className="font-body text-gray-400 text-lg leading-relaxed mb-10">
@@ -149,7 +149,7 @@ export default function ZunoApp() {
       {/* All Features Grid */}
       <section className="py-20 bg-white/5 border-y border-white/10">
         <div className="container">
-          <h2 className="font-display font-bold text-4xl text-center mb-12 text-white">
+          <h2 className="font-display font-bold text-3xl md:text-4xl text-center mb-12 text-white">
             O QUE ESTÁ <span className="text-primary">POR VIR</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -177,7 +177,7 @@ export default function ZunoApp() {
       {/* CTA Final */}
       <section className="py-32 container text-center">
         <Smartphone className="w-16 h-16 text-primary mx-auto mb-8" />
-        <h2 className="font-display font-bold text-4xl md:text-6xl mb-6">
+        <h2 className="font-display font-bold text-3xl md:text-6xl mb-6">
           SEJA O <span className="text-primary">PRIMEIRO</span>
         </h2>
         <p className="font-body text-gray-400 max-w-xl mx-auto mb-10 text-lg">

@@ -31,7 +31,7 @@ export default function Community() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/70 to-black z-10"></div>
           <img 
@@ -41,16 +41,17 @@ export default function Community() {
           />
         </div>
 
-        <div className="container relative z-20 text-center">
+        <div className="container relative z-20 text-center pt-36 pb-16">
           <div className="inline-flex items-center gap-2 border border-primary/50 bg-primary/10 px-4 py-2 rounded-full mb-8 backdrop-blur-md">
             <Users className="w-4 h-4 text-primary" />
             <span className="font-display font-bold text-primary tracking-widest text-sm">JUNTE-SE A NÓS</span>
           </div>
 
-          <h1 className="font-display font-bold text-6xl md:text-9xl mb-6 tracking-tighter">
-            ZUNO <span className="bg-primary text-black px-4">COMUNIDADE</span>
+          <h1 className="font-display font-bold text-5xl sm:text-6xl md:text-7xl lg:text-8xl mb-6 tracking-tighter leading-[1.1]">
+            ZUNO{' '}
+            <span className="bg-primary text-black px-3 md:px-4 inline-block mt-2 sm:mt-0">COMUNIDADE</span>
           </h1>
-          <p className="font-body text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="font-body text-gray-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Evoluímos juntos. Uma comunidade de atletas e entusiastas que compartilham a mesma obsessão por performance e estilo.
           </p>
         </div>
@@ -59,7 +60,7 @@ export default function Community() {
       {/* O que é a Comunidade */}
       <section className="py-20 container">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-display font-bold text-4xl md:text-5xl mb-8 text-white">
+          <h2 className="font-display font-bold text-3xl md:text-5xl mb-8 text-white">
             O QUE É A <span className="text-primary">COMUNIDADE ZUNO</span>?
           </h2>
           <p className="font-body text-gray-400 text-lg leading-relaxed mb-6">
@@ -79,7 +80,7 @@ export default function Community() {
         <div className="container">
           <div className="flex items-center gap-4 mb-12">
             <Calendar className="w-8 h-8 text-primary" />
-            <h2 className="font-display font-bold text-4xl text-white">DESAFIOS MENSAIS</h2>
+            <h2 className="font-display font-bold text-3xl md:text-4xl text-white">DESAFIOS MENSAIS</h2>
             <div className="flex-1 h-[1px] bg-white/10"></div>
           </div>
           <p className="font-body text-gray-400 text-lg mb-12 max-w-2xl">
@@ -107,7 +108,7 @@ export default function Community() {
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="w-full md:w-1/2">
             <Trophy className="w-12 h-12 text-primary mb-6" />
-            <h2 className="font-display font-bold text-4xl md:text-5xl mb-6 text-white">
+            <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white">
               DA COMUNIDADE <br/>AO <span className="text-primary">SQUAD</span>
             </h2>
             <p className="font-body text-gray-400 text-lg leading-relaxed mb-8">
@@ -150,7 +151,7 @@ export default function Community() {
       <section className="py-20 bg-white/5 border-y border-white/10">
         <div className="container text-center">
           <Smartphone className="w-12 h-12 text-primary mx-auto mb-6" />
-          <h2 className="font-display font-bold text-4xl md:text-5xl mb-6 text-white">
+          <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white">
             APP ZUNO <span className="text-gray-500">EM DESENVOLVIMENTO</span>
           </h2>
           <p className="font-body text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed mb-10">
@@ -170,7 +171,7 @@ export default function Community() {
 
       {/* CTA Final */}
       <section className="py-32 container text-center">
-        <h2 className="font-display font-bold text-4xl md:text-6xl mb-6">
+        <h2 className="font-display font-bold text-3xl md:text-6xl mb-6">
           PRONTO PARA <span className="text-primary">EVOLUIR</span>?
         </h2>
         <p className="font-body text-gray-400 max-w-xl mx-auto mb-10 text-lg">
