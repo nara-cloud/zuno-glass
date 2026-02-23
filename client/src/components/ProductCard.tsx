@@ -7,6 +7,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const installment = product.price > 0 ? (product.price / 3).toFixed(2) : null;
+
   return (
     <div className="group relative bg-card border border-white/5 hover:border-primary/50 transition-all duration-500 overflow-hidden">
       {/* New Badge */}
@@ -47,9 +49,14 @@ export default function ProductCard({ product }: ProductCardProps) {
             </p>
           </div>
           {product.price > 0 ? (
-            <span className="font-display font-bold text-lg text-white">
-              R$ {product.price.toFixed(2)}
-            </span>
+            <div className="text-right flex-shrink-0 ml-3">
+              <span className="font-display font-bold text-lg text-white block">
+                R$ {product.price.toFixed(2).replace('.', ',')}
+              </span>
+              <span className="font-body text-[11px] text-gray-500 block mt-0.5">
+                ou 3x de R$ {installment?.replace('.', ',')}
+              </span>
+            </div>
           ) : (
             <span className="font-display font-bold text-sm text-primary tracking-wider">
               EM BREVE

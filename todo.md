@@ -23,10 +23,10 @@
 - [x] Reposicionar rosto da atleta para ficar à direita na mesma altura de "LIMITE DA LUZ"
 - [x] Recortar imagem da atleta para focar no rosto/óculos e atualizar no hero banner
 - [x] Configurar infraestrutura Stripe (webdev_add_feature + secrets)
-- [ ] Implementar schema de base de dados para pedidos e pagamentos
-- [ ] Implementar rotas tRPC para checkout e webhooks Stripe
-- [ ] Implementar UI de carrinho e página de checkout
-- [ ] Implementar página de sucesso/cancelamento de pagamento
+- [x] Implementar schema de base de dados para pedidos e pagamentos (via Stripe API, sem DB local)
+- [x] Implementar rotas Express para checkout e webhooks Stripe
+- [x] Implementar UI de checkout (botão COMPRAR AGORA → Stripe Checkout)
+- [x] Implementar página de sucesso de pagamento (/checkout/success)
 - [ ] Escrever testes para a integração Stripe
 - [x] Corrigir SEO: título da página (30-60 caracteres)
 - [x] Corrigir SEO: adicionar meta description (50-160 caracteres)
@@ -64,3 +64,7 @@
 - [x] Verificar e corrigir layout de todas as outras páginas (Lab, Squad, App, Home)
 - [x] Adicionar secção de Parceiros (marcas e profissionais) na página Comunidade
 - [x] Atualizar preços dos produtos: casuais R$ 169,90 e esportivos R$ 189,90
+- [x] Adicionar exibição de parcelamento nos preços (ProductCard e ProductDetail)
+- [x] Criar countdown de lançamento 03/03 na Home page com destaque de preço
+- [x] Integrar pagamento Stripe (checkout session, webhook, página de sucesso)
+- [x] Endpoint /api/order/:sessionId para consultar pedidos via Stripe

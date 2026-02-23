@@ -4,17 +4,57 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { products } from '@/lib/products';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Check, Shield, Truck, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Check, Shield, Truck, RotateCcw, CreditCard, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function ProductDetail() {
   const [, params] = useRoute('/product/:id');
   const product = products.find(p => p.id === params?.id);
   const [selectedVariant, setSelectedVariant] = useState(0);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   if (!product) return <div>Produto não encontrado</div>;
 
   const currentVariant = product.variants[selectedVariant];
   const currentImage = currentVariant?.image || product.image;
+  const installment = product.price > 0 ? (product.price / 3).toFixed(2).replace('.', ',') : null;
+  const formattedPrice = product.price > 0 ? product.price.toFixed(2).replace('.', ',') : null;
+
+  const handleCheckout = async () => {
+    if (isCheckingOut) return;
+    setIsCheckingOut(true);
+
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product.id,
+          variantColor: currentVariant?.colorName || 'default',
+          quantity: 1,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro ao criar sessão de pagamento');
+      }
+
+      if (data.url) {
+        toast.info('Redirecionando para o checkout...', {
+          description: 'Você será levado à página de pagamento seguro.',
+        });
+        window.open(data.url, '_blank');
+      }
+    } catch (err: any) {
+      toast.error('Erro no checkout', {
+        description: err.message || 'Tente novamente em alguns instantes.',
+      });
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -76,9 +116,20 @@ export default function ProductDetail() {
               {product.tagline}
             </p>
 
-            {product.price > 0 ? (
-              <div className="font-display font-bold text-4xl text-primary mb-8">
-                R$ {product.price.toFixed(2)}
+            {formattedPrice ? (
+              <div className="mb-8">
+                <div className="font-display font-bold text-4xl text-primary">
+                  R$ {formattedPrice}
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <CreditCard className="w-4 h-4 text-gray-500" />
+                  <span className="font-body text-gray-400 text-sm">
+                    ou <span className="text-white font-bold">3x de R$ {installment}</span> sem juros no cartão
+                  </span>
+                </div>
+                <span className="font-body text-xs text-gray-600 mt-1 block">
+                  À vista no PIX com 5% de desconto: R$ {(product.price * 0.95).toFixed(2).replace('.', ',')}
+                </span>
               </div>
             ) : (
               <div className="font-display font-bold text-2xl text-primary mb-8 tracking-wider">
@@ -121,8 +172,19 @@ export default function ProductDetail() {
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               {product.price > 0 ? (
-                <Button className="flex-1 bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider">
-                  ADICIONAR AO CARRINHO
+                <Button 
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut}
+                  className="flex-1 bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider disabled:opacity-70"
+                >
+                  {isCheckingOut ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      PROCESSANDO...
+                    </>
+                  ) : (
+                    'COMPRAR AGORA'
+                  )}
                 </Button>
               ) : (
                 <Button className="flex-1 bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider">
@@ -134,6 +196,14 @@ export default function ProductDetail() {
                   EXPERIMENTAR AGORA
                 </Button>
               </Link>
+            </div>
+
+            {/* Payment Methods Info */}
+            <div className="bg-white/5 border border-white/10 p-4 mb-8 flex items-center gap-4">
+              <CreditCard className="w-5 h-5 text-gray-500 flex-shrink-0" />
+              <div>
+                <span className="font-body text-sm text-gray-400">Pagamento seguro via Stripe. Aceitamos Visa, Mastercard, Elo e PIX.</span>
+              </div>
             </div>
 
             {/* Features List */}

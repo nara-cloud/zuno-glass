@@ -16,6 +16,7 @@ import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import Community from "./pages/Community";
 import ZunoApp from "./pages/ZunoApp";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 
 function Router() {
   return (
@@ -32,6 +33,7 @@ function Router() {
       <Route path={"/faq"} component={FAQ} />
       <Route path={"/community"} component={Community} />
       <Route path={"/app"} component={ZunoApp} />
+      <Route path={"/checkout/success"} component={CheckoutSuccess} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
