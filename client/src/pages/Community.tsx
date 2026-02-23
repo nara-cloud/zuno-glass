@@ -2,7 +2,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Users, Trophy, Flame, Smartphone, ArrowRight, Target, Calendar } from 'lucide-react';
+import { Users, Trophy, Flame, Smartphone, ArrowRight, Target, Calendar, Handshake, Building2, Dumbbell, Heart, ExternalLink } from 'lucide-react';
 
 const challenges = [
   {
@@ -23,6 +23,48 @@ const challenges = [
     icon: Users,
     status: "EM BREVE"
   }
+];
+
+const partnersBrands = [
+  {
+    name: "Sua Marca Aqui",
+    category: "Esporte & Lifestyle",
+    description: "Marcas alinhadas com performance, esporte e estilo de vida ativo.",
+    icon: Building2,
+  },
+  {
+    name: "Sua Marca Aqui",
+    category: "Nutrição & Suplementos",
+    description: "Parceiros de nutrição esportiva e suplementação para atletas.",
+    icon: Building2,
+  },
+  {
+    name: "Sua Marca Aqui",
+    category: "Tecnologia & Wearables",
+    description: "Marcas de tecnologia e dispositivos compatíveis com o ecossistema ZUNO.",
+    icon: Building2,
+  },
+];
+
+const partnersProfessionals = [
+  {
+    name: "Seu Nome Aqui",
+    role: "Personal Trainer",
+    description: "Profissionais de educação física que treinam com ZUNO.",
+    icon: Dumbbell,
+  },
+  {
+    name: "Seu Nome Aqui",
+    role: "Fisioterapeuta Esportivo",
+    description: "Especialistas em saúde e recuperação para atletas da comunidade.",
+    icon: Heart,
+  },
+  {
+    name: "Seu Nome Aqui",
+    role: "Coach de Corrida",
+    description: "Treinadores de corrida que utilizam e recomendam ZUNO.",
+    icon: Target,
+  },
 ];
 
 export default function Community() {
@@ -103,43 +145,140 @@ export default function Community() {
         </div>
       </section>
 
-      {/* Integração com Squad */}
+      {/* Parceiros — Marcas e Profissionais */}
       <section className="py-20 container">
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          <div className="w-full md:w-1/2">
-            <Trophy className="w-12 h-12 text-primary mb-6" />
-            <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white">
-              DA COMUNIDADE <br/>AO <span className="text-primary">SQUAD</span>
-            </h2>
-            <p className="font-body text-gray-400 text-lg leading-relaxed mb-8">
-              Os membros mais ativos e dedicados da comunidade podem ser convidados para o Squad ZUNO — 
-              nosso time de embaixadores oficiais. Mostre sua dedicação, participe dos desafios e 
-              você pode ser o próximo.
-            </p>
-            <Link href="/squad">
-              <Button variant="outline" className="border-white/20 text-white hover:bg-primary hover:text-black hover:border-primary font-display tracking-wider h-12">
-                CONHECER O SQUAD <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 border border-primary/50 bg-primary/10 px-4 py-2 rounded-full mb-8 backdrop-blur-md">
+            <Handshake className="w-4 h-4 text-primary" />
+            <span className="font-display font-bold text-primary tracking-widest text-sm">ECOSSISTEMA</span>
           </div>
-          <div className="w-full md:w-1/2">
-            <div className="bg-white/5 border border-white/10 p-8 clip-corner">
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-black/50 border border-white/10">
-                  <div className="w-3 h-3 bg-primary rounded-full"></div>
-                  <span className="font-display text-white">Participe dos desafios mensais</span>
+          <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white">
+            NOSSOS <span className="text-primary">PARCEIROS</span>
+          </h2>
+          <p className="font-body text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            Marcas e profissionais que compartilham a mesma visão de performance, 
+            saúde e estilo de vida ativo. Juntos, construímos um ecossistema mais forte.
+          </p>
+        </div>
+
+        {/* Marcas */}
+        <div className="mb-16">
+          <div className="flex items-center gap-4 mb-10">
+            <Building2 className="w-6 h-6 text-primary" />
+            <h3 className="font-display font-bold text-2xl md:text-3xl text-white">MARCAS</h3>
+            <div className="flex-1 h-[1px] bg-white/10"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {partnersBrands.map((partner, i) => (
+              <div key={i} className="group relative bg-white/[0.03] border border-white/10 hover:border-primary/40 transition-all duration-300 p-8 clip-corner">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-14 h-14 bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-primary/30 transition-colors flex-shrink-0">
+                    <partner.icon className="w-6 h-6 text-gray-500 group-hover:text-primary transition-colors" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-mono text-primary/70 tracking-wider">{partner.category}</span>
+                    <h4 className="font-display font-bold text-lg text-white mt-1">{partner.name}</h4>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 p-4 bg-black/50 border border-white/10">
-                  <div className="w-3 h-3 bg-primary rounded-full"></div>
-                  <span className="font-display text-white">Compartilhe seus treinos</span>
+                <p className="text-gray-500 text-sm leading-relaxed">{partner.description}</p>
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ExternalLink className="w-4 h-4 text-primary/50" />
                 </div>
-                <div className="flex items-center gap-4 p-4 bg-black/50 border border-white/10">
-                  <div className="w-3 h-3 bg-primary rounded-full"></div>
-                  <span className="font-display text-white">Conecte-se com outros atletas</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Profissionais */}
+        <div className="mb-12">
+          <div className="flex items-center gap-4 mb-10">
+            <Dumbbell className="w-6 h-6 text-primary" />
+            <h3 className="font-display font-bold text-2xl md:text-3xl text-white">PROFISSIONAIS</h3>
+            <div className="flex-1 h-[1px] bg-white/10"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {partnersProfessionals.map((partner, i) => (
+              <div key={i} className="group relative bg-white/[0.03] border border-white/10 hover:border-primary/40 transition-all duration-300 p-8 clip-corner">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-14 h-14 bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-primary/30 transition-colors flex-shrink-0">
+                    <partner.icon className="w-6 h-6 text-gray-500 group-hover:text-primary transition-colors" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-mono text-primary/70 tracking-wider">{partner.role}</span>
+                    <h4 className="font-display font-bold text-lg text-white mt-1">{partner.name}</h4>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4 p-4 bg-primary/20 border border-primary/50">
-                  <Trophy className="w-5 h-5 text-primary" />
-                  <span className="font-display text-primary font-bold">Seja convidado para o Squad</span>
+                <p className="text-gray-500 text-sm leading-relaxed">{partner.description}</p>
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ExternalLink className="w-4 h-4 text-primary/50" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA Parceiros */}
+        <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 p-8 md:p-12 clip-corner">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="max-w-xl">
+              <h3 className="font-display font-bold text-2xl md:text-3xl text-white mb-3">
+                QUER SER <span className="text-primary">PARCEIRO</span>?
+              </h3>
+              <p className="font-body text-gray-400 text-lg leading-relaxed">
+                Se a sua marca ou o seu trabalho está alinhado com performance, esporte e estilo de vida ativo, 
+                queremos conversar. Juntos podemos ir mais longe.
+              </p>
+            </div>
+            <a href="mailto:contato@zunoglass.com" className="flex-shrink-0">
+              <Button className="bg-primary text-black hover:bg-white font-display font-bold px-10 h-14 tracking-wider text-lg clip-corner">
+                FALE CONOSCO <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Integração com Squad */}
+      <section className="py-20 bg-white/5 border-y border-white/10">
+        <div className="container">
+          <div className="flex flex-col md:flex-row items-center gap-12">
+            <div className="w-full md:w-1/2">
+              <Trophy className="w-12 h-12 text-primary mb-6" />
+              <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white">
+                DA COMUNIDADE <br/>AO <span className="text-primary">SQUAD</span>
+              </h2>
+              <p className="font-body text-gray-400 text-lg leading-relaxed mb-8">
+                Os membros mais ativos e dedicados da comunidade podem ser convidados para o Squad ZUNO — 
+                nosso time de embaixadores oficiais. Mostre sua dedicação, participe dos desafios e 
+                você pode ser o próximo.
+              </p>
+              <Link href="/squad">
+                <Button variant="outline" className="border-white/20 text-white hover:bg-primary hover:text-black hover:border-primary font-display tracking-wider h-12">
+                  CONHECER O SQUAD <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+            <div className="w-full md:w-1/2">
+              <div className="bg-white/5 border border-white/10 p-8 clip-corner">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 p-4 bg-black/50 border border-white/10">
+                    <div className="w-3 h-3 bg-primary rounded-full"></div>
+                    <span className="font-display text-white">Participe dos desafios mensais</span>
+                  </div>
+                  <div className="flex items-center gap-4 p-4 bg-black/50 border border-white/10">
+                    <div className="w-3 h-3 bg-primary rounded-full"></div>
+                    <span className="font-display text-white">Compartilhe seus treinos</span>
+                  </div>
+                  <div className="flex items-center gap-4 p-4 bg-black/50 border border-white/10">
+                    <div className="w-3 h-3 bg-primary rounded-full"></div>
+                    <span className="font-display text-white">Conecte-se com outros atletas</span>
+                  </div>
+                  <div className="flex items-center gap-4 p-4 bg-primary/20 border border-primary/50">
+                    <Trophy className="w-5 h-5 text-primary" />
+                    <span className="font-display text-primary font-bold">Seja convidado para o Squad</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -148,38 +287,38 @@ export default function Community() {
       </section>
 
       {/* App Waitlist */}
-      <section className="py-20 bg-white/5 border-y border-white/10">
-        <div className="container text-center">
-          <Smartphone className="w-12 h-12 text-primary mx-auto mb-6" />
-          <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white">
-            APP ZUNO <span className="text-gray-500">EM DESENVOLVIMENTO</span>
-          </h2>
-          <p className="font-body text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed mb-10">
-            Em breve, a comunidade ZUNO terá um app dedicado para registro de treinos, 
-            desafios internos, ranking e muito mais. Entre na lista de espera para ser 
-            um dos primeiros a testar.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/app">
-              <Button className="bg-primary text-black hover:bg-white font-display font-bold px-10 h-14 tracking-wider text-lg clip-corner">
-                ENTRAR NA LISTA DO APP
-              </Button>
-            </Link>
-          </div>
+      <section className="py-20 container text-center">
+        <Smartphone className="w-12 h-12 text-primary mx-auto mb-6" />
+        <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white">
+          APP ZUNO <span className="text-gray-500">EM DESENVOLVIMENTO</span>
+        </h2>
+        <p className="font-body text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed mb-10">
+          Em breve, a comunidade ZUNO terá um app dedicado para registro de treinos, 
+          desafios internos, ranking e muito mais. Entre na lista de espera para ser 
+          um dos primeiros a testar.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/app">
+            <Button className="bg-primary text-black hover:bg-white font-display font-bold px-10 h-14 tracking-wider text-lg clip-corner">
+              ENTRAR NA LISTA DO APP
+            </Button>
+          </Link>
         </div>
       </section>
 
       {/* CTA Final */}
-      <section className="py-32 container text-center">
-        <h2 className="font-display font-bold text-3xl md:text-6xl mb-6">
-          PRONTO PARA <span className="text-primary">EVOLUIR</span>?
-        </h2>
-        <p className="font-body text-gray-400 max-w-xl mx-auto mb-10 text-lg">
-          Junte-se à comunidade ZUNO e faça parte de algo maior. Esporte, estilo e atitude.
-        </p>
-        <Button className="bg-white text-black hover:bg-primary font-display font-bold px-10 h-14 tracking-wider text-lg">
-          ENTRAR PARA COMUNIDADE
-        </Button>
+      <section className="py-32 bg-white/5 border-t border-white/10">
+        <div className="container text-center">
+          <h2 className="font-display font-bold text-3xl md:text-6xl mb-6">
+            PRONTO PARA <span className="text-primary">EVOLUIR</span>?
+          </h2>
+          <p className="font-body text-gray-400 max-w-xl mx-auto mb-10 text-lg">
+            Junte-se à comunidade ZUNO e faça parte de algo maior. Esporte, estilo e atitude.
+          </p>
+          <Button className="bg-white text-black hover:bg-primary font-display font-bold px-10 h-14 tracking-wider text-lg">
+            ENTRAR PARA COMUNIDADE
+          </Button>
+        </div>
       </section>
 
       <Footer />
