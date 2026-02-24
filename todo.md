@@ -82,3 +82,8 @@
 - [x] Criar página Contato (/contact)
 - [x] Registar rotas no App.tsx para as 4 páginas de suporte
 - [x] Atualizar links no Footer para apontar para as novas páginas
+- [x] Implementar cálculo de frete por CEP no carrinho
+- [x] Criar endpoint de consulta de frete no servidor (client-side via shared/shipping.ts)
+- [x] Integrar frete no CartDrawer (campo CEP + resultado)
+- [x] Incluir frete no checkout Stripe (shipping_options)
+- [x] Atualizar página Envio e Devoluções com informações de frete

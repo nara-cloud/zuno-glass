@@ -18,7 +18,7 @@ async function startServer() {
 
   if (stripeSecretKey) {
     stripe = new Stripe(stripeSecretKey, {
-      apiVersion: "2026-01-28.clover",
+      apiVersion: "2025-12-18.acacia" as any,
     });
     console.log("[Stripe] Initialized successfully");
   } else {
@@ -76,14 +76,36 @@ async function startServer() {
   // JSON body parser for all other routes
   app.use(express.json());
 
-  // ─── Stripe Checkout Session (Multi-item cart) ───
+  // ─── Shipping Quote Endpoint ───
+  app.post("/api/shipping/quote", async (req, res) => {
+    try {
+      const { cep, cartTotal } = req.body;
+      const { calculateShipping, isValidCep } = await import("../shared/shipping.js");
+
+      if (!cep || !isValidCep(cep)) {
+        return res.status(400).json({ error: "CEP inválido" });
+      }
+
+      const quote = calculateShipping(cep, cartTotal || 0);
+      if (!quote) {
+        return res.status(404).json({ error: "CEP não encontrado" });
+      }
+
+      res.json(quote);
+    } catch (err: any) {
+      console.error("[Shipping] Error calculating quote:", err.message);
+      res.status(500).json({ error: "Erro ao calcular frete" });
+    }
+  });
+
+  // ─── Stripe Checkout Session (Multi-item cart with shipping) ───
   app.post("/api/checkout", async (req, res) => {
     if (!stripe) {
       return res.status(503).json({ error: "Stripe not configured" });
     }
 
     try {
-      const { items, productId, variantColor, quantity = 1 } = req.body;
+      const { items, productId, variantColor, quantity = 1, shippingCost = 0, shippingRegion, shippingEstimate } = req.body;
       const { getProductById } = await import("../shared/products.js");
       const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
 
@@ -147,6 +169,37 @@ async function startServer() {
         return res.status(400).json({ error: "No valid products found" });
       }
 
+      // Build shipping options based on calculated shipping
+      const shippingAmountCents = Math.round((shippingCost || 0) * 100);
+      const isFreeShipping = shippingAmountCents === 0;
+
+      // Parse estimate for Stripe delivery estimate
+      let minDays = 5;
+      let maxDays = 10;
+      if (shippingEstimate) {
+        const match = shippingEstimate.match(/(\d+)\s*a\s*(\d+)/);
+        if (match) {
+          minDays = parseInt(match[1], 10);
+          maxDays = parseInt(match[2], 10);
+        }
+      }
+
+      const shippingOptions: Stripe.Checkout.SessionCreateParams.ShippingOption[] = [
+        {
+          shipping_rate_data: {
+            type: "fixed_amount",
+            fixed_amount: { amount: shippingAmountCents, currency: "brl" },
+            display_name: isFreeShipping
+              ? "Frete Grátis"
+              : `Envio para ${shippingRegion || "Brasil"}`,
+            delivery_estimate: {
+              minimum: { unit: "business_day", value: minDays },
+              maximum: { unit: "business_day", value: maxDays },
+            },
+          },
+        },
+      ];
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
@@ -154,24 +207,14 @@ async function startServer() {
         shipping_address_collection: {
           allowed_countries: ["BR"],
         },
-        shipping_options: [
-          {
-            shipping_rate_data: {
-              type: "fixed_amount",
-              fixed_amount: { amount: 0, currency: "brl" },
-              display_name: "Frete Grátis",
-              delivery_estimate: {
-                minimum: { unit: "business_day", value: 5 },
-                maximum: { unit: "business_day", value: 10 },
-              },
-            },
-          },
-        ],
+        shipping_options: shippingOptions,
         phone_number_collection: { enabled: true },
         line_items: lineItems,
         metadata: {
           items: metadataItems.join(";"),
           item_count: String(lineItems.length),
+          shipping_region: shippingRegion || "Brasil",
+          shipping_estimate: shippingEstimate || `${minDays} a ${maxDays} dias úteis`,
         },
         success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/products`,
@@ -205,6 +248,7 @@ async function startServer() {
         customer_name: session.customer_details?.name,
         customer_phone: session.customer_details?.phone,
         shipping: sessionAny.shipping_details || null,
+        shipping_cost: sessionAny.total_details?.amount_shipping || 0,
         metadata: session.metadata,
         created: session.created,
         line_items: session.line_items?.data.map((item) => ({
@@ -248,21 +292,23 @@ async function startServer() {
         .map((s) => {
           const sAny = s as any;
           return {
-          id: s.id,
-          status: s.payment_status,
-          amount_total: s.amount_total,
-          currency: s.currency,
-          customer_email: s.customer_details?.email || s.customer_email,
-          customer_name: s.customer_details?.name,
-          shipping: sAny.shipping_details || null,
-          metadata: s.metadata,
-          created: s.created,
-          line_items: s.line_items?.data.map((item) => ({
-            name: item.description,
-            quantity: item.quantity,
-            amount: item.amount_total,
-          })),
-        }});
+            id: s.id,
+            status: s.payment_status,
+            amount_total: s.amount_total,
+            currency: s.currency,
+            customer_email: s.customer_details?.email || s.customer_email,
+            customer_name: s.customer_details?.name,
+            shipping: sAny.shipping_details || null,
+            shipping_cost: sAny.total_details?.amount_shipping || 0,
+            metadata: s.metadata,
+            created: s.created,
+            line_items: s.line_items?.data.map((item) => ({
+              name: item.description,
+              quantity: item.quantity,
+              amount: item.amount_total,
+            })),
+          };
+        });
 
       res.json({ orders: customerOrders });
     } catch (err: any) {

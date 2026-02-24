@@ -1,15 +1,80 @@
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
-import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2, CreditCard } from 'lucide-react';
-import { useState } from 'react';
+import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2, CreditCard, Truck, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
+import { calculateShipping, isValidCep, formatCep, FREE_SHIPPING_THRESHOLD } from '@shared/shipping';
+import type { ShippingQuote } from '@shared/shipping';
 
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isCartOpen, closeCart } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [cep, setCep] = useState('');
+  const [shippingQuote, setShippingQuote] = useState<ShippingQuote | null>(null);
+  const [cepError, setCepError] = useState('');
+  const [isCalculating, setIsCalculating] = useState(false);
 
-  const installmentTotal = totalPrice > 0 ? (totalPrice / 3).toFixed(2).replace('.', ',') : null;
+  // Carregar CEP salvo do localStorage
+  useEffect(() => {
+    const savedCep = localStorage.getItem('zuno_shipping_cep');
+    if (savedCep) {
+      setCep(formatCep(savedCep));
+      const quote = calculateShipping(savedCep, totalPrice);
+      if (quote) setShippingQuote(quote);
+    }
+  }, []);
+
+  // Recalcular frete quando o total do carrinho muda
+  useEffect(() => {
+    if (shippingQuote && cep) {
+      const quote = calculateShipping(cep, totalPrice);
+      if (quote) setShippingQuote(quote);
+    }
+  }, [totalPrice]);
+
+  const handleCepChange = (value: string) => {
+    const formatted = formatCep(value);
+    setCep(formatted);
+    setCepError('');
+    // Limpar cotação se CEP mudou
+    if (formatted.replace(/\D/g, '').length < 8) {
+      setShippingQuote(null);
+    }
+  };
+
+  const handleCalculateShipping = () => {
+    const cleanCep = cep.replace(/\D/g, '');
+
+    if (!isValidCep(cleanCep)) {
+      setCepError('CEP inválido. Digite 8 números.');
+      setShippingQuote(null);
+      return;
+    }
+
+    setIsCalculating(true);
+    setCepError('');
+
+    // Simular um pequeno delay para UX
+    setTimeout(() => {
+      const quote = calculateShipping(cleanCep, totalPrice);
+      if (quote) {
+        setShippingQuote(quote);
+        localStorage.setItem('zuno_shipping_cep', cleanCep);
+      } else {
+        setCepError('CEP não encontrado. Verifique e tente novamente.');
+      }
+      setIsCalculating(false);
+    }, 600);
+  };
+
+  const installmentValue = totalPrice > 0 ? (totalPrice / 3) : 0;
+  const shippingCost = shippingQuote ? shippingQuote.price : 0;
+  const grandTotal = totalPrice + shippingCost;
+  const grandTotalPix = grandTotal * 0.95;
+  const installmentGrandTotal = grandTotal > 0 ? (grandTotal / 3) : 0;
+
+  const amountUntilFreeShipping = FREE_SHIPPING_THRESHOLD - totalPrice;
 
   const handleCheckout = async () => {
     if (isCheckingOut || items.length === 0) return;
@@ -25,6 +90,9 @@ export default function CartDrawer() {
             variantColor: item.variantColorName,
             quantity: item.quantity,
           })),
+          shippingCost: shippingCost,
+          shippingRegion: shippingQuote?.region || 'Brasil',
+          shippingEstimate: shippingQuote?.estimateText || '5 a 12 dias úteis',
         }),
       });
 
@@ -104,67 +172,167 @@ export default function CartDrawer() {
               </Link>
             </div>
           ) : (
-            items.map((item) => (
-              <div
-                key={`${item.productId}-${item.variantColor}`}
-                className="flex gap-4 bg-white/5 border border-white/10 p-4 group"
-              >
-                {/* Image */}
-                <div className="w-20 h-20 bg-white/5 flex-shrink-0 flex items-center justify-center p-2">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h4 className="font-display font-bold text-sm text-white leading-tight">
-                        {item.name}
-                      </h4>
-                      <p className="font-body text-xs text-gray-500 mt-0.5">
-                        {item.variantColorName} · {item.category.toUpperCase()}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => removeItem(item.productId, item.variantColor)}
-                      className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+            <>
+              {items.map((item) => (
+                <div
+                  key={`${item.productId}-${item.variantColor}`}
+                  className="flex gap-4 bg-white/5 border border-white/10 p-4 group"
+                >
+                  {/* Image */}
+                  <div className="w-20 h-20 bg-white/5 flex-shrink-0 flex items-center justify-center p-2">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
 
-                  <div className="flex items-center justify-between mt-3">
-                    {/* Quantity Controls */}
-                    <div className="flex items-center gap-1 border border-white/10">
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="font-display font-bold text-sm text-white leading-tight">
+                          {item.name}
+                        </h4>
+                        <p className="font-body text-xs text-gray-500 mt-0.5">
+                          {item.variantColorName} · {item.category.toUpperCase()}
+                        </p>
+                      </div>
                       <button
-                        onClick={() => updateQuantity(item.productId, item.variantColor, item.quantity - 1)}
-                        className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                        onClick={() => removeItem(item.productId, item.variantColor)}
+                        className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0"
                       >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="font-display font-bold text-sm text-white w-8 text-center">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.productId, item.variantColor, item.quantity + 1)}
-                        className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                      >
-                        <Plus className="w-3 h-3" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
 
-                    {/* Price */}
-                    <span className="font-display font-bold text-sm text-primary">
-                      R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
+                    <div className="flex items-center justify-between mt-3">
+                      {/* Quantity Controls */}
+                      <div className="flex items-center gap-1 border border-white/10">
+                        <button
+                          onClick={() => updateQuantity(item.productId, item.variantColor, item.quantity - 1)}
+                          className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="font-display font-bold text-sm text-white w-8 text-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.productId, item.variantColor, item.quantity + 1)}
+                          className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+
+                      {/* Price */}
+                      <span className="font-display font-bold text-sm text-primary">
+                        R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Free Shipping Progress */}
+              {totalPrice < FREE_SHIPPING_THRESHOLD && (
+                <div className="bg-primary/5 border border-primary/20 p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Truck className="w-4 h-4 text-primary" />
+                    <span className="font-body text-xs text-gray-300">
+                      Falta <strong className="text-primary">R$ {amountUntilFreeShipping.toFixed(2).replace('.', ',')}</strong> para frete grátis!
                     </span>
                   </div>
+                  <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className="bg-primary h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100)}%` }}
+                    />
+                  </div>
                 </div>
+              )}
+
+              {totalPrice >= FREE_SHIPPING_THRESHOLD && !shippingQuote && (
+                <div className="bg-primary/10 border border-primary/30 p-3 flex items-center gap-2">
+                  <Truck className="w-4 h-4 text-primary" />
+                  <span className="font-body text-xs text-primary font-bold">
+                    Parabéns! Você ganhou frete grátis!
+                  </span>
+                </div>
+              )}
+
+              {/* Shipping Calculator */}
+              <div className="border border-white/10 bg-white/5 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <span className="font-display font-bold text-sm text-white tracking-wider">CALCULAR FRETE</span>
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={cep}
+                    onChange={(e) => handleCepChange(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleCalculateShipping()}
+                    placeholder="00000-000"
+                    maxLength={9}
+                    className="flex-1 bg-black/50 border border-white/10 px-3 py-2.5 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors"
+                  />
+                  <Button
+                    onClick={handleCalculateShipping}
+                    disabled={isCalculating}
+                    className="bg-primary text-black hover:bg-white font-display font-bold text-xs px-4 tracking-wider"
+                  >
+                    {isCalculating ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      'CALCULAR'
+                    )}
+                  </Button>
+                </div>
+
+                {cepError && (
+                  <p className="font-body text-xs text-red-400">{cepError}</p>
+                )}
+
+                {shippingQuote && (
+                  <div className="bg-black/30 border border-white/5 p-3 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Truck className="w-4 h-4 text-primary" />
+                        <span className="font-body text-xs text-gray-300">{shippingQuote.region}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-body text-xs text-gray-400">Prazo estimado</span>
+                      <span className="font-body text-xs text-white font-bold">{shippingQuote.estimateText}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-body text-xs text-gray-400">Valor do frete</span>
+                      <span className={`font-display font-bold text-sm ${shippingQuote.freeShipping ? 'text-primary' : 'text-white'}`}>
+                        {shippingQuote.formattedPrice}
+                      </span>
+                    </div>
+                    {shippingQuote.freeShipping && shippingQuote.price === 0 && totalPrice < FREE_SHIPPING_THRESHOLD && (
+                      <p className="font-body text-[10px] text-primary/70">Frete grátis para sua região!</p>
+                    )}
+                    {shippingQuote.freeShipping && totalPrice >= FREE_SHIPPING_THRESHOLD && (
+                      <p className="font-body text-[10px] text-primary/70">Frete grátis para compras acima de R$ {FREE_SHIPPING_THRESHOLD.toFixed(2).replace('.', ',')}!</p>
+                    )}
+                  </div>
+                )}
+
+                <a
+                  href="https://buscacepinter.correios.com.br/app/endereco/index.php"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-body text-[10px] text-gray-600 hover:text-primary transition-colors underline"
+                >
+                  Não sei meu CEP
+                </a>
               </div>
-            ))
+            </>
           )}
         </div>
 
@@ -179,24 +347,43 @@ export default function CartDrawer() {
               Limpar carrinho
             </button>
 
-            {/* Subtotal */}
+            {/* Totals */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="font-display text-sm text-gray-400 tracking-wider">SUBTOTAL</span>
-                <span className="font-display font-bold text-lg text-white">
+                <span className="font-display font-bold text-sm text-white">
                   R$ {totalPrice.toFixed(2).replace('.', ',')}
                 </span>
               </div>
+
+              {shippingQuote && (
+                <div className="flex items-center justify-between">
+                  <span className="font-display text-sm text-gray-400 tracking-wider">FRETE</span>
+                  <span className={`font-display font-bold text-sm ${shippingQuote.freeShipping ? 'text-primary' : 'text-white'}`}>
+                    {shippingQuote.formattedPrice}
+                  </span>
+                </div>
+              )}
+
+              <div className="border-t border-white/10 pt-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-display text-sm text-gray-300 tracking-wider">TOTAL</span>
+                  <span className="font-display font-bold text-lg text-white">
+                    R$ {grandTotal.toFixed(2).replace('.', ',')}
+                  </span>
+                </div>
+              </div>
+
               <div className="flex items-center justify-between">
                 <span className="font-body text-xs text-gray-500">Parcelamento</span>
                 <span className="font-body text-xs text-gray-400">
-                  ou <span className="text-white font-bold">3x de R$ {installmentTotal}</span> sem juros
+                  ou <span className="text-white font-bold">3x de R$ {installmentGrandTotal.toFixed(2).replace('.', ',')}</span> sem juros
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-body text-xs text-gray-500">PIX (5% desc.)</span>
                 <span className="font-body text-xs text-primary font-bold">
-                  R$ {(totalPrice * 0.95).toFixed(2).replace('.', ',')}
+                  R$ {grandTotalPix.toFixed(2).replace('.', ',')}
                 </span>
               </div>
             </div>
@@ -227,9 +414,11 @@ export default function CartDrawer() {
               )}
             </Button>
 
-            <p className="font-body text-[10px] text-gray-600 text-center">
-              Frete grátis para todo o Brasil. Entrega em até 10 dias úteis.
-            </p>
+            {!shippingQuote && (
+              <p className="font-body text-[10px] text-gray-600 text-center">
+                Informe seu CEP acima para calcular o frete.
+              </p>
+            )}
           </div>
         )}
       </div>
