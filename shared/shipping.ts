@@ -16,6 +16,12 @@ export interface ShippingQuote {
 
 // Mapeamento de faixas de CEP para regiões
 // Fonte: estrutura de CEPs dos Correios do Brasil
+// Cidades com frete grátis (verificadas antes das regiões gerais)
+const FREE_SHIPPING_CITIES: { start: number; end: number; city: string }[] = [
+  { start: 56300000, end: 56354999, city: "Petrolina — PE" },
+  { start: 48900000, end: 48924999, city: "Juazeiro — BA" },
+];
+
 const CEP_REGIONS: { start: number; end: number; region: string; price: number; minDays: number; maxDays: number }[] = [
   // São Paulo Capital e Grande SP
   { start: 1000000, end: 9999999, region: "São Paulo — Capital e Grande SP", price: 0, minDays: 2, maxDays: 4 },
@@ -81,6 +87,29 @@ export function calculateShipping(cep: string, cartTotal: number): ShippingQuote
   }
 
   const cepNumber = parseInt(cleanCep, 10);
+
+  // Verificar se é cidade com frete grátis
+  const freeCity = FREE_SHIPPING_CITIES.find(
+    (c) => cepNumber >= c.start && cepNumber <= c.end
+  );
+
+  if (freeCity) {
+    // Buscar prazo da região correspondente
+    const regionInfo = CEP_REGIONS.find(
+      (r) => cepNumber >= r.start && cepNumber <= r.end
+    );
+    const minDays = regionInfo?.minDays ?? 3;
+    const maxDays = regionInfo?.maxDays ?? 5;
+    return {
+      region: freeCity.city,
+      price: 0,
+      estimateMin: minDays,
+      estimateMax: maxDays,
+      freeShipping: true,
+      formattedPrice: "Grátis",
+      estimateText: `${minDays} a ${maxDays} dias úteis`,
+    };
+  }
 
   // Encontrar a região
   const regionInfo = CEP_REGIONS.find(

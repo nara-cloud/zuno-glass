@@ -88,3 +88,4 @@
 - [x] Incluir frete no checkout Stripe (shipping_options)
 - [x] Atualizar página Envio e Devoluções com informações de frete
 - [x] Aumentar tamanho da logo na Navbar
+- [x] Frete grátis para Petrolina (PE) e Juazeiro (BA)
