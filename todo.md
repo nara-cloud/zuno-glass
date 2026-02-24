@@ -89,3 +89,6 @@
 - [x] Atualizar página Envio e Devoluções com informações de frete
 - [x] Aumentar tamanho da logo na Navbar
 - [x] Frete grátis para Petrolina (PE) e Juazeiro (BA)
+- [x] Testar fluxo completo de compra com frete grátis (CEP Petrolina) no Stripe
+- [x] Verificar integração do frete grátis no checkout Stripe (shipping_options)
+- [x] Revisão final do site para publicação (links, imagens, textos, navegação)
