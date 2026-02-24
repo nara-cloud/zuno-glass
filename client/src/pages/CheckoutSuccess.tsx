@@ -171,7 +171,7 @@ export default function CheckoutSuccess() {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-primary rotate-45 mt-2 flex-shrink-0"></div>
-                  <span className="font-body text-gray-400">Prazo de entrega: 5 a 10 dias úteis. Frete grátis para todo o Brasil.</span>
+                  <span className="font-body text-gray-400">Prazo de entrega: 5 a 10 dias úteis. Frete grátis para Petrolina e Juazeiro, ou em compras acima de R$ 299,90.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-primary rotate-45 mt-2 flex-shrink-0"></div>

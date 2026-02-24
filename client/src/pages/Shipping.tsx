@@ -80,7 +80,7 @@ export default function Shipping() {
               <h3 className="font-display font-bold text-primary">FRETE GRÁTIS</h3>
             </div>
             <p className="text-gray-300 font-body">
-              Frete grátis para todo o Brasil em todas as compras. Sem valor mínimo, sem condições ocultas.
+              Frete grátis para Petrolina (PE) e Juazeiro (BA) em todas as compras. Para as demais regiões, frete grátis em compras acima de R$ 299,90. Consulte o valor do frete pelo CEP no carrinho.
             </p>
           </div>
         </div>
