@@ -87,3 +87,4 @@
 - [x] Integrar frete no CartDrawer (campo CEP + resultado)
 - [x] Incluir frete no checkout Stripe (shipping_options)
 - [x] Atualizar página Envio e Devoluções com informações de frete
+- [x] Aumentar tamanho da logo na Navbar
