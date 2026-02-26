@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 interface SquadMember {
   id: number;
   name: string;
-  category: "PERFORMANCE" | "CLÁSSICO";
+  category: "PERFORMANCE" | "LIFESTYLE";
   image: string;
   bio: string;
   instagram: string;
@@ -20,86 +20,80 @@ const performanceMembers: SquadMember[] = [
     id: 1,
     name: "NARA FERRARI",
     category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/gqcYBPyIaMpzFbMn.png",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/CqbaZlrSJEggSwZA.jpg",
     bio: "Empreendedora e atleta de Petrolina. Engenheira e estrategista de marketing, está sempre em movimento transformando ideias em realidade.",
     instagram: "https://instagram.com/naraferrari",
     instagramHandle: "@naraferrari",
     city: "Petrolina, PE",
-    activities: ["Engenharia", "Marketing", "Tênis"]
+    activities: ["Engenharia", "Marketing", "Corrida"]
   },
   {
     id: 2,
+    name: "LUIZA FERRARI",
+    category: "PERFORMANCE",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/aKoficEVsIhaFDMc.jpg",
+    bio: "Corredora apaixonada e empreendedora. Leva a performance ao limite em cada treino e prova, unindo esporte e negócios com a mesma intensidade.",
+    instagram: "https://instagram.com/luiizaferrari",
+    instagramHandle: "@luiizaferrari",
+    city: "Belo Horizonte, MG",
+    activities: ["Corrida de Rua", "Negócios", "Marketing"]
+  },
+  {
+    id: 3,
     name: "EDUARDO RODRIGUES",
     category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/LNFYVcVZAkYYdRNe.png",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/kTNreAwWGuKuUDpO.jpg",
     bio: "Corredor de rua de Petrolina. Inspira a todos com sua paixão pela corrida e sua jornada de treinos e superação.",
     instagram: "https://instagram.com/tiodudu8",
     instagramHandle: "@tiodudu8",
     city: "Petrolina, PE",
-    activities: ["Corrida de Rua"]
+    activities: ["Corrida de Rua", "Beach Tennis"]
   },
   {
-    id: 3,
+    id: 4,
     name: "NATÁLIA LEITE",
     category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/HJAVkHOsPPJnqFGT.png",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/RnBXePBvYxqJrzHu.jpg",
     bio: "Corredora dedicada ao esporte e ao estilo de vida ativo. Leva a performance ao limite em cada treino.",
     instagram: "https://instagram.com/naty_leite",
     instagramHandle: "@naty_leite",
     activities: ["Corrida", "Fitness"]
   },
   {
-    id: 4,
+    id: 5,
     name: "BEATRIZ CORDEIRO",
     category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/GhffsHiwdKuaffxU.png",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/XwARAvNWRVQqoLRW.jpg",
     bio: "Arquiteta e triatleta amadora de Petrolina. Vive com constância e propósito, unindo a paixão pelo esporte e pela arquitetura.",
     instagram: "https://instagram.com/beatrizcordeiro.arq",
     instagramHandle: "@beatrizcordeiro.arq",
     city: "Petrolina, PE",
-    activities: ["Triatlo", "Arquitetura", "IM 70.3"]
-  },
-  {
-    id: 5,
-    name: "LUCAS CORLETT",
-    category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ADLTBnbFbgTRiNwR.png",
-    bio: "Entusiasta de esportes e fitness. Promove um estilo de vida ativo e saudável com intensidade e dedicação.",
-    instagram: "https://instagram.com/lucascorlett",
-    instagramHandle: "@lucascorlett",
-    activities: ["Esporte", "Fitness"]
+    activities: ["Triatlo", "Arquitetura", "Corrida"]
   },
   {
     id: 6,
+    name: "LUCAS CORLETT",
+    category: "PERFORMANCE",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/SchKnUNzqOxmrSZq.jpg",
+    bio: "Atleta de beach tennis e entusiasta de esportes. Promove um estilo de vida ativo e saudável com intensidade e dedicação.",
+    instagram: "https://instagram.com/lucascorlett",
+    instagramHandle: "@lucascorlett",
+    activities: ["Beach Tennis", "Fitness"]
+  },
+  {
+    id: 7,
     name: "LUANDA PASSOS",
     category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/lePXiXWapegicueR.png",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/mVeEoxheraqPvYPR.jpg",
     bio: "Fisioterapeuta esportiva e maratonista. Doutoranda dedicada a ajudar atletas a alcançarem seu máximo potencial.",
     instagram: "https://instagram.com/luandapassosr",
     instagramHandle: "@luandapassosr",
     city: "Petrolina, PE",
-    activities: ["Fisioterapia Esportiva", "Maratona", "Beach Tennis"]
-  },
-];
-
-const classicoMembers: SquadMember[] = [
-  {
-    id: 7,
-    name: "LUIZA FERRARI",
-    category: "CLÁSSICO",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/DWrQPDmrzLkYXefq.png",
-    bio: "Empreendedora e profissional de marketing com forte foco em lifestyle. Sócia de múltiplas empresas, compartilha sua jornada de negócios e estilo.",
-    instagram: "https://instagram.com/luiizaferrari",
-    instagramHandle: "@luiizaferrari",
-    city: "Belo Horizonte, MG",
-    activities: ["Negócios", "Marketing", "Lifestyle"]
+    activities: ["Fisioterapia Esportiva", "Maratona", "CrossFit"]
   },
 ];
 
 function MemberCard({ member }: { member: SquadMember }) {
-  const isPerformance = member.category === "PERFORMANCE";
-  const CategoryIcon = isPerformance ? Zap : Crown;
-
   return (
     <div className="group relative">
       <div className="relative aspect-[3/4] overflow-hidden border border-white/10 bg-white/5 clip-corner mb-6">
@@ -112,7 +106,7 @@ function MemberCard({ member }: { member: SquadMember }) {
         
         <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 bg-gradient-to-t from-black via-black/80 to-transparent z-20">
           <div className="flex items-center gap-2 mb-2">
-            <CategoryIcon className="w-4 h-4 text-primary" />
+            <Zap className="w-4 h-4 text-primary" />
             <span className="font-display font-bold text-primary tracking-widest text-xs">{member.category}</span>
           </div>
           <h2 className="font-display font-bold text-2xl md:text-3xl text-white mb-2">{member.name}</h2>
@@ -189,7 +183,7 @@ export default function Squad() {
           </p>
           <p className="font-body text-gray-400 mt-6 text-lg leading-relaxed">
             O Squad ZUNO é formado por pessoas que vivem o esporte e o estilo com a mesma intensidade. 
-            Dividimos em duas categorias: quem compete e quem inspira.
+            Atletas que testam nossos óculos nas condições mais exigentes.
           </p>
         </div>
       </section>
@@ -212,24 +206,6 @@ export default function Squad() {
         </div>
       </section>
 
-      {/* Clássico Category */}
-      <section className="py-16 container">
-        <div className="flex items-center gap-4 mb-12">
-          <Crown className="w-8 h-8 text-primary" />
-          <h2 className="font-display font-bold text-3xl md:text-4xl text-white">CLÁSSICO</h2>
-          <div className="flex-1 h-[1px] bg-white/10"></div>
-        </div>
-        <p className="font-body text-gray-400 text-lg mb-12 max-w-2xl">
-          Membros ligados a estilo, postura e lifestyle. Onde a atitude encontra o design.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-          {classicoMembers.map((member) => (
-            <MemberCard key={member.id} member={member} />
-          ))}
-        </div>
-      </section>
-
       {/* Join CTA */}
       <section className="py-32 container">
         <div className="bg-white/5 border border-white/10 p-12 md:p-20 text-center relative overflow-hidden clip-corner">
@@ -241,7 +217,7 @@ export default function Squad() {
           </h2>
           <p className="font-body text-gray-400 max-w-xl mx-auto mb-10 text-lg">
             Estamos sempre em busca de pessoas que compartilham nossa visão. 
-            Se você vive o esporte ou o estilo com intensidade, queremos te conhecer.
+            Se você vive o esporte com intensidade, queremos te conhecer.
           </p>
           <a href="mailto:contato@zunoglass.com?subject=Quero fazer parte do Squad ZUNO">
             <Button className="bg-white text-black hover:bg-primary font-display font-bold px-10 h-14 tracking-wider text-lg">

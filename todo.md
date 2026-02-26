@@ -100,3 +100,5 @@
 - [x] Renomear modelos: Linha Lifestyle (11 modelos) com novos nomes
 - [x] Criar/Renomear: Linha Edição Limitada (5 modelos) com novos nomes
 - [x] Atualizar referências de linhas em todo o site (filtros, páginas, etc.)
+- [x] Substituir avatares gerados por fotos reais dos 7 membros do Squad
+- [x] Mover Luiza Ferrari de Clássico para Performance (corredora)
