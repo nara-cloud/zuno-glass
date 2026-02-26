@@ -2,7 +2,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Users, Trophy, Flame, Smartphone, ArrowRight, Target, Calendar, Handshake, Building2, Dumbbell, Heart, ExternalLink } from 'lucide-react';
+import { Users, Trophy, Flame, Smartphone, ArrowRight, Target, Calendar, Handshake, Building2, Dumbbell, Clock, ExternalLink } from 'lucide-react';
 
 const challenges = [
   {
@@ -23,48 +23,6 @@ const challenges = [
     icon: Users,
     status: "EM BREVE"
   }
-];
-
-const partnersBrands = [
-  {
-    name: "Sua Marca Aqui",
-    category: "Esporte & Lifestyle",
-    description: "Marcas alinhadas com performance, esporte e estilo de vida ativo.",
-    icon: Building2,
-  },
-  {
-    name: "Sua Marca Aqui",
-    category: "Nutrição & Suplementos",
-    description: "Parceiros de nutrição esportiva e suplementação para atletas.",
-    icon: Building2,
-  },
-  {
-    name: "Sua Marca Aqui",
-    category: "Tecnologia & Wearables",
-    description: "Marcas de tecnologia e dispositivos compatíveis com o ecossistema ZUNO.",
-    icon: Building2,
-  },
-];
-
-const partnersProfessionals = [
-  {
-    name: "Seu Nome Aqui",
-    role: "Personal Trainer",
-    description: "Profissionais de educação física que treinam com ZUNO.",
-    icon: Dumbbell,
-  },
-  {
-    name: "Seu Nome Aqui",
-    role: "Fisioterapeuta Esportivo",
-    description: "Especialistas em saúde e recuperação para atletas da comunidade.",
-    icon: Heart,
-  },
-  {
-    name: "Seu Nome Aqui",
-    role: "Coach de Corrida",
-    description: "Treinadores de corrida que utilizam e recomendam ZUNO.",
-    icon: Target,
-  },
 ];
 
 export default function Community() {
@@ -145,7 +103,7 @@ export default function Community() {
         </div>
       </section>
 
-      {/* Parceiros — Marcas e Profissionais */}
+      {/* Parceiros — Em Breve */}
       <section className="py-20 container">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 border border-primary/50 bg-primary/10 px-4 py-2 rounded-full mb-8 backdrop-blur-md">
@@ -161,7 +119,7 @@ export default function Community() {
           </p>
         </div>
 
-        {/* Marcas */}
+        {/* Marcas — Em Breve */}
         <div className="mb-16">
           <div className="flex items-center gap-4 mb-10">
             <Building2 className="w-6 h-6 text-primary" />
@@ -169,28 +127,25 @@ export default function Community() {
             <div className="flex-1 h-[1px] bg-white/10"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {partnersBrands.map((partner, i) => (
-              <div key={i} className="group relative bg-white/[0.03] border border-white/10 hover:border-primary/40 transition-all duration-300 p-8 clip-corner">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-14 h-14 bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-primary/30 transition-colors flex-shrink-0">
-                    <partner.icon className="w-6 h-6 text-gray-500 group-hover:text-primary transition-colors" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-mono text-primary/70 tracking-wider">{partner.category}</span>
-                    <h4 className="font-display font-bold text-lg text-white mt-1">{partner.name}</h4>
-                  </div>
-                </div>
-                <p className="text-gray-500 text-sm leading-relaxed">{partner.description}</p>
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ExternalLink className="w-4 h-4 text-primary/50" />
-                </div>
-              </div>
-            ))}
+          <div className="relative border border-dashed border-white/20 rounded-lg p-12 md:p-16 text-center bg-white/[0.02]">
+            <div className="absolute top-4 right-4">
+              <span className="text-xs font-mono border border-primary/40 bg-primary/10 px-3 py-1 text-primary rounded-full">EM BREVE</span>
+            </div>
+            <Clock className="w-12 h-12 text-primary/40 mx-auto mb-6" />
+            <h4 className="font-display font-bold text-xl md:text-2xl text-white mb-4">
+              PARCERIAS COM MARCAS EM BREVE
+            </h4>
+            <p className="font-body text-gray-500 text-base max-w-lg mx-auto leading-relaxed mb-2">
+              Estamos selecionando marcas alinhadas com performance, esporte e estilo de vida ativo 
+              para fazer parte do ecossistema ZUNO.
+            </p>
+            <p className="font-body text-gray-600 text-sm">
+              Categorias: Esporte & Lifestyle · Nutrição & Suplementos · Tecnologia & Wearables
+            </p>
           </div>
         </div>
 
-        {/* Profissionais */}
+        {/* Profissionais — Em Breve */}
         <div className="mb-12">
           <div className="flex items-center gap-4 mb-10">
             <Dumbbell className="w-6 h-6 text-primary" />
@@ -198,24 +153,21 @@ export default function Community() {
             <div className="flex-1 h-[1px] bg-white/10"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {partnersProfessionals.map((partner, i) => (
-              <div key={i} className="group relative bg-white/[0.03] border border-white/10 hover:border-primary/40 transition-all duration-300 p-8 clip-corner">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-14 h-14 bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-primary/30 transition-colors flex-shrink-0">
-                    <partner.icon className="w-6 h-6 text-gray-500 group-hover:text-primary transition-colors" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-mono text-primary/70 tracking-wider">{partner.role}</span>
-                    <h4 className="font-display font-bold text-lg text-white mt-1">{partner.name}</h4>
-                  </div>
-                </div>
-                <p className="text-gray-500 text-sm leading-relaxed">{partner.description}</p>
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ExternalLink className="w-4 h-4 text-primary/50" />
-                </div>
-              </div>
-            ))}
+          <div className="relative border border-dashed border-white/20 rounded-lg p-12 md:p-16 text-center bg-white/[0.02]">
+            <div className="absolute top-4 right-4">
+              <span className="text-xs font-mono border border-primary/40 bg-primary/10 px-3 py-1 text-primary rounded-full">EM BREVE</span>
+            </div>
+            <Clock className="w-12 h-12 text-primary/40 mx-auto mb-6" />
+            <h4 className="font-display font-bold text-xl md:text-2xl text-white mb-4">
+              PROFISSIONAIS PARCEIROS EM BREVE
+            </h4>
+            <p className="font-body text-gray-500 text-base max-w-lg mx-auto leading-relaxed mb-2">
+              Estamos convidando profissionais de saúde e esporte que compartilham a visão ZUNO 
+              para integrar nosso ecossistema.
+            </p>
+            <p className="font-body text-gray-600 text-sm">
+              Áreas: Personal Trainers · Fisioterapeutas Esportivos · Coaches de Corrida
+            </p>
           </div>
         </div>
 
@@ -246,7 +198,7 @@ export default function Community() {
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="w-full md:w-1/2">
               <Trophy className="w-12 h-12 text-primary mb-6" />
-              <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white">
+              <h2 className="font-display font-bold text-3xl md:text-5xl mb-6 text-white leading-tight">
                 DA COMUNIDADE <br/>AO <span className="text-primary">SQUAD</span>
               </h2>
               <p className="font-body text-gray-400 text-lg leading-relaxed mb-8">

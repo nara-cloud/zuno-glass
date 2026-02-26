@@ -93,3 +93,4 @@
 - [x] Verificar integração do frete grátis no checkout Stripe (shipping_options)
 - [x] Revisão final do site para publicação (links, imagens, textos, navegação)
 - [x] Corrigir texto "Frete grátis para todo o Brasil" — frete grátis é apenas para Petrolina/Juazeiro e compras acima de R$ 299,90
+- [x] Atualizar secção Parceiros na Comunidade com "Em Breve" — ainda sem marcas/profissionais cadastrados
