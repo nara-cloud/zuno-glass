@@ -119,7 +119,7 @@ export default function ProductDetail() {
           <div>
             <div className="flex items-center gap-4 mb-4">
               <span className="font-display text-primary tracking-widest uppercase text-sm border border-primary/30 px-3 py-1">
-                {product.category}
+                {product.category === 'limited' ? 'EDIÇÃO LIMITADA' : product.category === 'performance' ? 'PERFORMANCE' : 'LIFESTYLE'}
               </span>
               {product.isNew && (
                 <span className="font-display bg-white text-black font-bold text-xs px-3 py-1 clip-corner">

@@ -1,45 +1,158 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Instagram, Trophy, Target, Zap, Crown } from 'lucide-react';
+import { Instagram, Trophy, Target, Zap, Crown, MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const performanceMembers = [
+interface SquadMember {
+  id: number;
+  name: string;
+  category: "PERFORMANCE" | "CLÁSSICO";
+  image: string;
+  bio: string;
+  instagram: string;
+  instagramHandle: string;
+  city?: string;
+  activities: string[];
+}
+
+const performanceMembers: SquadMember[] = [
   {
     id: 1,
-    name: "MEMBRO 1",
+    name: "NARA FERRARI",
     category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/QtcCXfLHxIsmKmbd.png",
-    bio: "Atleta de corrida. Leva o treino ao limite todos os dias.",
-    instagram: "#"
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/gqcYBPyIaMpzFbMn.png",
+    bio: "Empreendedora e atleta de Petrolina. Engenheira e estrategista de marketing, está sempre em movimento transformando ideias em realidade.",
+    instagram: "https://instagram.com/naraferrari",
+    instagramHandle: "@naraferrari",
+    city: "Petrolina, PE",
+    activities: ["Engenharia", "Marketing", "Tênis"]
   },
   {
     id: 2,
-    name: "MEMBRO 2",
+    name: "EDUARDO RODRIGUES",
     category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/qAwYpxOkXdUsEimU.png",
-    bio: "Ciclista de estrada. Velocidade e resistência como estilo de vida.",
-    instagram: "#"
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/LNFYVcVZAkYYdRNe.png",
+    bio: "Corredor de rua de Petrolina. Inspira a todos com sua paixão pela corrida e sua jornada de treinos e superação.",
+    instagram: "https://instagram.com/tiodudu8",
+    instagramHandle: "@tiodudu8",
+    city: "Petrolina, PE",
+    activities: ["Corrida de Rua"]
   },
-];
-
-const classicoMembers = [
   {
     id: 3,
-    name: "MEMBRO 3",
-    category: "CLÁSSICO",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ZprAYfUVQCGmhqRu.png",
-    bio: "Estilo e postura. A atitude fala mais alto que qualquer troféu.",
-    instagram: "#"
+    name: "NATÁLIA LEITE",
+    category: "PERFORMANCE",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/HJAVkHOsPPJnqFGT.png",
+    bio: "Corredora dedicada ao esporte e ao estilo de vida ativo. Leva a performance ao limite em cada treino.",
+    instagram: "https://instagram.com/naty_leite",
+    instagramHandle: "@naty_leite",
+    activities: ["Corrida", "Fitness"]
   },
   {
     id: 4,
-    name: "MEMBRO 4",
-    category: "CLÁSSICO",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OUTBhbLkSAqYGkGd.png",
-    bio: "Lifestyle urbano. Onde o esporte encontra a moda de rua.",
-    instagram: "#"
-  }
+    name: "BEATRIZ CORDEIRO",
+    category: "PERFORMANCE",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/GhffsHiwdKuaffxU.png",
+    bio: "Arquiteta e triatleta amadora de Petrolina. Vive com constância e propósito, unindo a paixão pelo esporte e pela arquitetura.",
+    instagram: "https://instagram.com/beatrizcordeiro.arq",
+    instagramHandle: "@beatrizcordeiro.arq",
+    city: "Petrolina, PE",
+    activities: ["Triatlo", "Arquitetura", "IM 70.3"]
+  },
+  {
+    id: 5,
+    name: "LUCAS CORLETT",
+    category: "PERFORMANCE",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ADLTBnbFbgTRiNwR.png",
+    bio: "Entusiasta de esportes e fitness. Promove um estilo de vida ativo e saudável com intensidade e dedicação.",
+    instagram: "https://instagram.com/lucascorlett",
+    instagramHandle: "@lucascorlett",
+    activities: ["Esporte", "Fitness"]
+  },
+  {
+    id: 6,
+    name: "LUANDA PASSOS",
+    category: "PERFORMANCE",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/lePXiXWapegicueR.png",
+    bio: "Fisioterapeuta esportiva e maratonista. Doutoranda dedicada a ajudar atletas a alcançarem seu máximo potencial.",
+    instagram: "https://instagram.com/luandapassosr",
+    instagramHandle: "@luandapassosr",
+    city: "Petrolina, PE",
+    activities: ["Fisioterapia Esportiva", "Maratona", "Beach Tennis"]
+  },
 ];
+
+const classicoMembers: SquadMember[] = [
+  {
+    id: 7,
+    name: "LUIZA FERRARI",
+    category: "CLÁSSICO",
+    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/DWrQPDmrzLkYXefq.png",
+    bio: "Empreendedora e profissional de marketing com forte foco em lifestyle. Sócia de múltiplas empresas, compartilha sua jornada de negócios e estilo.",
+    instagram: "https://instagram.com/luiizaferrari",
+    instagramHandle: "@luiizaferrari",
+    city: "Belo Horizonte, MG",
+    activities: ["Negócios", "Marketing", "Lifestyle"]
+  },
+];
+
+function MemberCard({ member }: { member: SquadMember }) {
+  const isPerformance = member.category === "PERFORMANCE";
+  const CategoryIcon = isPerformance ? Zap : Crown;
+
+  return (
+    <div className="group relative">
+      <div className="relative aspect-[3/4] overflow-hidden border border-white/10 bg-white/5 clip-corner mb-6">
+        <div className="absolute inset-0 bg-primary/20 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
+        <img 
+          src={member.image} 
+          alt={member.name} 
+          className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105" 
+        />
+        
+        <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 bg-gradient-to-t from-black via-black/80 to-transparent z-20">
+          <div className="flex items-center gap-2 mb-2">
+            <CategoryIcon className="w-4 h-4 text-primary" />
+            <span className="font-display font-bold text-primary tracking-widest text-xs">{member.category}</span>
+          </div>
+          <h2 className="font-display font-bold text-2xl md:text-3xl text-white mb-2">{member.name}</h2>
+          
+          {member.city && (
+            <div className="flex items-center gap-1.5 mb-2">
+              <MapPin className="w-3.5 h-3.5 text-gray-400" />
+              <span className="font-body text-gray-400 text-xs">{member.city}</span>
+            </div>
+          )}
+
+          <p className="font-body text-gray-300 text-sm leading-relaxed max-w-md mb-3">
+            {member.bio}
+          </p>
+
+          <div className="flex flex-wrap gap-2 mb-3">
+            {member.activities.map((activity, idx) => (
+              <span key={idx} className="text-[10px] font-mono uppercase tracking-wider border border-white/20 px-2 py-0.5 text-gray-400">
+                {activity}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between items-center px-2">
+        <span className="text-xs font-mono border border-primary/30 px-3 py-1 text-primary">{member.category}</span>
+        <a 
+          href={member.instagram} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors group/link"
+        >
+          <span className="text-xs font-body opacity-0 group-hover/link:opacity-100 transition-opacity">{member.instagramHandle}</span>
+          <Instagram className="w-5 h-5" />
+        </a>
+      </div>
+    </div>
+  );
+}
 
 export default function Squad() {
   return (
@@ -92,36 +205,9 @@ export default function Squad() {
           Membros ligados ao esporte e treino. Atletas que testam nossos óculos nas condições mais exigentes.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
           {performanceMembers.map((member) => (
-            <div key={member.id} className="group relative">
-              <div className="relative aspect-[3/4] overflow-hidden border border-white/10 bg-white/5 clip-corner mb-6">
-                <div className="absolute inset-0 bg-primary/20 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
-                <img 
-                  src={member.image} 
-                  alt={member.name} 
-                  className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105" 
-                />
-                
-                <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-black via-black/80 to-transparent z-20">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Zap className="w-4 h-4 text-primary" />
-                    <span className="font-display font-bold text-primary tracking-widest text-sm">{member.category}</span>
-                  </div>
-                  <h2 className="font-display font-bold text-3xl md:text-4xl text-white mb-3">{member.name}</h2>
-                  <p className="font-body text-gray-300 text-sm leading-relaxed max-w-md">
-                    {member.bio}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center px-2">
-                <span className="text-xs font-mono border border-primary/30 px-3 py-1 text-primary">{member.category}</span>
-                <a href={member.instagram} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary transition-colors">
-                  <Instagram className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
+            <MemberCard key={member.id} member={member} />
           ))}
         </div>
       </section>
@@ -137,36 +223,9 @@ export default function Squad() {
           Membros ligados a estilo, postura e lifestyle. Onde a atitude encontra o design.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
           {classicoMembers.map((member) => (
-            <div key={member.id} className="group relative">
-              <div className="relative aspect-[3/4] overflow-hidden border border-white/10 bg-white/5 clip-corner mb-6">
-                <div className="absolute inset-0 bg-primary/20 mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
-                <img 
-                  src={member.image} 
-                  alt={member.name} 
-                  className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105" 
-                />
-                
-                <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-black via-black/80 to-transparent z-20">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Crown className="w-4 h-4 text-primary" />
-                    <span className="font-display font-bold text-primary tracking-widest text-sm">{member.category}</span>
-                  </div>
-                  <h2 className="font-display font-bold text-3xl md:text-4xl text-white mb-3">{member.name}</h2>
-                  <p className="font-body text-gray-300 text-sm leading-relaxed max-w-md">
-                    {member.bio}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center px-2">
-                <span className="text-xs font-mono border border-primary/30 px-3 py-1 text-primary">{member.category}</span>
-                <a href={member.instagram} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary transition-colors">
-                  <Instagram className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
+            <MemberCard key={member.id} member={member} />
           ))}
         </div>
       </section>
@@ -184,9 +243,11 @@ export default function Squad() {
             Estamos sempre em busca de pessoas que compartilham nossa visão. 
             Se você vive o esporte ou o estilo com intensidade, queremos te conhecer.
           </p>
-          <Button className="bg-white text-black hover:bg-primary font-display font-bold px-10 h-14 tracking-wider text-lg">
-            APLICAR PARA O SQUAD
-          </Button>
+          <a href="mailto:contato@zunoglass.com?subject=Quero fazer parte do Squad ZUNO">
+            <Button className="bg-white text-black hover:bg-primary font-display font-bold px-10 h-14 tracking-wider text-lg">
+              APLICAR PARA O SQUAD
+            </Button>
+          </a>
         </div>
       </section>
 

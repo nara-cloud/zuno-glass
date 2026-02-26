@@ -7,38 +7,36 @@ export interface ProductInfo {
   id: string;
   name: string;
   price: number; // in BRL
-  category: 'sport' | 'urban' | 'premium' | 'lifestyle';
+  category: 'performance' | 'lifestyle' | 'limited';
 }
 
 export const productCatalog: ProductInfo[] = [
-  // SPORT LINE - R$ 189,90
-  { id: 'zuno-prime-stealth', name: 'PRIME STEALTH', price: 189.90, category: 'sport' },
-  { id: 'zuno-devon-apex', name: 'DEVON APEX', price: 189.90, category: 'sport' },
-  { id: 'zuno-madagascar-rush', name: 'MADAGASCAR RUSH', price: 189.90, category: 'sport' },
-  { id: 'zuno-oregon-blaze', name: 'OREGON BLAZE', price: 189.90, category: 'sport' },
-  { id: 'zuno-jin-flow', name: 'JIN FLOW', price: 189.90, category: 'sport' },
-
-  // URBAN LINE - R$ 169,90
-  { id: 'zuno-verona-shadow', name: 'VERONA SHADOW', price: 169.90, category: 'urban' },
-  { id: 'zuno-diamond-edge', name: 'DIAMOND EDGE', price: 169.90, category: 'urban' },
-  { id: 'zuno-harper-volt', name: 'HARPER VOLT', price: 169.90, category: 'urban' },
-  { id: 'zuno-lorena-strike', name: 'LORENA STRIKE', price: 169.90, category: 'urban' },
-  { id: 'zuno-mia-camo', name: 'MIA CAMO', price: 169.90, category: 'urban' },
-  { id: 'zuno-dune-tracker', name: 'DUNE TRACKER', price: 169.90, category: 'urban' },
-
-  // PREMIUM LINE - R$ 169,90
-  { id: 'zuno-ares-titan', name: 'ARES TITAN', price: 169.90, category: 'premium' },
-  { id: 'zuno-diamond-noir', name: 'DIAMOND NOIR', price: 169.90, category: 'premium' },
-  { id: 'zuno-dubai-royal', name: 'DUBAI ROYAL', price: 169.90, category: 'premium' },
-  { id: 'zuno-kansas-forge', name: 'KANSAS FORGE', price: 169.90, category: 'premium' },
-  { id: 'zuno-samba-gold', name: 'SAMBA GOLD', price: 169.90, category: 'premium' },
+  // PERFORMANCE LINE - R$ 189,90
+  { id: 'zuno-veyron', name: 'ZUNO VEYRON', price: 189.90, category: 'performance' },
+  { id: 'zuno-strix', name: 'ZUNO STRIX', price: 189.90, category: 'performance' },
+  { id: 'zuno-kaizen', name: 'ZUNO KAIZEN', price: 189.90, category: 'performance' },
+  { id: 'zuno-vortexa', name: 'ZUNO VORTEXA', price: 189.90, category: 'performance' },
+  { id: 'zuno-noxis', name: 'ZUNO NOXIS', price: 189.90, category: 'performance' },
 
   // LIFESTYLE LINE - R$ 169,90
-  { id: 'zuno-aviador-sky', name: 'AVIADOR SKY', price: 169.90, category: 'lifestyle' },
-  { id: 'zuno-florenca-vita', name: 'FLORENÇA VITA', price: 169.90, category: 'lifestyle' },
-  { id: 'zuno-hawai-breeze', name: 'HAWAI BREEZE', price: 169.90, category: 'lifestyle' },
-  { id: 'zuno-hexagonal-prism', name: 'HEXAGONAL PRISM', price: 169.90, category: 'lifestyle' },
-  { id: 'zuno-infinity-mirror', name: 'INFINITY MIRROR', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-altis', name: 'ZUNO ALTIS', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-arven', name: 'ZUNO ARVEN', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-kaori', name: 'ZUNO KAORI', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-venza', name: 'ZUNO VENZA', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-mistral', name: 'ZUNO MISTRAL', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-lumea', name: 'ZUNO LUMEA', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-savik', name: 'ZUNO SAVIK', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-neroz', name: 'ZUNO NEROZ', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-axiom', name: 'ZUNO AXIOM', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-orvik', name: 'ZUNO ORVIK', price: 169.90, category: 'lifestyle' },
+  { id: 'zuno-infinity-mirror', name: 'ZUNO INFINITY MIRROR', price: 169.90, category: 'lifestyle' },
+
+  // EDIÇÃO LIMITADA LINE - R$ 169,90
+  { id: 'zuno-apex', name: 'ZUNO APEX', price: 169.90, category: 'limited' },
+  { id: 'zuno-titan', name: 'ZUNO TITAN', price: 169.90, category: 'limited' },
+  { id: 'zuno-solaris', name: 'ZUNO SOLARIS', price: 169.90, category: 'limited' },
+  { id: 'zuno-obsidian', name: 'ZUNO OBSIDIAN', price: 169.90, category: 'limited' },
+  { id: 'zuno-infinity-x', name: 'ZUNO INFINITY X', price: 169.90, category: 'limited' },
 ];
 
 export function getProductById(id: string): ProductInfo | undefined {

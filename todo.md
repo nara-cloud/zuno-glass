@@ -95,3 +95,8 @@
 - [x] Corrigir texto "Frete grátis para todo o Brasil" — frete grátis é apenas para Petrolina/Juazeiro e compras acima de R$ 299,90
 - [x] Atualizar secção Parceiros na Comunidade com "Em Breve" — ainda sem marcas/profissionais cadastrados
 - [x] Recortar margens da logo para aumentar tamanho visual na navbar
+- [x] Atualizar Squad com 7 membros reais: Nara Ferrari, Luiza Ferrari, Eduardo Rodrigues, Natália Leite, Beatriz Cordeiro, Lucas Corlett, Luanda Passos
+- [x] Renomear modelos: Linha Performance (5 modelos) com novos nomes
+- [x] Renomear modelos: Linha Lifestyle (11 modelos) com novos nomes
+- [x] Criar/Renomear: Linha Edição Limitada (5 modelos) com novos nomes
+- [x] Atualizar referências de linhas em todo o site (filtros, páginas, etc.)

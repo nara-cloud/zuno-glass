@@ -15,10 +15,9 @@ export default function Products() {
 
   const categories = [
     { id: 'all', label: 'TODOS' },
-    { id: 'sport', label: productCategories.sport.label },
-    { id: 'urban', label: productCategories.urban.label },
-    { id: 'premium', label: productCategories.premium.label },
+    { id: 'performance', label: productCategories.performance.label },
     { id: 'lifestyle', label: productCategories.lifestyle.label },
+    { id: 'limited', label: productCategories.limited.label },
   ];
 
   return (
