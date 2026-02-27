@@ -104,3 +104,7 @@
 - [x] Mover Luiza Ferrari de Clássico para Performance (corredora)
 - [x] Configurar logo ZUNO como favicon do site
 - [x] Bug: popup Lead Capture mostrando dois botões X de fechar
+- [x] Revisar lógica de frete grátis e envio
+- [x] Remover frete grátis automático de SP Capital (cobrar normalmente)
+- [x] Corrigir badge "Frete Grátis Brasil" no ProductDetail para informação precisa
+- [x] Manter frete grátis apenas para Petrolina/Juazeiro e compras acima de R$ 299,90

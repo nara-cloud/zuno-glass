@@ -44,10 +44,37 @@ describe("calculateShipping", () => {
     expect(calculateShipping("", 100)).toBeNull();
   });
 
-  it("should calculate shipping for São Paulo Capital (free)", () => {
+  it("should charge shipping for São Paulo Capital (NOT free anymore)", () => {
     const quote = calculateShipping("01001000", 100);
     expect(quote).not.toBeNull();
     expect(quote!.region).toContain("São Paulo");
+    expect(quote!.price).toBe(12.90);
+    expect(quote!.freeShipping).toBe(false);
+    expect(quote!.formattedPrice).toBe("R$ 12,90");
+  });
+
+  it("should give free shipping for São Paulo Capital when cart >= threshold", () => {
+    const quote = calculateShipping("01001000", FREE_SHIPPING_THRESHOLD);
+    expect(quote).not.toBeNull();
+    expect(quote!.region).toContain("São Paulo");
+    expect(quote!.price).toBe(0);
+    expect(quote!.freeShipping).toBe(true);
+    expect(quote!.formattedPrice).toBe("Grátis");
+  });
+
+  it("should give free shipping for Petrolina (PE) always", () => {
+    const quote = calculateShipping("56304000", 100);
+    expect(quote).not.toBeNull();
+    expect(quote!.region).toContain("Petrolina");
+    expect(quote!.price).toBe(0);
+    expect(quote!.freeShipping).toBe(true);
+    expect(quote!.formattedPrice).toBe("Grátis");
+  });
+
+  it("should give free shipping for Juazeiro (BA) always", () => {
+    const quote = calculateShipping("48900000", 100);
+    expect(quote).not.toBeNull();
+    expect(quote!.region).toContain("Juazeiro");
     expect(quote!.price).toBe(0);
     expect(quote!.freeShipping).toBe(true);
     expect(quote!.formattedPrice).toBe("Grátis");
@@ -119,9 +146,7 @@ describe("calculateShipping", () => {
   });
 
   it("should return default for unknown CEP ranges", () => {
-    // CEP that doesn't match any range
     const quote = calculateShipping("00000000", 100);
-    // Should return a fallback
     expect(quote).not.toBeNull();
   });
 });

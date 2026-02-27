@@ -24,7 +24,7 @@ const FREE_SHIPPING_CITIES: { start: number; end: number; city: string }[] = [
 
 const CEP_REGIONS: { start: number; end: number; region: string; price: number; minDays: number; maxDays: number }[] = [
   // São Paulo Capital e Grande SP
-  { start: 1000000, end: 9999999, region: "São Paulo — Capital e Grande SP", price: 0, minDays: 2, maxDays: 4 },
+  { start: 1000000, end: 9999999, region: "São Paulo — Capital e Grande SP", price: 12.90, minDays: 2, maxDays: 4 },
   // São Paulo Interior
   { start: 11000000, end: 19999999, region: "São Paulo — Interior", price: 12.90, minDays: 3, maxDays: 6 },
   // Rio de Janeiro
@@ -129,7 +129,7 @@ export function calculateShipping(cep: string, cartTotal: number): ShippingQuote
     };
   }
 
-  const isFree = cartTotal >= FREE_SHIPPING_THRESHOLD || regionInfo.price === 0;
+  const isFree = cartTotal >= FREE_SHIPPING_THRESHOLD;
 
   return {
     region: regionInfo.region,
