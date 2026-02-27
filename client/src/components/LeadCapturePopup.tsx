@@ -64,13 +64,6 @@ export default function LeadCapturePopup() {
 
           {/* Form Side */}
           <div className="p-8 md:p-12 flex flex-col justify-center relative">
-            <button 
-              onClick={handleClose}
-              className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
             <div className="mb-8 md:hidden">
               <h2 className="font-display font-bold text-3xl text-white mb-2">
                 ACESSO <span className="text-primary">VIP</span>

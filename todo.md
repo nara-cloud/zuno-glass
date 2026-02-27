@@ -103,3 +103,4 @@
 - [x] Substituir avatares gerados por fotos reais dos 7 membros do Squad
 - [x] Mover Luiza Ferrari de Clássico para Performance (corredora)
 - [x] Configurar logo ZUNO como favicon do site
+- [x] Bug: popup Lead Capture mostrando dois botões X de fechar
