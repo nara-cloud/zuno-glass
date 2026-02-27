@@ -43,11 +43,11 @@ const performanceMembers: SquadMember[] = [
     name: "EDUARDO RODRIGUES",
     category: "PERFORMANCE",
     image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/kTNreAwWGuKuUDpO.jpg",
-    bio: "Corredor de rua de Petrolina. Inspira a todos com sua paixão pela corrida e sua jornada de treinos e superação.",
+    bio: "Coach de Tênis e Beach Tênis de Petrolina. Inspira a todos com sua paixão pelo esporte e dedicação ao treinamento de atletas.",
     instagram: "https://instagram.com/tiodudu8",
     instagramHandle: "@tiodudu8",
     city: "Petrolina, PE",
-    activities: ["Corrida de Rua", "Beach Tennis"]
+    activities: ["Tênis", "Beach Tennis"]
   },
   {
     id: 4,

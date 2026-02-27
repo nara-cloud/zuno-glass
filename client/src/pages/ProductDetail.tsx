@@ -276,7 +276,7 @@ export default function ProductDetail() {
             <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8">
               {[
                 { icon: Shield, text: "Garantia de 2 Anos" },
-                { icon: Truck, text: "Frete Grátis acima de R$ 299,90" },
+                { icon: Truck, text: "Envio para todo o Brasil" },
                 { icon: RotateCcw, text: "30 Dias para Troca" }
               ].map((item, i: number) => (
                 <div key={i} className="flex flex-col items-center text-center gap-2">

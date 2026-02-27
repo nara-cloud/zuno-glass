@@ -4,7 +4,7 @@ import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2, CreditCard, T
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
-import { calculateShipping, isValidCep, formatCep, FREE_SHIPPING_THRESHOLD } from '@shared/shipping';
+import { calculateShipping, isValidCep, formatCep } from '@shared/shipping';
 import type { ShippingQuote } from '@shared/shipping';
 
 export default function CartDrawer() {
@@ -73,8 +73,6 @@ export default function CartDrawer() {
   const grandTotal = totalPrice + shippingCost;
   const grandTotalPix = grandTotal * 0.95;
   const installmentGrandTotal = grandTotal > 0 ? (grandTotal / 3) : 0;
-
-  const amountUntilFreeShipping = FREE_SHIPPING_THRESHOLD - totalPrice;
 
   const handleCheckout = async () => {
     if (isCheckingOut || items.length === 0) return;
@@ -235,33 +233,6 @@ export default function CartDrawer() {
                 </div>
               ))}
 
-              {/* Free Shipping Progress */}
-              {totalPrice < FREE_SHIPPING_THRESHOLD && (
-                <div className="bg-primary/5 border border-primary/20 p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Truck className="w-4 h-4 text-primary" />
-                    <span className="font-body text-xs text-gray-300">
-                      Falta <strong className="text-primary">R$ {amountUntilFreeShipping.toFixed(2).replace('.', ',')}</strong> para frete grátis!
-                    </span>
-                  </div>
-                  <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-primary h-full rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min((totalPrice / FREE_SHIPPING_THRESHOLD) * 100, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {totalPrice >= FREE_SHIPPING_THRESHOLD && !shippingQuote && (
-                <div className="bg-primary/10 border border-primary/30 p-3 flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-primary" />
-                  <span className="font-body text-xs text-primary font-bold">
-                    Parabéns! Você ganhou frete grátis!
-                  </span>
-                </div>
-              )}
-
               {/* Shipping Calculator */}
               <div className="border border-white/10 bg-white/5 p-4 space-y-3">
                 <div className="flex items-center gap-2">
@@ -314,11 +285,8 @@ export default function CartDrawer() {
                         {shippingQuote.formattedPrice}
                       </span>
                     </div>
-                    {shippingQuote.freeShipping && shippingQuote.price === 0 && totalPrice < FREE_SHIPPING_THRESHOLD && (
+                    {shippingQuote.freeShipping && (
                       <p className="font-body text-[10px] text-primary/70">Frete grátis para sua região!</p>
-                    )}
-                    {shippingQuote.freeShipping && totalPrice >= FREE_SHIPPING_THRESHOLD && (
-                      <p className="font-body text-[10px] text-primary/70">Frete grátis para compras acima de R$ {FREE_SHIPPING_THRESHOLD.toFixed(2).replace('.', ',')}!</p>
                     )}
                   </div>
                 )}

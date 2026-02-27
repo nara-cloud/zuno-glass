@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calculateShipping, isValidCep, formatCep, FREE_SHIPPING_THRESHOLD } from "./shipping";
+import { calculateShipping, isValidCep, formatCep } from "./shipping";
 
 describe("isValidCep", () => {
   it("should accept valid 8-digit CEPs", () => {
@@ -44,7 +44,7 @@ describe("calculateShipping", () => {
     expect(calculateShipping("", 100)).toBeNull();
   });
 
-  it("should charge shipping for São Paulo Capital (NOT free anymore)", () => {
+  it("should charge shipping for São Paulo Capital", () => {
     const quote = calculateShipping("01001000", 100);
     expect(quote).not.toBeNull();
     expect(quote!.region).toContain("São Paulo");
@@ -53,13 +53,11 @@ describe("calculateShipping", () => {
     expect(quote!.formattedPrice).toBe("R$ 12,90");
   });
 
-  it("should give free shipping for São Paulo Capital when cart >= threshold", () => {
-    const quote = calculateShipping("01001000", FREE_SHIPPING_THRESHOLD);
+  it("should always charge shipping for São Paulo even with high cart total", () => {
+    const quote = calculateShipping("01001000", 500);
     expect(quote).not.toBeNull();
-    expect(quote!.region).toContain("São Paulo");
-    expect(quote!.price).toBe(0);
-    expect(quote!.freeShipping).toBe(true);
-    expect(quote!.formattedPrice).toBe("Grátis");
+    expect(quote!.price).toBe(12.90);
+    expect(quote!.freeShipping).toBe(false);
   });
 
   it("should give free shipping for Petrolina (PE) always", () => {
@@ -102,6 +100,13 @@ describe("calculateShipping", () => {
     expect(quote!.price).toBe(19.90);
   });
 
+  it("should NOT give free shipping for high cart total in other regions", () => {
+    const quote = calculateShipping("40000000", 500);
+    expect(quote).not.toBeNull();
+    expect(quote!.freeShipping).toBe(false);
+    expect(quote!.price).toBe(19.90);
+  });
+
   it("should calculate shipping for Paraná", () => {
     const quote = calculateShipping("80000000", 100);
     expect(quote).not.toBeNull();
@@ -123,21 +128,6 @@ describe("calculateShipping", () => {
     expect(quote!.price).toBe(16.90);
   });
 
-  it("should give free shipping when cart total >= threshold", () => {
-    const quote = calculateShipping("40000000", FREE_SHIPPING_THRESHOLD);
-    expect(quote).not.toBeNull();
-    expect(quote!.freeShipping).toBe(true);
-    expect(quote!.price).toBe(0);
-    expect(quote!.formattedPrice).toBe("Grátis");
-  });
-
-  it("should charge shipping when cart total < threshold", () => {
-    const quote = calculateShipping("40000000", FREE_SHIPPING_THRESHOLD - 1);
-    expect(quote).not.toBeNull();
-    expect(quote!.freeShipping).toBe(false);
-    expect(quote!.price).toBeGreaterThan(0);
-  });
-
   it("should include estimate text", () => {
     const quote = calculateShipping("01001000", 100);
     expect(quote).not.toBeNull();
@@ -148,11 +138,6 @@ describe("calculateShipping", () => {
   it("should return default for unknown CEP ranges", () => {
     const quote = calculateShipping("00000000", 100);
     expect(quote).not.toBeNull();
-  });
-});
-
-describe("FREE_SHIPPING_THRESHOLD", () => {
-  it("should be R$ 299.90", () => {
-    expect(FREE_SHIPPING_THRESHOLD).toBe(299.90);
+    expect(quote!.freeShipping).toBe(false);
   });
 });

@@ -108,3 +108,7 @@
 - [x] Remover frete grátis automático de SP Capital (cobrar normalmente)
 - [x] Corrigir badge "Frete Grátis Brasil" no ProductDetail para informação precisa
 - [x] Manter frete grátis apenas para Petrolina/Juazeiro e compras acima de R$ 299,90
+- [x] Remover regra de frete grátis acima de R$ 299,90 (frete grátis só Petrolina/Juazeiro)
+- [x] Remover barra de progresso de frete grátis do carrinho
+- [x] Atualizar badge, páginas e textos que mencionam frete grátis acima de R$ 299,90
+- [x] Corrigir perfil do Eduardo Rodrigues: Coach de Tênis e Beach Tênis (não corredor)

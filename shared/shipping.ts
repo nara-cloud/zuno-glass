@@ -1,7 +1,7 @@
 /**
  * ZUNO GLASS — Tabela de Frete por Região
  * Baseada nos primeiros dígitos do CEP para determinar a região e calcular frete.
- * Frete grátis para compras acima de R$ 299,90.
+ * Frete grátis apenas para Petrolina (PE) e Juazeiro (BA).
  */
 
 export interface ShippingQuote {
@@ -14,8 +14,6 @@ export interface ShippingQuote {
   estimateText: string;
 }
 
-// Mapeamento de faixas de CEP para regiões
-// Fonte: estrutura de CEPs dos Correios do Brasil
 // Cidades com frete grátis (verificadas antes das regiões gerais)
 const FREE_SHIPPING_CITIES: { start: number; end: number; city: string }[] = [
   { start: 56300000, end: 56354999, city: "Petrolina — PE" },
@@ -76,9 +74,7 @@ const CEP_REGIONS: { start: number; end: number; region: string; price: number; 
   { start: 90000000, end: 99999999, region: "Rio Grande do Sul", price: 16.90, minDays: 4, maxDays: 7 },
 ];
 
-const FREE_SHIPPING_THRESHOLD = 299.90;
-
-export function calculateShipping(cep: string, cartTotal: number): ShippingQuote | null {
+export function calculateShipping(cep: string, _cartTotal?: number): ShippingQuote | null {
   // Limpar CEP (remover traços, espaços)
   const cleanCep = cep.replace(/\D/g, "");
 
@@ -88,7 +84,7 @@ export function calculateShipping(cep: string, cartTotal: number): ShippingQuote
 
   const cepNumber = parseInt(cleanCep, 10);
 
-  // Verificar se é cidade com frete grátis
+  // Verificar se é cidade com frete grátis (Petrolina ou Juazeiro)
   const freeCity = FREE_SHIPPING_CITIES.find(
     (c) => cepNumber >= c.start && cepNumber <= c.end
   );
@@ -123,21 +119,19 @@ export function calculateShipping(cep: string, cartTotal: number): ShippingQuote
       price: 24.90,
       estimateMin: 5,
       estimateMax: 12,
-      freeShipping: cartTotal >= FREE_SHIPPING_THRESHOLD,
-      formattedPrice: cartTotal >= FREE_SHIPPING_THRESHOLD ? "Grátis" : "R$ 24,90",
+      freeShipping: false,
+      formattedPrice: "R$ 24,90",
       estimateText: "5 a 12 dias úteis",
     };
   }
 
-  const isFree = cartTotal >= FREE_SHIPPING_THRESHOLD;
-
   return {
     region: regionInfo.region,
-    price: isFree ? 0 : regionInfo.price,
+    price: regionInfo.price,
     estimateMin: regionInfo.minDays,
     estimateMax: regionInfo.maxDays,
-    freeShipping: isFree,
-    formattedPrice: isFree ? "Grátis" : `R$ ${regionInfo.price.toFixed(2).replace(".", ",")}`,
+    freeShipping: false,
+    formattedPrice: `R$ ${regionInfo.price.toFixed(2).replace(".", ",")}`,
     estimateText: `${regionInfo.minDays} a ${regionInfo.maxDays} dias úteis`,
   };
 }
@@ -152,5 +146,3 @@ export function formatCep(value: string): string {
   if (digits.length <= 5) return digits;
   return `${digits.slice(0, 5)}-${digits.slice(5)}`;
 }
-
-export { FREE_SHIPPING_THRESHOLD };
