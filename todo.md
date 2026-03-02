@@ -112,3 +112,8 @@
 - [x] Remover barra de progresso de frete grátis do carrinho
 - [x] Atualizar badge, páginas e textos que mencionam frete grátis acima de R$ 299,90
 - [x] Corrigir perfil do Eduardo Rodrigues: Coach de Tênis e Beach Tênis (não corredor)
+- [ ] Integração com ZUNO Gestão: analisar API disponível
+- [ ] Integração com ZUNO Gestão: criar endpoints de sincronização de estoque
+- [ ] Integração com ZUNO Gestão: exibir disponibilidade de estoque no frontend
+- [ ] Integração com ZUNO Gestão: testes da integração
+- [x] Bug: imagem hero não preenche toda a seção até o fim do cabeçalho
