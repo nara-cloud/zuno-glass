@@ -118,3 +118,4 @@
 - [ ] Integração com ZUNO Gestão: testes da integração
 - [x] Bug: imagem hero não preenche toda a seção até o fim do cabeçalho
 - [x] Ajustar posicionamento da imagem hero: pessoa no lado direito (sem texto)
+- [x] Ajustar hero: pessoa completamente no lado direito, texto à esquerda
