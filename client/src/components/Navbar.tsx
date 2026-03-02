@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, X, ShoppingBag } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 
@@ -59,20 +59,6 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-3">
-          {/* Cart Button */}
-          <button
-            onClick={openCart}
-            className="relative text-white hover:text-primary transition-colors p-2"
-            aria-label="Carrinho"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            {totalItems > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-primary text-black font-display font-bold text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
-                {totalItems > 9 ? '9+' : totalItems}
-              </span>
-            )}
-          </button>
-
           <Link href="/try-on">
             <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-black font-display font-bold text-xs tracking-wider">
               TRY-ON
@@ -82,20 +68,6 @@ export default function Navbar() {
 
         {/* Mobile Actions */}
         <div className="flex md:hidden items-center gap-2">
-          {/* Mobile Cart */}
-          <button
-            onClick={openCart}
-            className="relative text-white hover:text-primary transition-colors p-2"
-            aria-label="Carrinho"
-          >
-            <ShoppingBag className="w-6 h-6" />
-            {totalItems > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-primary text-black font-display font-bold text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
-                {totalItems > 9 ? '9+' : totalItems}
-              </span>
-            )}
-          </button>
-
           {/* Mobile Toggle */}
           <button 
             className="text-white hover:text-primary transition-colors"

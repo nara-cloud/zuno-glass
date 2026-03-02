@@ -138,3 +138,4 @@
 - [ ] Integração Mercado Pago: criar endpoints de pagamento
 - [ ] Integração Mercado Pago: testar fluxo de checkout
 - [x] Corrigir favicon: adicionar marca ZUNO (círculo amarelo/neon)
+- [x] Remover ícone de carrinho do canto superior direito da navbar
