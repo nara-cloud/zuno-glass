@@ -35,13 +35,6 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className="group relative bg-card border border-white/5 hover:border-primary/50 transition-all duration-500 overflow-hidden">
-      {/* New Badge */}
-      {product.isNew && (
-        <div className="absolute top-4 left-4 z-20 bg-primary text-black font-display font-bold text-xs px-3 py-1 clip-corner">
-          NOVO
-        </div>
-      )}
-
       {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-b from-white/5 to-transparent p-6 flex items-center justify-center">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
@@ -91,7 +84,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           ) : (
             <span className="font-display font-bold text-sm text-primary tracking-wider">
-              EM BREVE
+              CONSULTAR
             </span>
           )}
         </div>

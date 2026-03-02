@@ -121,11 +121,7 @@ export default function ProductDetail() {
               <span className="font-display text-primary tracking-widest uppercase text-sm border border-primary/30 px-3 py-1">
                 {product.category === 'limited' ? 'EDIÇÃO LIMITADA' : product.category === 'performance' ? 'PERFORMANCE' : 'LIFESTYLE'}
               </span>
-              {product.isNew && (
-                <span className="font-display bg-white text-black font-bold text-xs px-3 py-1 clip-corner">
-                  NOVO LANÇAMENTO
-                </span>
-              )}
+
             </div>
 
             <h1 className="font-display font-bold text-5xl md:text-7xl text-white mb-2 leading-none">
@@ -152,7 +148,7 @@ export default function ProductDetail() {
               </div>
             ) : (
               <div className="font-display font-bold text-2xl text-primary mb-8 tracking-wider">
-                PREÇO EM BREVE
+                CONSULTAR PREÇO
               </div>
             )}
 

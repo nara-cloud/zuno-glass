@@ -25,7 +25,7 @@ const socialLinks = [
   { Icon: Instagram, href: "https://www.instagram.com/zuno.glass/", label: "Instagram" },
   { Icon: Facebook, href: "https://www.facebook.com/profile.php?id=61581944526033", label: "Facebook" },
   { Icon: TikTokIcon, href: "https://www.tiktok.com/@zuno.glass", label: "TikTok" },
-  { Icon: XIcon, href: "#", label: "X (em breve)" },
+  { Icon: XIcon, href: "#", label: "X" },
 ];
 
 export default function Footer() {
@@ -90,7 +90,7 @@ export default function Footer() {
           <div className="md:col-span-4">
             <h4 className="font-display font-bold text-white text-lg mb-6">FIQUE NO LOOP</h4>
             <p className="font-body text-gray-400 mb-6">
-              Receba atualizações sobre lançamentos, desafios e novidades da comunidade ZUNO.
+              Receba novidades sobre novos modelos, desafios e promoções exclusivas da comunidade ZUNO.
             </p>
             <div className="flex gap-2">
               <Input 

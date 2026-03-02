@@ -119,3 +119,9 @@
 - [x] Bug: imagem hero não preenche toda a seção até o fim do cabeçalho
 - [x] Ajustar posicionamento da imagem hero: pessoa no lado direito (sem texto)
 - [x] Ajustar hero: pessoa completamente no lado direito, texto à esquerda
+- [ ] Melhorar qualidade da imagem hero (upload em alta resolução)
+- [x] Ajustar site para pós-lançamento: remover countdown timer
+- [x] Ajustar site para pós-lançamento: remover badge "LANÇAMENTO 03/03"
+- [x] Ajustar site para pós-lançamento: atualizar popup Lead Capture para newsletter
+- [x] Ajustar site para pós-lançamento: remover badges "NOVO" dos produtos
+- [x] Ajustar site para pós-lançamento: atualizar textos de "em breve" e "pré-lançamento"

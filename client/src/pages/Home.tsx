@@ -3,11 +3,9 @@ import { Link } from 'wouter';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import CountdownTimer from '@/components/CountdownTimer';
-import LeadCapturePopup from '@/components/LeadCapturePopup';
 import { products } from '@/lib/products';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Eye, Shield, Feather, Zap } from 'lucide-react';
+import { ArrowRight, Eye, Shield, Feather } from 'lucide-react';
 
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -27,12 +25,11 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const featuredProducts = products.filter(p => p.isNew).slice(0, 6);
+  const featuredProducts = products.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Navbar />
-      <LeadCapturePopup />
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center overflow-hidden bg-background">
@@ -55,7 +52,7 @@ export default function Home() {
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 border border-primary/30 bg-black/50 backdrop-blur-sm px-4 py-2 mb-6 clip-corner">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-              <span className="font-display text-primary text-sm tracking-widest">LANÇAMENTO 03/03</span>
+              <span className="font-display text-primary text-sm tracking-widest">PARA QUEM VIVE NO LIMITE</span>
             </div>
             
             <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl leading-[0.9] text-white mb-8 animate-in-up delay-100">
@@ -90,26 +87,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Countdown Launch Banner */}
+      {/* Pricing Banner - replaces countdown */}
       <section className="py-20 bg-gradient-to-b from-black via-black to-background relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5"></div>
         <div className="container relative z-10">
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 border border-primary/50 bg-primary/10 px-5 py-2.5 rounded-full mb-6 backdrop-blur-md">
-              <Zap className="w-4 h-4 text-primary" />
-              <span className="font-display font-bold text-primary tracking-widest text-sm">LANÇAMENTO OFICIAL</span>
-            </div>
             <h2 className="font-display font-bold text-4xl md:text-6xl text-white mb-4">
-              03 DE MARÇO <span className="text-primary">2026</span>
+              COLEÇÃO <span className="text-primary">DISPONÍVEL</span>
             </h2>
             <p className="font-body text-gray-400 text-lg max-w-xl mx-auto mb-2">
-              A coleção completa ZUNO GLASS estará disponível para compra. Não perca o lançamento.
+              A coleção completa ZUNO GLASS já está disponível. Escolha o modelo ideal para o seu estilo.
             </p>
           </div>
 
-          <CountdownTimer />
-
-          <div className="mt-12 flex flex-col md:flex-row items-center justify-center gap-8">
+          <div className="mt-8 flex flex-col md:flex-row items-center justify-center gap-8">
             <div className="bg-white/5 border border-white/10 p-6 md:p-8 clip-corner text-center max-w-xs">
               <span className="font-display text-sm text-gray-500 tracking-widest block mb-2">ESPORTIVOS A PARTIR DE</span>
               <span className="font-display font-bold text-3xl text-primary block">R$ 189,90</span>
@@ -157,7 +148,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-12">
             <div>
               <h2 className="font-display font-bold text-3xl md:text-4xl text-white">DESTAQUES</h2>
-              <p className="font-body text-gray-500 mt-2">Novos modelos da coleção ZUNO GLASS</p>
+              <p className="font-body text-gray-500 mt-2">Modelos da coleção ZUNO GLASS</p>
             </div>
             <Link href="/products">
               <Button variant="outline" className="border-white/20 text-white hover:bg-primary hover:text-black hover:border-primary font-display tracking-wider">
@@ -224,7 +215,7 @@ export default function Home() {
                 </Link>
                 <Link href="/app">
                   <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black font-display font-bold px-8 h-12 tracking-wider">
-                    APP EM BREVE
+                    CONHEÇA O APP
                   </Button>
                 </Link>
               </div>
@@ -244,7 +235,7 @@ export default function Home() {
               </div>
               <div className="bg-white/5 border border-primary/30 p-6 clip-corner">
                 <div className="text-primary font-display font-bold text-lg mb-2">APP</div>
-                <p className="text-gray-500 text-sm">Em desenvolvimento — entre na lista de espera</p>
+                <p className="text-gray-500 text-sm">Conecte-se com a comunidade ZUNO</p>
               </div>
             </div>
           </div>
