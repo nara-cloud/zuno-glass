@@ -130,3 +130,11 @@
 - [x] Ajustar site para pós-lançamento: atualizar textos de "em breve" e "pré-lançamento"
 - [x] Corrigir badge "PARA QUEM VIVE NO LIMITE" duplicado e mal posicionado na hero section
 - [x] Substituir imagem hero pela nova foto da atleta correndo (IMG_9729) otimizada
+- [x] Página de login/admin: criar componente de autenticação
+- [x] Página de login/admin: implementar acesso restrito para admins
+- [x] Dashboard de vendas: criar layout com gráficos
+- [x] Dashboard de vendas: exibir relatórios em tempo real
+- [ ] Integração Mercado Pago: configurar credenciais
+- [ ] Integração Mercado Pago: criar endpoints de pagamento
+- [ ] Integração Mercado Pago: testar fluxo de checkout
+- [x] Corrigir favicon: adicionar marca ZUNO (círculo amarelo/neon)

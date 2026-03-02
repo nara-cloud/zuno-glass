@@ -24,6 +24,8 @@ import Shipping from "./pages/Shipping";
 import Warranty from "./pages/Warranty";
 import SizeGuide from "./pages/SizeGuide";
 import Contact from "./pages/Contact";
+import Admin from "./pages/Admin";
+import AdminSales from "./pages/AdminSales";
 
 function Router() {
   return (
@@ -46,6 +48,8 @@ function Router() {
       <Route path={"/warranty"} component={Warranty} />
       <Route path={"/size-guide"} component={SizeGuide} />
       <Route path={"/contact"} component={Contact} />
+      <Route path={"/admin"} component={Admin} />
+      <Route path={"/admin/sales"} component={AdminSales} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
