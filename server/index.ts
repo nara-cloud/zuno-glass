@@ -3,6 +3,8 @@ import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from "stripe";
+import { getStockMap, decrementGestaoStock, invalidateStockCache } from "./zunoGestao.js";
+import { stockMapping, findGestaoProduct, getVariantStock, getTotalProductStock } from "../shared/stockMapping.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,6 +60,37 @@ async function startServer() {
           console.log(`[Webhook] Customer email: ${session.customer_email || session.customer_details?.email}`);
           console.log(`[Webhook] Amount: ${session.amount_total}`);
           console.log(`[Webhook] Metadata:`, session.metadata);
+
+          // ─── Decrement stock in ZUNO Gestão ───
+          if (session.metadata?.items) {
+            const itemEntries = session.metadata.items.split(";");
+            for (const entry of itemEntries) {
+              const [productName, variantColor, quantityStr] = entry.split("|");
+              const quantity = parseInt(quantityStr, 10) || 1;
+
+              // Find the matching e-commerce product by name
+              const { productCatalog } = await import("../shared/products.js");
+              const ecomProduct = productCatalog.find(
+                (p: any) => p.name === productName
+              );
+
+              if (ecomProduct) {
+                const gestaoEntry = findGestaoProduct(ecomProduct.id, variantColor);
+                if (gestaoEntry) {
+                  const success = await decrementGestaoStock(gestaoEntry.gestaoProductId, quantity);
+                  console.log(
+                    `[Webhook] Stock update for ${gestaoEntry.gestaoName}: ${success ? "OK" : "FAILED"} (qty: -${quantity})`
+                  );
+                } else {
+                  console.warn(
+                    `[Webhook] No stock mapping found for ${productName} / ${variantColor}`
+                  );
+                }
+              } else {
+                console.warn(`[Webhook] Product not found in catalog: ${productName}`);
+              }
+            }
+          }
           break;
         }
         case "payment_intent.succeeded": {
@@ -75,6 +108,73 @@ async function startServer() {
 
   // JSON body parser for all other routes
   app.use(express.json());
+
+  // ─── Stock Endpoint: Get all stock levels ───
+  app.get("/api/stock", async (_req, res) => {
+    try {
+      const stockMap = await getStockMap();
+
+      // Build response: for each e-commerce product, return stock per variant
+      const stockData: Record<string, { total: number; variants: Record<string, number> }> = {};
+
+      // Get unique product IDs
+      const productIds = Array.from(new Set(stockMapping.map((m) => m.ecommerceProductId)));
+
+      for (const productId of productIds) {
+        const total = getTotalProductStock(productId, stockMap);
+        const variants: Record<string, number> = {};
+
+        const entries = stockMapping.filter((m) => m.ecommerceProductId === productId);
+        for (const entry of entries) {
+          variants[entry.ecommerceColorName] = stockMap.get(entry.gestaoProductId) || 0;
+        }
+
+        stockData[productId] = { total, variants };
+      }
+
+      res.json({ stock: stockData, cached: true });
+    } catch (err: any) {
+      console.error("[Stock] Error fetching stock:", err.message);
+      res.status(500).json({ error: "Erro ao buscar estoque" });
+    }
+  });
+
+  // ─── Stock Endpoint: Get stock for specific product ───
+  app.get("/api/stock/:productId", async (req, res) => {
+    try {
+      const { productId } = req.params;
+      const stockMap = await getStockMap();
+
+      const total = getTotalProductStock(productId, stockMap);
+      const variants: Record<string, number> = {};
+
+      const entries = stockMapping.filter((m) => m.ecommerceProductId === productId);
+      if (entries.length === 0) {
+        return res.status(404).json({ error: "Produto não encontrado no mapeamento de estoque" });
+      }
+
+      for (const entry of entries) {
+        variants[entry.ecommerceColorName] = stockMap.get(entry.gestaoProductId) || 0;
+      }
+
+      res.json({ productId, total, variants });
+    } catch (err: any) {
+      console.error("[Stock] Error fetching product stock:", err.message);
+      res.status(500).json({ error: "Erro ao buscar estoque do produto" });
+    }
+  });
+
+  // ─── Stock Endpoint: Force refresh cache ───
+  app.post("/api/stock/refresh", async (_req, res) => {
+    try {
+      invalidateStockCache();
+      const stockMap = await getStockMap(true);
+      res.json({ success: true, productCount: stockMap.size });
+    } catch (err: any) {
+      console.error("[Stock] Error refreshing stock:", err.message);
+      res.status(500).json({ error: "Erro ao atualizar estoque" });
+    }
+  });
 
   // ─── Shipping Quote Endpoint ───
   app.post("/api/shipping/quote", async (req, res) => {
@@ -108,6 +208,40 @@ async function startServer() {
       const { items, productId, variantColor, quantity = 1, shippingCost = 0, shippingRegion, shippingEstimate } = req.body;
       const { getProductById } = await import("../shared/products.js");
       const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
+
+      // ─── Stock validation before checkout ───
+      const stockMap = await getStockMap();
+      const stockErrors: string[] = [];
+
+      if (items && Array.isArray(items) && items.length > 0) {
+        for (const item of items) {
+          const product = getProductById(item.productId);
+          if (!product) continue;
+          const variantStock = getVariantStock(item.productId, item.variantColor || '', stockMap);
+          if (variantStock < (item.quantity || 1)) {
+            stockErrors.push(
+              `${product.name} (${item.variantColor || 'padrão'}): apenas ${variantStock} em estoque`
+            );
+          }
+        }
+      } else if (productId) {
+        const product = getProductById(productId);
+        if (product) {
+          const variantStock = getVariantStock(productId, variantColor || '', stockMap);
+          if (variantStock < quantity) {
+            stockErrors.push(
+              `${product.name} (${variantColor || 'padrão'}): apenas ${variantStock} em estoque`
+            );
+          }
+        }
+      }
+
+      if (stockErrors.length > 0) {
+        return res.status(409).json({
+          error: "Estoque insuficiente",
+          details: stockErrors,
+        });
+      }
 
       let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
       let metadataItems: string[] = [];

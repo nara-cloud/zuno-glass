@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingBag } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+import { useStock } from '@/hooks/useStock';
 
 interface ProductCardProps {
   product: Product;
@@ -12,10 +13,21 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const installment = product.price > 0 ? (product.price / 3).toFixed(2) : null;
   const { addItem } = useCart();
+  const { getProductStock, isInStock } = useStock();
+
+  const totalStock = getProductStock(product.id);
+  const inStock = isInStock(product.id);
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!inStock) {
+      toast.error('Produto esgotado', {
+        description: `${product.name} está temporariamente indisponível.`,
+      });
+      return;
+    }
 
     const defaultVariant = product.variants[0];
     addItem({
@@ -34,14 +46,28 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group relative bg-card border border-white/5 hover:border-primary/50 transition-all duration-500 overflow-hidden">
+    <div className={`group relative bg-card border border-white/5 hover:border-primary/50 transition-all duration-500 overflow-hidden ${!inStock ? 'opacity-70' : ''}`}>
+      {/* Out of Stock Badge */}
+      {!inStock && totalStock !== -1 && (
+        <div className="absolute top-3 right-3 z-30 bg-red-600 text-white font-display text-[10px] tracking-widest px-3 py-1 clip-corner">
+          ESGOTADO
+        </div>
+      )}
+
+      {/* Low Stock Badge */}
+      {inStock && totalStock > 0 && totalStock <= 3 && (
+        <div className="absolute top-3 right-3 z-30 bg-amber-500 text-black font-display text-[10px] tracking-widest px-3 py-1 clip-corner">
+          ÚLTIMAS UNIDADES
+        </div>
+      )}
+
       {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-b from-white/5 to-transparent p-6 flex items-center justify-center">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
         <img 
           src={product.image} 
           alt={product.name}
-          className="w-full h-full object-contain transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-700 ease-out z-10 drop-shadow-2xl"
+          className={`w-full h-full object-contain transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-700 ease-out z-10 drop-shadow-2xl ${!inStock ? 'grayscale' : ''}`}
         />
         
         {/* Quick Actions Overlay */}
@@ -51,7 +77,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               VER DETALHES
             </Button>
           </Link>
-          {product.price > 0 && (
+          {product.price > 0 && inStock && (
             <Button 
               onClick={handleQuickAdd}
               className="bg-primary text-black hover:bg-white font-display tracking-wider clip-corner"
@@ -73,7 +99,11 @@ export default function ProductCard({ product }: ProductCardProps) {
               {product.tagline}
             </p>
           </div>
-          {product.price > 0 ? (
+          {!inStock && totalStock !== -1 ? (
+            <span className="font-display font-bold text-sm text-red-400 tracking-wider flex-shrink-0 ml-3">
+              INDISPONÍVEL
+            </span>
+          ) : product.price > 0 ? (
             <div className="text-right flex-shrink-0 ml-3">
               <span className="font-display font-bold text-lg text-white block">
                 R$ {product.price.toFixed(2).replace('.', ',')}
