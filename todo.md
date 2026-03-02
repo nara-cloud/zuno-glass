@@ -139,3 +139,6 @@
 - [ ] Integração Mercado Pago: testar fluxo de checkout
 - [x] Corrigir favicon: adicionar marca ZUNO (círculo amarelo/neon)
 - [x] Remover ícone de carrinho do canto superior direito da navbar
+- [x] Página de confirmação de pedido: endpoint para buscar detalhes do pedido
+- [x] Página de confirmação de pedido: layout com número do pedido e rastreamento
+- [x] Página de confirmação de pedido: integrar com checkout Stripe
