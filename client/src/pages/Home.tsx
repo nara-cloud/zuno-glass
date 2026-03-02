@@ -41,9 +41,9 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/50 to-transparent z-10"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent z-10"></div>
           <img 
-            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/NThazqDkGcYfJAgq.png" 
-            alt="Atleta com óculos ZUNO GLASS em close" 
-            className="w-full h-full object-cover object-[30%_20%] md:object-[35%_20%]"
+            src="https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/hero-athlete-running_bef4ff10.jpg" 
+            alt="Atleta correndo com óculos ZUNO GLASS" 
+            className="w-full h-full object-cover object-center"
           />
         </div>
 
