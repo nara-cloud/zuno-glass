@@ -130,4 +130,3 @@
 - [x] Ajustar site para pós-lançamento: atualizar textos de "em breve" e "pré-lançamento"
 - [x] Corrigir badge "PARA QUEM VIVE NO LIMITE" duplicado e mal posicionado na hero section
 - [x] Substituir imagem hero pela nova foto da atleta correndo (IMG_9729) otimizada
-- [x] Remover pergunta FAQ "OS ÓCULOS ZUNO POSSUEM TECNOLOGIA ELETRÔNICA INTEGRADA?"

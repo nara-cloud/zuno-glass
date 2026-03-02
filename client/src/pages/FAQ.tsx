@@ -10,6 +10,10 @@ import {
 export default function FAQ() {
   const faqs = [
     {
+      question: "OS ÓCULOS ZUNO POSSUEM TECNOLOGIA ELETRÔNICA INTEGRADA?",
+      answer: "Não. Os óculos Zuno são projetados para alta performance óptica e esportiva. Recursos digitais estarão disponíveis futuramente através do aplicativo Zuno, atualmente em desenvolvimento."
+    },
+    {
       question: "QUAL A PROTEÇÃO DAS LENTES ZUNO?",
       answer: "Todas as lentes ZUNO oferecem proteção UV400, bloqueando 100% dos raios UVA e UVB. Além disso, contam com tratamento anti-reflexo para maior conforto visual durante atividades ao ar livre."
     },
