@@ -125,3 +125,4 @@
 - [x] Ajustar site para pós-lançamento: atualizar popup Lead Capture para newsletter
 - [x] Ajustar site para pós-lançamento: remover badges "NOVO" dos produtos
 - [x] Ajustar site para pós-lançamento: atualizar textos de "em breve" e "pré-lançamento"
+- [x] Corrigir badge "PARA QUEM VIVE NO LIMITE" duplicado e mal posicionado na hero section

@@ -50,11 +50,6 @@ export default function Home() {
         {/* Hero Content - left side, below navbar */}
         <div className="container relative z-20 pt-44 md:pt-48">
           <div className="max-w-xl">
-            <div className="inline-flex items-center gap-2 border border-primary/30 bg-black/50 backdrop-blur-sm px-4 py-2 mb-6 clip-corner">
-              <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-              <span className="font-display text-primary text-sm tracking-widest">PARA QUEM VIVE NO LIMITE</span>
-            </div>
-            
             <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl leading-[0.9] text-white mb-8 animate-in-up delay-100">
               LIMITE <br/>
               <span className="text-transparent text-stroke-neon italic pr-4">DA LUZ</span>
