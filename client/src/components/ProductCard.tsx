@@ -11,12 +11,16 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0);
+  const price = typeof product.price === 'string' ? parseFloat(product.price as string) : (product.price || 0);
   const installment = price > 0 ? (price / 3).toFixed(2) : null;
   const { addItem } = useCart();
   const { getProductStock, isInStock } = useStock();
   // Defensive: ensure variants is always an array
   const variants = Array.isArray(product.variants) ? product.variants : [];
+  // Defensive: use placeholder when image is empty/null
+  const imageSrc = product.image && product.image.trim() !== '' 
+    ? product.image 
+    : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWExYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNDQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+U0VNIElNQUdFTTwvdGV4dD48L3N2Zz4=';
 
   const totalStock = getProductStock(product.id);
   const inStock = isInStock(product.id);
@@ -68,7 +72,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-b from-white/5 to-transparent p-6 flex items-center justify-center">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
         <img 
-          src={product.image} 
+          src={imageSrc} 
           alt={product.name}
           className={`w-full h-full object-contain transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-700 ease-out z-10 drop-shadow-2xl ${!inStock ? 'grayscale' : ''}`}
         />
