@@ -3,13 +3,14 @@ import { Button } from '@/components/ui/button';
 import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2, CreditCard, Truck, MapPin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { calculateShipping, isValidCep, formatCep } from '@shared/shipping';
 import type { ShippingQuote } from '@shared/shipping';
 
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isCartOpen, closeCart } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [, navigate] = useLocation();
   const [cep, setCep] = useState('');
   const [shippingQuote, setShippingQuote] = useState<ShippingQuote | null>(null);
   const [cepError, setCepError] = useState('');
@@ -74,45 +75,10 @@ export default function CartDrawer() {
   const grandTotalPix = grandTotal * 0.95;
   const installmentGrandTotal = grandTotal > 0 ? (grandTotal / 3) : 0;
 
-  const handleCheckout = async () => {
-    if (isCheckingOut || items.length === 0) return;
-    setIsCheckingOut(true);
-
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: items.map(item => ({
-            productId: item.productId,
-            variantColor: item.variantColorName,
-            quantity: item.quantity,
-          })),
-          shippingCost: shippingCost,
-          shippingRegion: shippingQuote?.region || 'Brasil',
-          shippingEstimate: shippingQuote?.estimateText || '5 a 12 dias úteis',
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Erro ao criar sessão de pagamento');
-      }
-
-      if (data.url) {
-        toast.info('Redirecionando para o checkout...', {
-          description: 'Você será levado à página de pagamento seguro.',
-        });
-        window.open(data.url, '_blank');
-      }
-    } catch (err: any) {
-      toast.error('Erro no checkout', {
-        description: err.message || 'Tente novamente em alguns instantes.',
-      });
-    } finally {
-      setIsCheckingOut(false);
-    }
+  const handleCheckout = () => {
+    if (items.length === 0) return;
+    closeCart();
+    navigate('/checkout');
   };
 
   return (

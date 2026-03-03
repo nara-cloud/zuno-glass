@@ -18,7 +18,8 @@ import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import Community from "./pages/Community";
 import ZunoApp from "./pages/ZunoApp";
-import CheckoutSuccess from "./pages/CheckoutSuccess";
+import CheckoutSuccess from "@/pages/CheckoutSuccess";
+import Checkout from "@/pages/Checkout";
 import Orders from "./pages/Orders";
 import Shipping from "./pages/Shipping";
 import Warranty from "./pages/Warranty";
@@ -26,6 +27,9 @@ import SizeGuide from "./pages/SizeGuide";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
 import AdminSales from "./pages/AdminSales";
+import AdminOrders from "./pages/AdminOrders";
+import AdminOrderDetail from "./pages/AdminOrderDetail";
+import AdminStock from "./pages/AdminStock";
 
 function Router() {
   return (
@@ -42,6 +46,7 @@ function Router() {
       <Route path={"/faq"} component={FAQ} />
       <Route path={"/community"} component={Community} />
       <Route path={"/app"} component={ZunoApp} />
+      <Route path={"/checkout"} component={Checkout} />
       <Route path={"/checkout/success"} component={CheckoutSuccess} />
       <Route path={"/orders"} component={Orders} />
       <Route path={"/shipping"} component={Shipping} />
@@ -50,6 +55,9 @@ function Router() {
       <Route path={"/contact"} component={Contact} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/admin/sales"} component={AdminSales} />
+      <Route path={"/admin/orders"} component={AdminOrders} />
+      <Route path={"/admin/orders/:id"} component={AdminOrderDetail} />
+      <Route path={"/admin/stock"} component={AdminStock} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

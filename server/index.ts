@@ -57,9 +57,75 @@ async function startServer() {
         case "checkout.session.completed": {
           const session = event.data.object as Stripe.Checkout.Session;
           console.log(`[Webhook] Checkout completed: ${session.id}`);
-          console.log(`[Webhook] Customer email: ${session.customer_email || session.customer_details?.email}`);
-          console.log(`[Webhook] Amount: ${session.amount_total}`);
-          console.log(`[Webhook] Metadata:`, session.metadata);
+          const customerEmail = session.customer_email || session.customer_details?.email || '';
+          const customerName = session.customer_details?.name || undefined;
+          const customerPhone = session.customer_details?.phone || undefined;
+          const shippingAddr = (session as any).shipping_details?.address;
+          const amountTotal = (session.amount_total || 0) / 100;
+          const amountShipping = (session.total_details?.amount_shipping || 0) / 100;
+          const amountDiscount = (session.total_details?.amount_discount || 0) / 100;
+          const subtotal = amountTotal - amountShipping + amountDiscount;
+
+          // ─── Save order to database ───
+          try {
+            const { productCatalog } = await import('../shared/products.js');
+            const { createOrder, generateOrderNumber, getOrderByNumber } = await import('./db/orders.js');
+
+            // Avoid duplicate orders (idempotency)
+            const existingOrder = await getOrderByNumber(`STRIPE-${session.id}`);
+            if (!existingOrder) {
+              const orderItems: any[] = [];
+              if (session.metadata?.items) {
+                const itemEntries = session.metadata.items.split(';');
+                for (const entry of itemEntries) {
+                  const [productName, variantColor, quantityStr] = entry.split('|');
+                  const qty = parseInt(quantityStr, 10) || 1;
+                  const product = productCatalog.find((p: any) => p.name === productName);
+                  if (product) {
+                    const p = product as any;
+                    const variantObj = p.variants?.find((v: any) =>
+                      v.color === variantColor || v.colorName === variantColor
+                    );
+                    orderItems.push({
+                      productId: product.id,
+                      productName: product.name,
+                      variantColor: variantColor !== 'default' ? variantColor : undefined,
+                      variantColorName: variantObj?.colorName || (variantColor !== 'default' ? variantColor : undefined),
+                      quantity: qty,
+                      unitPrice: product.price,
+                      totalPrice: product.price * qty,
+                      imageUrl: p.images?.[0] || undefined,
+                    });
+                  }
+                }
+              }
+
+              const orderNumber = await generateOrderNumber();
+              await createOrder({
+                orderNumber,
+                customerName,
+                customerEmail,
+                customerPhone,
+                shippingZip: shippingAddr?.postal_code || undefined,
+                shippingStreet: shippingAddr?.line1 || undefined,
+                shippingNumber: shippingAddr?.line2 || undefined,
+                shippingCity: shippingAddr?.city || undefined,
+                shippingState: shippingAddr?.state || undefined,
+                subtotal,
+                shippingCost: amountShipping,
+                discount: amountDiscount,
+                total: amountTotal,
+                paymentMethod: 'stripe',
+                paymentStatus: 'paid',
+                paymentId: session.payment_intent as string || session.id,
+                paymentGateway: 'stripe',
+                items: orderItems,
+              });
+              console.log(`[Webhook] Order ${orderNumber} saved to DB`);
+            }
+          } catch (dbErr: any) {
+            console.error('[Webhook] Failed to save order to DB:', dbErr.message);
+          }
 
           // ─── Decrement stock in ZUNO Gestão ───
           if (session.metadata?.items) {
@@ -448,6 +514,323 @@ async function startServer() {
     } catch (err: any) {
       console.error("[Orders] Error listing orders:", err.message);
       res.status(500).json({ error: "Failed to list orders" });
+    }
+  });
+
+  // ─── Mercado Pago: PIX Payment ───
+  app.post("/api/mp/pix", async (req, res) => {
+    try {
+      const { items, payer, address, externalReference } = req.body;
+      if (!items || !payer?.email) {
+        return res.status(400).json({ error: "items e payer.email são obrigatórios" });
+      }
+      const { createPixPayment } = await import("./mercadopago.js");
+      const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
+      const result = await createPixPayment({
+        items,
+        payer,
+        address,
+        externalReference,
+        notificationUrl: `${origin}/api/mp/webhook`,
+      });
+      res.json(result);
+    } catch (err: any) {
+      console.error("[MP PIX] Error:", err.message);
+      res.status(500).json({ error: "Erro ao criar pagamento PIX" });
+    }
+  });
+
+  // ─── Mercado Pago: Boleto Payment ───
+  app.post("/api/mp/boleto", async (req, res) => {
+    try {
+      const { items, payer, address, externalReference } = req.body;
+      if (!items || !payer?.email || !payer?.cpf) {
+        return res.status(400).json({ error: "items, payer.email e payer.cpf são obrigatórios" });
+      }
+      if (!address?.zip_code || !address?.street_name) {
+        return res.status(400).json({ error: "Endereço completo é obrigatório para boleto" });
+      }
+      const { createBoletoPayment } = await import("./mercadopago.js");
+      const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
+      const result = await createBoletoPayment({
+        items,
+        payer,
+        address,
+        externalReference,
+        notificationUrl: `${origin}/api/mp/webhook`,
+      });
+      res.json(result);
+    } catch (err: any) {
+      console.error("[MP Boleto] Error:", err.message);
+      res.status(500).json({ error: "Erro ao criar boleto" });
+    }
+  });
+
+  // ─── Mercado Pago: Card Payment ───
+  app.post("/api/mp/card", async (req, res) => {
+    try {
+      const { items, payer, token, installments, issuerId, paymentMethodId, externalReference } = req.body;
+      if (!items || !payer?.email || !payer?.cpf || !token || !paymentMethodId) {
+        return res.status(400).json({ error: "items, payer, token e paymentMethodId são obrigatórios" });
+      }
+      const { createCardPayment } = await import("./mercadopago.js");
+      const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
+      const result = await createCardPayment({
+        items,
+        payer,
+        token,
+        installments: installments || 1,
+        issuerId,
+        paymentMethodId,
+        externalReference,
+        notificationUrl: `${origin}/api/mp/webhook`,
+      });
+      res.json(result);
+    } catch (err: any) {
+      console.error("[MP Card] Error:", err.message);
+      res.status(500).json({ error: "Erro ao processar pagamento" });
+    }
+  });
+
+  // ─── Mercado Pago: Get Payment Status ───
+  app.get("/api/mp/payment/:id", async (req, res) => {
+    try {
+      const paymentId = parseInt(req.params.id, 10);
+      if (isNaN(paymentId)) {
+        return res.status(400).json({ error: "ID de pagamento inválido" });
+      }
+      const { getPaymentStatus } = await import("./mercadopago.js");
+      const result = await getPaymentStatus(paymentId);
+      res.json(result);
+    } catch (err: any) {
+      console.error("[MP Status] Error:", err.message);
+      res.status(500).json({ error: "Erro ao buscar status do pagamento" });
+    }
+  });
+
+  // ─── Mercado Pago: Webhook ───
+  app.post("/api/mp/webhook", async (req, res) => {
+    try {
+      const { type, data } = req.body;
+      console.log(`[MP Webhook] Event: ${type}, ID: ${data?.id}`);
+
+      if (type === "payment" && data?.id) {
+        const { getPaymentStatus } = await import("./mercadopago.js");
+        const payment = await getPaymentStatus(parseInt(data.id, 10));
+        console.log(`[MP Webhook] Payment ${payment.id} status: ${payment.status}`);
+
+        // Save order to database on approved/in_process payment
+        if ((payment.status === 'approved' || payment.status === 'in_process') && payment.external_reference) {
+          try {
+            const { createOrder, generateOrderNumber, getOrderByNumber } = await import('./db/orders.js');
+            const { productCatalog } = await import('../shared/products.js');
+
+            // Idempotency: avoid duplicate orders
+            const existingOrder = await getOrderByNumber(`MP-${payment.id}`);
+            if (!existingOrder) {
+              const parts = payment.external_reference.split(';');
+              const orderItems: any[] = [];
+              let subtotal = 0;
+
+              for (const part of parts) {
+                const [productId, variantColor, qtyStr] = part.split('|');
+                const qty = parseInt(qtyStr, 10) || 1;
+                const product = (productCatalog as any[]).find((p: any) => p.id === productId);
+                if (product) {
+                  const p = product as any;
+                  const variantObj = p.variants?.find((v: any) =>
+                    v.color === variantColor || v.colorName === variantColor
+                  );
+                  const unitPrice = product.price;
+                  const totalPrice = unitPrice * qty;
+                  subtotal += totalPrice;
+                  orderItems.push({
+                    productId: product.id,
+                    productName: product.name,
+                    variantColor: variantColor !== 'default' ? variantColor : undefined,
+                    variantColorName: variantObj?.colorName || (variantColor !== 'default' ? variantColor : undefined),
+                    quantity: qty,
+                    unitPrice,
+                    totalPrice,
+                    imageUrl: p.images?.[0] || undefined,
+                  });
+                }
+              }
+
+              const total = payment.amount || subtotal;
+              const paymentMethodId = payment.payment_method || 'pix';
+              const methodMap: Record<string, 'pix' | 'boleto' | 'card'> = {
+                pix: 'pix', bolbradesco: 'boleto', pec: 'boleto',
+                visa: 'card', master: 'card', amex: 'card', elo: 'card',
+              };
+              const method = methodMap[paymentMethodId] || 'pix';
+
+              const orderNumber = await generateOrderNumber();
+              await createOrder({
+                orderNumber,
+                customerEmail: payment.payer_email || '',
+                subtotal,
+                shippingCost: 0,
+                discount: 0,
+                total,
+                paymentMethod: method,
+                paymentStatus: payment.status === 'approved' ? 'paid' : 'pending',
+                paymentId: String(payment.id),
+                paymentGateway: 'mercadopago',
+                items: orderItems,
+              });
+              console.log(`[MP Webhook] Order ${orderNumber} saved to DB (payment ${payment.id})`);
+            }
+          } catch (dbErr: any) {
+            console.error('[MP Webhook] Failed to save order:', dbErr.message);
+          }
+        }
+
+        // Decrement stock on approved payment
+        if (payment.status === "approved" && payment.external_reference) {
+          console.log(`[MP Webhook] Payment approved, ref: ${payment.external_reference}`);
+          // external_reference format: "productId|variantColor|quantity"
+          const parts = payment.external_reference.split(";");
+          for (const part of parts) {
+            const [productId, variantColor, qtyStr] = part.split("|");
+            const quantity = parseInt(qtyStr, 10) || 1;
+            const { findGestaoProduct } = await import("../shared/stockMapping.js");
+            const { decrementGestaoStock } = await import("./zunoGestao.js");
+            const gestaoEntry = findGestaoProduct(productId, variantColor);
+            if (gestaoEntry) {
+              await decrementGestaoStock(gestaoEntry.gestaoProductId, quantity);
+              console.log(`[MP Webhook] Stock decremented for ${gestaoEntry.gestaoName}`);
+            }
+          }
+        }
+      }
+
+      res.json({ received: true });
+    } catch (err: any) {
+      console.error("[MP Webhook] Error:", err.message);
+      res.status(500).json({ error: "Webhook error" });
+    }
+  });
+
+  // ─── Admin Auth ───
+  app.post('/api/admin/login', async (req, res) => {
+    try {
+      const { password } = req.body;
+      if (!password) return res.status(400).json({ error: 'Senha obrigatória' });
+      const { adminLogin } = await import('./adminAuth.js');
+      const token = await adminLogin(password);
+      if (!token) return res.status(401).json({ error: 'Senha incorreta' });
+      res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; Path=/; Max-Age=${24 * 3600}; SameSite=Lax`);
+      res.json({ token, ok: true });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/admin/logout', async (req, res) => {
+    try {
+      const { extractAdminToken, adminLogout } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (token) await adminLogout(token);
+      res.setHeader('Set-Cookie', 'admin_token=; HttpOnly; Path=/; Max-Age=0');
+      res.json({ ok: true });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/admin/me', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token) return res.status(401).json({ error: 'Não autenticado' });
+      const valid = await validateAdminToken(token);
+      if (!valid) return res.status(401).json({ error: 'Sessão expirada' });
+      res.json({ authenticated: true, role: 'admin' });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ─── Admin: Stats Dashboard ───
+  app.get('/api/admin/stats', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
+      const { getAdminStats } = await import('./db/orders.js');
+      const stats = await getAdminStats();
+      res.json(stats);
+    } catch (err: any) {
+      console.error('[Admin Stats]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ─── Admin: List Orders ───
+  app.get('/api/admin/orders', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
+      const { getOrders } = await import('./db/orders.js');
+      const { page, limit, status, search, dateFrom, dateTo } = req.query as any;
+      const result = await getOrders({
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 20,
+        status, search, dateFrom, dateTo,
+      });
+      res.json(result);
+    } catch (err: any) {
+      console.error('[Admin Orders]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ─── Admin: Get Order Detail ───
+  app.get('/api/admin/orders/:id', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
+      const { getOrderById } = await import('./db/orders.js');
+      const result = await getOrderById(parseInt(req.params.id));
+      if (!result) return res.status(404).json({ error: 'Pedido não encontrado' });
+      res.json(result);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ─── Admin: Update Order Status ───
+  app.patch('/api/admin/orders/:id/status', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
+      const { updateOrderStatus } = await import('./db/orders.js');
+      const { status, trackingCode } = req.body;
+      await updateOrderStatus(parseInt(req.params.id), status, trackingCode);
+      res.json({ ok: true });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ─── Admin: Stock (from ZUNO Gestão) ───
+  app.get('/api/admin/stock', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
+      const stockMap = await getStockMap();
+      const result = stockMapping.map(m => ({
+        ...m,
+        currentStock: stockMap.get(m.gestaoProductId) || 0,
+      }));
+      res.json(result);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
     }
   });
 

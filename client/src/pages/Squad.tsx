@@ -91,6 +91,17 @@ const performanceMembers: SquadMember[] = [
     city: "Petrolina, PE",
     activities: ["Fisioterapia Esportiva", "Maratona", "CrossFit"]
   },
+  {
+    id: 8,
+    name: "BEATRIZ POSSIDIO",
+    category: "PERFORMANCE",
+    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/beatriz-possidio_cd35955c.jpeg",
+    bio: "Corredora incansável e empreendedora de estética. Transforma treinos e resultados com a mesma dedicação com que eleva a beleza a outro nível.",
+    instagram: "https://instagram.com/beatrizpossidio",
+    instagramHandle: "@beatrizpossidio",
+    city: "Petrolina, PE",
+    activities: ["Performance", "Empreendedorismo", "Lifestyle & Disciplina"]
+  },
 ];
 
 function MemberCard({ member }: { member: SquadMember }) {

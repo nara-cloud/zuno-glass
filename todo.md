@@ -143,3 +143,24 @@
 - [x] Página de confirmação de pedido: layout com número do pedido e rastreamento
 - [x] Página de confirmação de pedido: integrar com checkout Stripe
 - [x] Corrigir favicon: ainda não está a aparecer no browser
+- [x] Seção "Produtos Relacionados" na página de detalhes do produto
+- [ ] Integração Mercado Pago: PIX e boleto
+- [ ] Email transacional: confirmação automática de pedido
+- [x] Botão login/admin no rodapé: login se não autenticado, redirecionar para /admin se autenticado
+- [ ] Mercado Pago: configurar credenciais (Access Token + Public Key)
+- [ ] Mercado Pago: endpoints de pagamento PIX, boleto e cartão
+- [ ] Mercado Pago: página de checkout transparente no frontend
+- [ ] Email transacional: confirmação de pedido com Resend
+
+## Plataforma de Gestão do E-commerce (Admin)
+- [ ] Criar schema de pedidos no banco de dados (tabelas: orders, order_items)
+- [ ] Criar rotas de API para pedidos (listar, detalhar, atualizar status)
+- [ ] Criar rotas de API para admin (stats, produtos, estoque)
+- [ ] Criar layout do painel admin com sidebar de navegação
+- [ ] Página admin: Dashboard com KPIs reais (pedidos, receita, estoque)
+- [ ] Página admin: Gestão de Pedidos (listar, filtrar, atualizar status)
+- [ ] Página admin: Detalhe do Pedido (itens, cliente, endereço, pagamento)
+- [ ] Página admin: Gestão de Estoque (sincronizado com ZUNO Gestão)
+- [ ] Página admin: Relatório de Vendas com gráficos reais
+- [ ] Integrar checkout para salvar pedidos no banco de dados
+- [ ] Autenticação admin via senha fixa (sem dependência de OAuth)

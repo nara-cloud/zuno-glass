@@ -3,6 +3,7 @@ import { useRoute, Link } from 'wouter';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { products } from '@/lib/products';
+import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Check, Shield, Truck, RotateCcw, CreditCard, Loader2, ShoppingBag, Minus, Plus, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -389,6 +390,36 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* Related Products */}
+      <section className="pb-20 container">
+        <div className="border-t border-white/10 pt-16 mb-12">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="w-8 h-[2px] bg-primary"></div>
+            <span className="font-display text-primary text-sm tracking-widest">VOCÊ TAMBÉM PODE GOSTAR</span>
+          </div>
+          <h2 className="font-display font-bold text-4xl md:text-5xl text-white">
+            PRODUTOS RELACIONADOS
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products
+            .filter(p => p.id !== product.id && p.category === product.category)
+            .slice(0, 4)
+            .concat(
+              products.filter(
+                p => p.id !== product.id &&
+                p.category !== product.category &&
+                !products.filter(x => x.id !== product.id && x.category === product.category).slice(0, 4).find(x => x.id === p.id)
+              )
+            )
+            .slice(0, 4)
+            .map(relProduct => (
+              <ProductCard key={relProduct.id} product={relProduct} />
+            ))}
+        </div>
+      </section>
 
       <Footer />
     </div>

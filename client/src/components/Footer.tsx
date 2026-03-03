@@ -1,7 +1,9 @@
 import { Link } from 'wouter';
-import { Instagram, Facebook, ArrowRight } from 'lucide-react';
+import { Instagram, Facebook, ArrowRight, Lock, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/useAuth';
+import { getLoginUrl } from '@/const';
 
 // Custom TikTok icon (not available in lucide-react)
 function TikTokIcon({ className }: { className?: string }) {
@@ -27,6 +29,35 @@ const socialLinks = [
   { Icon: TikTokIcon, href: "https://www.tiktok.com/@zuno.glass", label: "TikTok" },
   { Icon: XIcon, href: "#", label: "X" },
 ];
+
+function AdminFooterButton() {
+  const { user, loading, isAuthenticated } = useAuth();
+
+  if (loading) return null;
+
+  const hasAdminAccess = isAuthenticated && (user?.role === 'admin' || user?.role === 'manager');
+
+  if (hasAdminAccess) {
+    return (
+      <Link href="/admin">
+        <button className="flex items-center gap-1.5 font-body text-gray-600 text-sm hover:text-primary transition-colors group">
+          <LayoutDashboard className="w-3.5 h-3.5 group-hover:text-primary transition-colors" />
+          <span>PAINEL ADMIN</span>
+        </button>
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={getLoginUrl()}
+      className="flex items-center gap-1.5 font-body text-gray-600 text-sm hover:text-primary transition-colors group"
+    >
+      <Lock className="w-3.5 h-3.5 group-hover:text-primary transition-colors" />
+      <span>ACESSO RESTRITO</span>
+    </a>
+  );
+}
 
 export default function Footer() {
   return (
@@ -108,9 +139,10 @@ export default function Footer() {
           <p className="font-body text-gray-600 text-sm">
             © 2026 ZUNO GLASS. TODOS OS DIREITOS RESERVADOS.
           </p>
-          <div className="flex gap-8">
+          <div className="flex items-center gap-8">
             <a href="#" className="font-body text-gray-600 text-sm hover:text-white transition-colors">PRIVACIDADE</a>
             <a href="#" className="font-body text-gray-600 text-sm hover:text-white transition-colors">TERMOS</a>
+            <AdminFooterButton />
           </div>
         </div>
       </div>
