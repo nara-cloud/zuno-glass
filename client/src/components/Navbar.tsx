@@ -172,7 +172,7 @@ export default function Navbar() {
               variant="outline"
               size="sm"
               disabled
-              className="border-primary/20 text-primary/40 font-display font-bold text-xs tracking-wider cursor-not-allowed opacity-50"
+              className="border-white/20 text-white font-display font-bold text-xs tracking-wider cursor-not-allowed opacity-60"
             >
               TRY-ON
             </Button>
@@ -225,7 +225,7 @@ export default function Navbar() {
             variant="outline"
             size="lg"
             disabled
-            className="border-primary/20 text-primary/40 font-display tracking-wider font-bold cursor-not-allowed opacity-50"
+            className="border-white/20 text-white font-display tracking-wider font-bold cursor-not-allowed opacity-60"
           >
             TRY-ON VIRTUAL
           </Button>

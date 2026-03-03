@@ -267,7 +267,8 @@ export default function Home() {
             playsInline
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none"></div>
+          <div className="absolute inset-0 bg-black/70 pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent pointer-events-none"></div>
           <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none">
             <p className="font-display font-bold text-white text-xl md:text-2xl tracking-widest drop-shadow-lg">PERFORMANCE EM MOVIMENTO</p>
           </div>

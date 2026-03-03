@@ -346,3 +346,7 @@
 - [ ] Implementar sistema de notificação por abandono de carrinho (backend + WhatsApp/email)
 - [x] Adicionar campo de cupom de desconto no checkout (frontend + endpoint de validação)
 - [x] Inserir 11 cupons novos no banco de dados (LEOPOSSIDIO10, MICAELY10, SIMONE10, BIAPOSSIDIO10, BEAMENDES10, GUILHERME10, LUANDA10, PEDRO10, RANNA10, LUIZA10, CATARINA10)
+- [ ] Corrigir foto da Luanda no Squad (remover print do Instagram)
+- [ ] Mudar cor do texto TRY-ON no cabeçalho para branco
+- [ ] Girar foto da Nara no Squad para rosto ficar na parte de cima
+- [ ] Reduzir exposição (brilho) do vídeo na secção de performance da Home
