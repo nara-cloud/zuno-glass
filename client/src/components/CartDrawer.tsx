@@ -75,10 +75,39 @@ export default function CartDrawer() {
   const grandTotalPix = grandTotal * 0.95;
   const installmentGrandTotal = grandTotal > 0 ? (grandTotal / 3) : 0;
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (items.length === 0) return;
-    closeCart();
-    navigate('/checkout');
+    setIsCheckingOut(true);
+    try {
+      const checkoutItems = items.map(item => ({
+        title: `${item.name} — ${item.variantColorName}`,
+        quantity: item.quantity,
+        unit_price: item.price,
+        currency_id: 'BRL',
+      }));
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: checkoutItems,
+          payerEmail: '',
+          shippingCost: shippingQuote?.price || 0,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao criar sessão de pagamento');
+      if (data.url) {
+        toast.info('Redirecionando para o Mercado Pago...');
+        window.open(data.url, '_blank');
+        closeCart();
+      } else {
+        throw new Error('URL de pagamento não retornada');
+      }
+    } catch (err: any) {
+      toast.error('Erro no checkout', { description: err.message });
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   return (
