@@ -11,7 +11,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const installment = product.price > 0 ? (product.price / 3).toFixed(2) : null;
+  const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0);
+  const installment = price > 0 ? (price / 3).toFixed(2) : null;
   const { addItem } = useCart();
   const { getProductStock, isInStock } = useStock();
 
@@ -33,7 +34,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     addItem({
       productId: product.id,
       name: product.name,
-      price: product.price,
+      price: price,
       image: product.image,
       variantColor: defaultVariant?.color || '#000',
       variantColorName: defaultVariant?.colorName || 'Padrão',
@@ -77,7 +78,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               VER DETALHES
             </Button>
           </Link>
-          {product.price > 0 && inStock && (
+          {price > 0 && inStock && (
             <Button 
               onClick={handleQuickAdd}
               className="bg-primary text-black hover:bg-white font-display tracking-wider clip-corner"
@@ -103,10 +104,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             <span className="font-display font-bold text-sm text-red-400 tracking-wider flex-shrink-0 ml-3">
               INDISPONÍVEL
             </span>
-          ) : product.price > 0 ? (
+          ) : price > 0 ? (
             <div className="text-right flex-shrink-0 ml-3">
               <span className="font-display font-bold text-lg text-white block">
-                R$ {product.price.toFixed(2).replace('.', ',')}
+                R$ {price.toFixed(2).replace('.', ',')}
               </span>
               <span className="font-body text-[11px] text-gray-500 block mt-0.5">
                 ou 3x de R$ {installment?.replace('.', ',')}

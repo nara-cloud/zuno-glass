@@ -1434,6 +1434,9 @@ async function startServer() {
           features: (() => { try { return JSON.parse(p.features || '[]'); } catch { return []; } })(),
           variants: productVariants,
           tagline: p.tagline || '',
+          price: parseFloat(p.price) || 0,
+          compareAtPrice: p.compare_at_price ? parseFloat(p.compare_at_price) : null,
+          cost: p.cost ? parseFloat(p.cost) : null,
         };
       });
       res.json(mapped);
