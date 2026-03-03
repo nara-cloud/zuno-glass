@@ -80,8 +80,6 @@ export default function Checkout() {
     ? calculateShipping(cep.replace(/\D/g, ''), totalPrice)
     : null;
   const shippingCost = shippingQuote?.price || 0;
-  const grandTotal = totalPrice + shippingCost;
-  const pixTotal = grandTotal * 0.95;
 
   // Payer info
   const [payer, setPayer] = useState<PayerInfo>({ email: '', firstName: '', lastName: '', cpf: '' });
@@ -95,6 +93,44 @@ export default function Checkout() {
   const [cardCvv, setCardCvv] = useState('');
   const [cardName, setCardName] = useState('');
   const [installments, setInstallments] = useState(1);
+
+  // Cupom
+  const [couponCode, setCouponCode] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0); // valor absoluto de desconto
+  const [couponApplied, setCouponApplied] = useState<string | null>(null);
+  const [isCheckingCoupon, setIsCheckingCoupon] = useState(false);
+
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim().toUpperCase();
+    if (!code) return;
+    setIsCheckingCoupon(true);
+    try {
+      const res = await fetch(`/api/mp/coupon?code=${encodeURIComponent(code)}&total=${grandTotal}`);
+      const data = await res.json();
+      if (!res.ok || !data.valid) {
+        toast.error(data.error || 'Cupom inválido ou expirado.');
+        setCouponDiscount(0);
+        setCouponApplied(null);
+      } else {
+        setCouponDiscount(data.discountAmount);
+        setCouponApplied(code);
+        toast.success(`Cupom ${code} aplicado! Desconto de R$ ${data.discountAmount.toFixed(2).replace('.', ',')}`);
+      }
+    } catch {
+      toast.error('Erro ao validar cupom.');
+    } finally {
+      setIsCheckingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setCouponCode('');
+    setCouponDiscount(0);
+    setCouponApplied(null);
+  };
+
+  const grandTotal = Math.max(0, totalPrice + shippingCost - couponDiscount);
+  const pixTotal = grandTotal * 0.95;
 
   useEffect(() => {
     const savedCep = localStorage.getItem('zuno_shipping_cep');
@@ -395,10 +431,28 @@ export default function Checkout() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="font-display font-bold text-3xl text-white tracking-wider">FINALIZAR COMPRA</h1>
-          <div className="flex items-center gap-1 ml-auto">
-            <Lock className="w-4 h-4 text-primary" />
-            <span className="font-body text-xs text-gray-400">Pagamento seguro</span>
+          <div className="flex items-center gap-3 ml-auto">
+            <div className="flex items-center gap-1">
+              <Lock className="w-4 h-4 text-primary" />
+              <span className="font-body text-xs text-gray-400">Pagamento seguro</span>
+            </div>
+            <img
+              src="https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/mercadopago-logo_72baea45.png"
+              alt="Mercado Pago"
+              className="h-6 object-contain opacity-80"
+            />
           </div>
+        </div>
+
+        {/* Bandeiras dos cartões */}
+        <div className="flex items-center gap-2 mb-6 flex-wrap">
+          <span className="font-body text-xs text-gray-500">Aceito:</span>
+          <img
+            src="https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/bandeiras-cartoes_f4c4174b.png"
+            alt="Bandeiras aceitas: Elo, Visa, Mastercard, Hipercard, American Express"
+            className="h-6 object-contain"
+          />
+          <span className="font-body text-xs text-gray-600 ml-1">PIX · Boleto</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -578,16 +632,70 @@ export default function Checkout() {
             {paymentMethod === 'card' && (
               <div className="bg-white/5 border border-white/10 p-6 space-y-4">
                 <h2 className="font-display font-bold text-lg text-white tracking-wider">DADOS DO CARTÃO</h2>
-                <p className="font-body text-xs text-gray-500">
-                  Insira os dados do cartão abaixo. O pagamento é processado com segurança via Mercado Pago.
-                </p>
                 <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 p-3">
                   <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
                   <span className="font-body text-xs text-primary">
-                    Pagamento processado com segurança via Mercado Pago. Seus dados do cartão nunca passam pelo nosso servidor.
+                    Pagamento 100% seguro via Mercado Pago. Seus dados são criptografados.
                   </span>
                 </div>
 
+                {/* Número do cartão */}
+                <div className="space-y-1">
+                  <Label className="font-body text-xs text-gray-400">Número do Cartão *</Label>
+                  <Input
+                    value={cardNumber}
+                    onChange={e => {
+                      const digits = e.target.value.replace(/\D/g, '').slice(0, 16);
+                      const formatted = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+                      setCardNumber(formatted);
+                    }}
+                    placeholder="0000 0000 0000 0000"
+                    maxLength={19}
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 font-mono tracking-widest"
+                  />
+                </div>
+
+                {/* Nome no cartão */}
+                <div className="space-y-1">
+                  <Label className="font-body text-xs text-gray-400">Nome no Cartão *</Label>
+                  <Input
+                    value={cardName}
+                    onChange={e => setCardName(e.target.value.toUpperCase())}
+                    placeholder="NOME COMO NO CARTÃO"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 uppercase tracking-wider"
+                  />
+                </div>
+
+                {/* Validade e CVV */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label className="font-body text-xs text-gray-400">Validade *</Label>
+                    <Input
+                      value={cardExpiry}
+                      onChange={e => {
+                        const digits = e.target.value.replace(/\D/g, '').slice(0, 4);
+                        const formatted = digits.length > 2 ? `${digits.slice(0,2)}/${digits.slice(2)}` : digits;
+                        setCardExpiry(formatted);
+                      }}
+                      placeholder="MM/AA"
+                      maxLength={5}
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 font-mono"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="font-body text-xs text-gray-400">CVV *</Label>
+                    <Input
+                      value={cardCvv}
+                      onChange={e => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      placeholder="123"
+                      maxLength={4}
+                      type="password"
+                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Parcelamento */}
                 <div className="space-y-1">
                   <Label className="font-body text-xs text-gray-400">Parcelamento</Label>
                   <select
@@ -694,6 +802,35 @@ export default function Checkout() {
                   ))}
                 </div>
 
+                {/* Campo de Cupom */}
+                <div className="space-y-2 border-b border-white/10 pb-4">
+                  <p className="font-display font-bold text-xs text-white tracking-wider">CUPOM DE DESCONTO</p>
+                  {couponApplied ? (
+                    <div className="flex items-center justify-between bg-primary/10 border border-primary/20 px-3 py-2">
+                      <span className="font-display font-bold text-xs text-primary tracking-wider">{couponApplied}</span>
+                      <button onClick={removeCoupon} className="text-gray-400 hover:text-white text-xs font-body transition-colors">remover</button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        value={couponCode}
+                        onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                        onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
+                        placeholder="SEU CUPOM"
+                        className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 font-display tracking-wider text-xs h-9"
+                      />
+                      <Button
+                        onClick={handleApplyCoupon}
+                        disabled={isCheckingCoupon || !couponCode.trim()}
+                        size="sm"
+                        className="bg-primary text-black hover:bg-white font-display font-bold text-xs tracking-wider h-9 px-3 flex-shrink-0"
+                      >
+                        {isCheckingCoupon ? <Loader2 className="w-3 h-3 animate-spin" /> : 'APLICAR'}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
                 {/* Totals */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -708,6 +845,14 @@ export default function Checkout() {
                       {shippingQuote ? shippingQuote.formattedPrice : '—'}
                     </span>
                   </div>
+                  {couponApplied && couponDiscount > 0 && (
+                    <div className="flex items-center justify-between">
+                      <span className="font-body text-sm text-primary">Cupom {couponApplied}</span>
+                      <span className="font-display font-bold text-sm text-primary">
+                        − R$ {couponDiscount.toFixed(2).replace('.', ',')}
+                      </span>
+                    </div>
+                  )}
                   {paymentMethod === 'pix' && (
                     <div className="flex items-center justify-between">
                       <span className="font-body text-sm text-green-400">Desconto PIX (5%)</span>

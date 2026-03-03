@@ -1,0 +1,82 @@
+{
+  "query": "SELECT code, discount_value, used_count, is_active FROM coupons ORDER BY code;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute SELECT code, discount_value, used_count, is_active FROM coupons ORDER BY code;",
+  "rows": [
+    {
+      "code": "BARBARA10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "BEA10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "BRUNO10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "CORLETT10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "DUDU10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "LEO10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "LU10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "NARA10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "POSSIDIO10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "RENATA10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "TATALA10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    },
+    {
+      "code": "ZUNO10",
+      "discount_value": "10.00",
+      "used_count": "0",
+      "is_active": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "code\tdiscount_value\tused_count\tis_active\nBARBARA10\t10.00\t0\t1\nBEA10\t10.00\t0\t1\nBRUNO10\t10.00\t0\t1\nCORLETT10\t10.00\t0\t1\nDUDU10\t10.00\t0\t1\nLEO10\t10.00\t0\t1\nLU10\t10.00\t0\t1\nNARA10\t10.00\t0\t1\nPOSSIDIO10\t10.00\t0\t1\nRENATA10\t10.00\t0\t1\nTATALA10\t10.00\t0\t1\nZUNO10\t10.00\t0\t1\n",
+  "stderr": "",
+  "execution_time_ms": 354
+}

@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, name, slug, image_url FROM catalog_products WHERE name LIKE '%INFINITY X%' OR slug LIKE '%infinity-x%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute SELECT id, name, slug, image_url FROM catalog_products WHERE name LIKE '%INFINITY X%' OR slug LIKE '%infinity-x%';",
+  "rows": [
+    {
+      "id": "30040",
+      "name": "ZUNO INFINITY X PRETO DOURADO",
+      "slug": "zuno-infinity-x-preto-dourado",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/dPOZzjqntbrUSZEZ.webp"
+    },
+    {
+      "id": "30041",
+      "name": "ZUNO INFINITY X MARROM DEGRADÊ ROSE",
+      "slug": "zuno-infinity-x-marrom-degrade-rose",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ZfpBmCXvPuBcACYt.webp"
+    },
+    {
+      "id": "30042",
+      "name": "ZUNO INFINITY X MARROM DEGRADÊ PRETO",
+      "slug": "zuno-infinity-x-marrom-degrade-preto",
+      "image_url": "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/SambaMarromDegradêPreto_3b16f596.webp"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tslug\timage_url\n30040\tZUNO INFINITY X PRETO DOURADO\tzuno-infinity-x-preto-dourado\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/dPOZzjqntbrUSZEZ.webp\n30041\tZUNO INFINITY X MARROM DEGRADÊ ROSE\tzuno-infinity-x-marrom-degrade-rose\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ZfpBmCXvPuBcACYt.webp\n30042\tZUNO INFINITY X MARROM DEGRADÊ PRETO\tzuno-infinity-x-marrom-degrade-preto\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/SambaMarromDegradêPreto_3b16f596.webp\n",
+  "stderr": "",
+  "execution_time_ms": 362
+}

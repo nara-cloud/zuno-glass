@@ -656,6 +656,69 @@ async function startServer() {
     }
   });
 
+  // ─── Coupon Validation ───
+  app.get('/api/mp/coupon', async (req, res) => {
+    try {
+      const code = (req.query.code as string || '').trim().toUpperCase();
+      const total = parseFloat(req.query.total as string) || 0;
+
+      if (!code) {
+        return res.status(400).json({ valid: false, error: 'Código do cupom não informado.' });
+      }
+
+      const mysql2 = await import('mysql2/promise');
+      const conn = await mysql2.createConnection(process.env.DATABASE_URL || '');
+      const [rows] = await conn.execute(
+        'SELECT * FROM coupons WHERE code = ? AND is_active = 1 LIMIT 1',
+        [code]
+      ) as any[];
+      await conn.end();
+
+      if (!rows || rows.length === 0) {
+        return res.json({ valid: false, error: 'Cupom inválido ou não encontrado.' });
+      }
+
+      const coupon = rows[0];
+
+      // Check expiry
+      if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+        return res.json({ valid: false, error: 'Cupom expirado.' });
+      }
+
+      // Check max uses
+      if (coupon.max_uses !== null && coupon.used_count >= coupon.max_uses) {
+        return res.json({ valid: false, error: 'Cupom já atingiu o limite de usos.' });
+      }
+
+      // Check minimum order value
+      if (coupon.min_order_value !== null && total < parseFloat(coupon.min_order_value)) {
+        return res.json({
+          valid: false,
+          error: `Pedido mínimo de R$ ${parseFloat(coupon.min_order_value).toFixed(2).replace('.', ',')} para usar este cupom.`
+        });
+      }
+
+      // Calculate discount
+      let discountAmount = 0;
+      if (coupon.discount_type === 'percentage') {
+        discountAmount = total * (parseFloat(coupon.discount_value) / 100);
+      } else {
+        discountAmount = Math.min(parseFloat(coupon.discount_value), total);
+      }
+
+      return res.json({
+        valid: true,
+        code: coupon.code,
+        discountType: coupon.discount_type,
+        discountValue: parseFloat(coupon.discount_value),
+        discountAmount: Math.round(discountAmount * 100) / 100,
+      });
+    } catch (err: any) {
+      console.error('[Coupon] Error:', err.message);
+      res.status(500).json({ valid: false, error: 'Erro ao validar cupom.' });
+    }
+  });
+
   // ─── Admin Auth ───
   app.post('/api/admin/login', async (req, res) => {
     try {

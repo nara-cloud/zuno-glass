@@ -333,3 +333,16 @@
 - [ ] Bloco institucional humano (fundadores, autoridade)
 - [ ] FAQ estratégico com perguntas anti-objecção
 - [ ] Secção de fotos em movimento (squad/bastidor)
+
+## Correções e Novas Funcionalidades (Mar 2026)
+- [x] Corrigir imagem do ZUNO INFINITY X MARROM DEGRADÊ PRETO (variant e product_image_url)
+- [x] Adicionar ícone de carrinho com contador no cabeçalho (Navbar)
+- [ ] Implementar notificação por abandono de carrinho (backend + WhatsApp/email)
+- [ ] Reverter secção de vídeo na Home para placeholder (vídeo não aprovado)
+- [x] Corrigir posicionamento da foto de Nara Ferrari no Squad (rosto visível)
+- [x] Substituir foto de Natália Leite no Squad pela nova (IMG_2484.jpeg)
+- [x] Adicionar logo do Mercado Pago e bandeiras dos cartões no checkout
+- [x] Adicionar ícone de carrinho com contador na Navbar
+- [ ] Implementar sistema de notificação por abandono de carrinho (backend + WhatsApp/email)
+- [x] Adicionar campo de cupom de desconto no checkout (frontend + endpoint de validação)
+- [x] Inserir 11 cupons novos no banco de dados (LEOPOSSIDIO10, MICAELY10, SIMONE10, BIAPOSSIDIO10, BEAMENDES10, GUILHERME10, LUANDA10, PEDRO10, RANNA10, LUIZA10, CATARINA10)

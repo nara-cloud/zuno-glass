@@ -258,22 +258,19 @@ export default function Home() {
 
       {/* ─── VÍDEO EM MOVIMENTO ───────────────────────────────── */}
       <section className="py-0 bg-black relative overflow-hidden">
-        <div className="relative h-[60vh] bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center group cursor-pointer">
-          {/* Placeholder visual — substitua pelo vídeo real */}
-          <div className="absolute inset-0 bg-[url('https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/hero-athlete-running_bef4ff10.jpg')] bg-cover bg-center opacity-30"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60"></div>
-          
-          {/* Play button */}
-          <div className="relative z-10 flex flex-col items-center gap-6">
-            <div className="w-24 h-24 rounded-full border-2 border-primary flex items-center justify-center bg-black/60 backdrop-blur-sm group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-              <Play className="w-10 h-10 text-primary group-hover:text-black transition-colors duration-300 ml-1" fill="currentColor" />
-            </div>
-            <div className="text-center">
-              <p className="font-display font-bold text-white text-2xl tracking-widest">PERFORMANCE EM MOVIMENTO</p>
-              <p className="font-body text-gray-400 text-sm mt-2">Vídeo em breve — corrida, bike e treino funcional</p>
-            </div>
+        <div className="relative h-[60vh] overflow-hidden">
+          <video
+            src="https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/zuno-performance-video_ee338dea.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none"></div>
+          <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none">
+            <p className="font-display font-bold text-white text-xl md:text-2xl tracking-widest drop-shadow-lg">PERFORMANCE EM MOVIMENTO</p>
           </div>
-
           {/* Corner accent */}
           <div className="absolute bottom-0 left-0 w-32 h-1 bg-primary"></div>
           <div className="absolute top-0 right-0 w-32 h-1 bg-primary"></div>

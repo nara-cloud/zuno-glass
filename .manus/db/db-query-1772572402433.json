@@ -1,0 +1,46 @@
+{
+  "query": "SELECT code FROM coupons ORDER BY code;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute SELECT code FROM coupons ORDER BY code;",
+  "rows": [
+    {
+      "code": "BARBARA10"
+    },
+    {
+      "code": "BEA10"
+    },
+    {
+      "code": "BRUNO10"
+    },
+    {
+      "code": "CORLETT10"
+    },
+    {
+      "code": "DUDU10"
+    },
+    {
+      "code": "LEO10"
+    },
+    {
+      "code": "LU10"
+    },
+    {
+      "code": "NARA10"
+    },
+    {
+      "code": "POSSIDIO10"
+    },
+    {
+      "code": "RENATA10"
+    },
+    {
+      "code": "TATALA10"
+    },
+    {
+      "code": "ZUNO10"
+    }
+  ],
+  "messages": [],
+  "stdout": "code\nBARBARA10\nBEA10\nBRUNO10\nCORLETT10\nDUDU10\nLEO10\nLU10\nNARA10\nPOSSIDIO10\nRENATA10\nTATALA10\nZUNO10\n",
+  "stderr": "",
+  "execution_time_ms": 476
+}

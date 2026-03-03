@@ -8,6 +8,7 @@ interface SquadMember {
   name: string;
   category: "PERFORMANCE" | "LIFESTYLE";
   image: string;
+  objectPosition?: string;
   bio: string;
   instagram: string;
   instagramHandle: string;
@@ -21,6 +22,7 @@ const performanceMembers: SquadMember[] = [
     name: "NARA FERRARI",
     category: "PERFORMANCE",
     image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/a634238d-3a43-4cb7-b1fd-b0f68267bdbf_9a6bc72f.jpeg",
+    objectPosition: "center 25%",
     bio: "Empreendedora e atleta de Petrolina. Engenheira e estrategista de marketing, está sempre em movimento transformando ideias em realidade.",
     instagram: "https://instagram.com/naraferrari",
     instagramHandle: "@naraferrari",
@@ -53,7 +55,8 @@ const performanceMembers: SquadMember[] = [
     id: 4,
     name: "NATÁLIA LEITE",
     category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/RnBXePBvYxqJrzHu.jpg",
+    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/IMG_2484_fad1865c.jpeg",
+    objectPosition: "center 30%",
     bio: "Corredora dedicada ao esporte e ao estilo de vida ativo. Leva a performance ao limite em cada treino.",
     instagram: "https://instagram.com/naty_leite",
     instagramHandle: "@naty_leite",
@@ -167,7 +170,8 @@ function MemberCard({ member }: { member: SquadMember }) {
         <img 
           src={member.image} 
           alt={member.name} 
-          className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105" 
+          className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 scale-100 group-hover:scale-105"
+          style={{ objectPosition: member.objectPosition ?? 'center top' }}
         />
         
         <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 bg-gradient-to-t from-black via-black/80 to-transparent z-20">

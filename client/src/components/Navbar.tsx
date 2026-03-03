@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, X, LogIn, LogOut, User, Package, Shield, ChevronDown } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, User, Package, Shield, ChevronDown, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -153,6 +153,20 @@ export default function Navbar() {
               </Button>
             </Link>
           )}
+          {/* Carrinho */}
+          <button
+            onClick={openCart}
+            className="relative p-2 text-white hover:text-primary transition-colors"
+            aria-label="Abrir carrinho"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-black text-[10px] font-display font-bold w-4 h-4 flex items-center justify-center rounded-full leading-none">
+                {totalItems > 9 ? '9+' : totalItems}
+              </span>
+            )}
+          </button>
+
           <div className="relative">
             <Button
               variant="outline"
@@ -170,6 +184,19 @@ export default function Navbar() {
 
         {/* Mobile Actions */}
         <div className="flex md:hidden items-center gap-2">
+          {/* Carrinho mobile */}
+          <button
+            onClick={openCart}
+            className="relative p-2 text-white hover:text-primary transition-colors"
+            aria-label="Abrir carrinho"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-black text-[10px] font-display font-bold w-4 h-4 flex items-center justify-center rounded-full leading-none">
+                {totalItems > 9 ? '9+' : totalItems}
+              </span>
+            )}
+          </button>
           <button 
             className="text-white hover:text-primary transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
