@@ -283,3 +283,4 @@
 - [x] Actualizar /api/catalog para retornar 32 produtos (um por SKU)
 - [x] Actualizar loja para exibir os 32 cards de produtos
 - [x] Corrigir categoria do ZUNO VORTEXA: mudar de performance para lifestyle (casual)
+- [x] Corrigir slogan hero: PARA QUEM VIVE NO / LIMITE DA LUZ
