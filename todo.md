@@ -284,3 +284,4 @@
 - [x] Actualizar loja para exibir os 32 cards de produtos
 - [x] Corrigir categoria do ZUNO VORTEXA: mudar de performance para lifestyle (casual)
 - [x] Corrigir slogan hero: PARA QUEM VIVE NO / LIMITE DA LUZ
+- [ ] Formulário de parceria na página /partners com botão FALE CONOSCO rolando até o formulário

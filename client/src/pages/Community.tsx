@@ -2,7 +2,9 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Users, Trophy, Flame, Smartphone, ArrowRight, Target, Calendar, Handshake, Building2, Dumbbell, Clock, ExternalLink } from 'lucide-react';
+import { Users, Trophy, Flame, Smartphone, ArrowRight, Target, Calendar, Handshake, Building2, Dumbbell, Clock, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import PartnerForm from '@/components/PartnerForm';
 
 const challenges = [
   {
@@ -183,12 +185,30 @@ export default function Community() {
                 queremos conversar. Juntos podemos ir mais longe.
               </p>
             </div>
-            <a href="mailto:contato@zunoglass.com" className="flex-shrink-0">
-              <Button className="bg-primary text-black hover:bg-white font-display font-bold px-10 h-14 tracking-wider text-lg clip-corner">
-                FALE CONOSCO <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </a>
+            <button
+              onClick={() => document.getElementById('partner-form')?.scrollIntoView({ behavior: 'smooth' })}
+              className="flex-shrink-0 bg-primary text-black hover:bg-white font-display font-bold px-10 h-14 tracking-wider text-lg clip-corner flex items-center gap-2 transition-colors"
+            >
+              FALE CONOSCO <ArrowRight className="w-5 h-5" />
+            </button>
           </div>
+        </div>
+      </section>
+
+      {/* Formulário de Parceria */}
+      <section id="partner-form" className="py-20 bg-black border-t border-white/10">
+        <div className="container max-w-2xl">
+          <div className="mb-10">
+            <div className="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-4 py-2 rounded-full mb-4">
+              <Handshake className="w-4 h-4 text-primary" />
+              <span className="font-display font-bold text-primary text-sm tracking-widest">PARCERIA</span>
+            </div>
+            <h2 className="font-display font-bold text-3xl md:text-4xl text-white mb-3">
+              VAMOS <span className="text-primary">CONVERSAR</span>
+            </h2>
+            <p className="font-body text-gray-400">Preencha o formulário e entraremos em contato em até 48 horas.</p>
+          </div>
+          <PartnerForm />
         </div>
       </section>
 
