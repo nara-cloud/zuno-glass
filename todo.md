@@ -322,3 +322,4 @@
 - [x] Corrigir AdminCatalog: adicionar token de autenticação em todos os fetch (salvar, upload imagem, toggle activo/destaque, stock)
 - [x] Placeholder elegante "Z" para produtos sem imagem na coleção e detalhe
 - [x] Corrigir flatMap is not a function no AdminProducts
+- [x] Upload das 32 fotos de produtos para CDN e actualização da base de dados

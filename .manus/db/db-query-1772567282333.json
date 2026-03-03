@@ -1,0 +1,9 @@
+{
+  "query": "\nUPDATE catalog_products \nSET image_url = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/DiamondPremiumPretoDegradê_a4f535f9.webp',\n    images = '[\"https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/DiamondPremiumPretoDegradê_a4f535f9.webp\"]'\nWHERE slug = 'zuno-titan';\n\nUPDATE catalog_products \nSET image_url = 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/wrPCbEZEkyeihXpy.webp',\n    images = '[\"https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/wrPCbEZEkyeihXpy.webp\"]'\nWHERE slug = 'zuno-savik';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute \nUPDATE catalog_products \nSET image_url = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/DiamondPremiumPretoDegradê_a4f535f9.webp',\n    images = '[\"https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/DiamondPremiumPretoDegradê_a4f535f9.webp\"]'\nWHERE slug = 'zuno-titan';\n\nUPDATE catalog_products \nSET image_url = 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/wrPCbEZEkyeihXpy.webp',\n    images = '[\"https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/wrPCbEZEkyeihXpy.webp\"]'\nWHERE slug = 'zuno-savik';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 494
+}
