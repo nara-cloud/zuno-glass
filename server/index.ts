@@ -446,6 +446,16 @@ async function startServer() {
     }
   });
 
+  // Helper: build a valid public notification URL for Mercado Pago
+  function getNotificationUrl(req: any): string | undefined {
+    const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
+    // MP requires a publicly reachable URL; skip for localhost/dev
+    if (origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('.manus.computer')) {
+      return undefined;
+    }
+    return `${origin}/api/mp/webhook`;
+  }
+
   // ─── Mercado Pago: PIX Payment ───
   app.post("/api/mp/pix", async (req, res) => {
     try {
@@ -454,13 +464,12 @@ async function startServer() {
         return res.status(400).json({ error: "items e payer.email são obrigatórios" });
       }
       const { createPixPayment } = await import("./mercadopago.js");
-      const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
       const result = await createPixPayment({
         items,
         payer,
         address,
         externalReference,
-        notificationUrl: `${origin}/api/mp/webhook`,
+        notificationUrl: getNotificationUrl(req),
       });
       res.json(result);
     } catch (err: any) {
@@ -480,13 +489,12 @@ async function startServer() {
         return res.status(400).json({ error: "Endereço completo é obrigatório para boleto" });
       }
       const { createBoletoPayment } = await import("./mercadopago.js");
-      const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
       const result = await createBoletoPayment({
         items,
         payer,
         address,
         externalReference,
-        notificationUrl: `${origin}/api/mp/webhook`,
+        notificationUrl: getNotificationUrl(req),
       });
       res.json(result);
     } catch (err: any) {
@@ -503,7 +511,6 @@ async function startServer() {
         return res.status(400).json({ error: "items, payer, token e paymentMethodId são obrigatórios" });
       }
       const { createCardPayment } = await import("./mercadopago.js");
-      const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
       const result = await createCardPayment({
         items,
         payer,
@@ -512,7 +519,7 @@ async function startServer() {
         issuerId,
         paymentMethodId,
         externalReference,
-        notificationUrl: `${origin}/api/mp/webhook`,
+        notificationUrl: getNotificationUrl(req),
       });
       res.json(result);
     } catch (err: any) {

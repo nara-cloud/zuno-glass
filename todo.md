@@ -350,3 +350,5 @@
 - [ ] Mudar cor do texto TRY-ON no cabeçalho para branco
 - [ ] Girar foto da Nara no Squad para rosto ficar na parte de cima
 - [ ] Reduzir exposição (brilho) do vídeo na secção de performance da Home
+- [x] BUG: Erro ao processar pagamento no checkout (notification_url inválida em dev)
+- [ ] BUG: Fotos com erro na página de produtos: ZUNO ORVIK, ZUNO VENZA PRETO DEGRADÊ BRANCO, ZUNO KAORI, ZUNO INFINITY X MARROM DEGRADÊ ROSE
