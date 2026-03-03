@@ -114,6 +114,17 @@ const performanceMembers: SquadMember[] = [
     activities: ["Estratégia & Estrutura", "Direito Empresarial", "Alta Performance"]
   },
   {
+    id: 11,
+    name: "RENATA SOUZA",
+    category: "PERFORMANCE",
+    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/renata-souza_499fad24.jpeg",
+    bio: "Estudante de Medicina movida por propósito, disciplina e alta performance. Une ciência, esporte e estilo de vida saudável como pilares de crescimento.",
+    instagram: "https://instagram.com/renatasouza",
+    instagramHandle: "@renatasouza",
+    city: "Petrolina, PE",
+    activities: ["Medicina & Propósito", "Performance & Disciplina", "Vida Saudável"]
+  },
+  {
     id: 8,
     name: "BEATRIZ POSSIDIO",
     category: "PERFORMANCE",
