@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE catalog_products SET image_url = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/infinity_x_marrom_degrade_rose_88d5d373.webp' WHERE id = 30041;\nUPDATE catalog_variants SET image_url = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/infinity_x_marrom_degrade_rose_88d5d373.webp' WHERE id = 30041;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute UPDATE catalog_products SET image_url = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/infinity_x_marrom_degrade_rose_88d5d373.webp' WHERE id = 30041;\nUPDATE catalog_variants SET image_url = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/infinity_x_marrom_degrade_rose_88d5d373.webp' WHERE id = 30041;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 428
+}
