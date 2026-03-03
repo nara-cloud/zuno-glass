@@ -1,0 +1,138 @@
+{
+  "query": "SELECT id, name FROM catalog_products ORDER BY id ASC",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute SELECT id, name FROM catalog_products ORDER BY id ASC",
+  "rows": [
+    {
+      "id": "30014",
+      "name": "ZUNO STRIX"
+    },
+    {
+      "id": "30015",
+      "name": "ZUNO STRIX AZUL MULTICOLORS"
+    },
+    {
+      "id": "30016",
+      "name": "ZUNO STRIX MARROM VERDE"
+    },
+    {
+      "id": "30017",
+      "name": "ZUNO VEYRON AZUL MULTICOLORS PRETO"
+    },
+    {
+      "id": "30018",
+      "name": "ZUNO VEYRON AMARELO MULTICOLORS"
+    },
+    {
+      "id": "30019",
+      "name": "ZUNO VEYRON VERDE MULTICOLORS"
+    },
+    {
+      "id": "30020",
+      "name": "ZUNO VEYRON PRETO FOSCO"
+    },
+    {
+      "id": "30021",
+      "name": "ZUNO INFINITY MIRROR"
+    },
+    {
+      "id": "30022",
+      "name": "ZUNO KAIZEN AZUL ESCURO PRETO"
+    },
+    {
+      "id": "30023",
+      "name": "ZUNO KAIZEN VERDE PRETO"
+    },
+    {
+      "id": "30024",
+      "name": "ZUNO NOXIS PRETO VERDE"
+    },
+    {
+      "id": "30025",
+      "name": "ZUNO NOXIS BRANCO ROSA"
+    },
+    {
+      "id": "30026",
+      "name": "ZUNO NOXIS BRANCO AZUL CLARO"
+    },
+    {
+      "id": "30027",
+      "name": "ZUNO OBSIDIAN"
+    },
+    {
+      "id": "30028",
+      "name": "ZUNO MISTRAL"
+    },
+    {
+      "id": "30029",
+      "name": "ZUNO VORTEXA"
+    },
+    {
+      "id": "30030",
+      "name": "ZUNO KAORI"
+    },
+    {
+      "id": "30031",
+      "name": "ZUNO APEX"
+    },
+    {
+      "id": "30032",
+      "name": "ZUNO VENZA AZUL"
+    },
+    {
+      "id": "30033",
+      "name": "ZUNO VENZA PRETO DEGRADÊ BRANCO"
+    },
+    {
+      "id": "30034",
+      "name": "ZUNO ALTIS"
+    },
+    {
+      "id": "30035",
+      "name": "ZUNO AXIOM"
+    },
+    {
+      "id": "30036",
+      "name": "ZUNO TITAN"
+    },
+    {
+      "id": "30037",
+      "name": "ZUNO SOLARIS"
+    },
+    {
+      "id": "30038",
+      "name": "ZUNO ORVIK"
+    },
+    {
+      "id": "30039",
+      "name": "ZUNO NEROZ"
+    },
+    {
+      "id": "30040",
+      "name": "ZUNO INFINITY X PRETO DOURADO"
+    },
+    {
+      "id": "30041",
+      "name": "ZUNO INFINITY X MARROM DEGRADÊ ROSE"
+    },
+    {
+      "id": "30042",
+      "name": "ZUNO INFINITY X MARROM DEGRADÊ PRETO"
+    },
+    {
+      "id": "30043",
+      "name": "ZUNO LUMEA"
+    },
+    {
+      "id": "30044",
+      "name": "ZUNO SAVIK"
+    },
+    {
+      "id": "30045",
+      "name": "ZUNO ARVEN"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n30014\tZUNO STRIX\n30015\tZUNO STRIX AZUL MULTICOLORS\n30016\tZUNO STRIX MARROM VERDE\n30017\tZUNO VEYRON AZUL MULTICOLORS PRETO\n30018\tZUNO VEYRON AMARELO MULTICOLORS\n30019\tZUNO VEYRON VERDE MULTICOLORS\n30020\tZUNO VEYRON PRETO FOSCO\n30021\tZUNO INFINITY MIRROR\n30022\tZUNO KAIZEN AZUL ESCURO PRETO\n30023\tZUNO KAIZEN VERDE PRETO\n30024\tZUNO NOXIS PRETO VERDE\n30025\tZUNO NOXIS BRANCO ROSA\n30026\tZUNO NOXIS BRANCO AZUL CLARO\n30027\tZUNO OBSIDIAN\n30028\tZUNO MISTRAL\n30029\tZUNO VORTEXA\n30030\tZUNO KAORI\n30031\tZUNO APEX\n30032\tZUNO VENZA AZUL\n30033\tZUNO VENZA PRETO DEGRADÊ BRANCO\n30034\tZUNO ALTIS\n30035\tZUNO AXIOM\n30036\tZUNO TITAN\n30037\tZUNO SOLARIS\n30038\tZUNO ORVIK\n30039\tZUNO NEROZ\n30040\tZUNO INFINITY X PRETO DOURADO\n30041\tZUNO INFINITY X MARROM DEGRADÊ ROSE\n30042\tZUNO INFINITY X MARROM DEGRADÊ PRETO\n30043\tZUNO LUMEA\n30044\tZUNO SAVIK\n30045\tZUNO ARVEN\n",
+  "stderr": "",
+  "execution_time_ms": 359
+}

@@ -1,0 +1,202 @@
+{
+  "query": "SELECT id, name, slug, image_url FROM catalog_products ORDER BY id ASC LIMIT 32",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute SELECT id, name, slug, image_url FROM catalog_products ORDER BY id ASC LIMIT 32",
+  "rows": [
+    {
+      "id": "30014",
+      "name": "ZUNO STRIX",
+      "slug": "zuno-strix",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/uYQLlQyNuJReIwzd.webp"
+    },
+    {
+      "id": "30015",
+      "name": "ZUNO STRIX AZUL MULTICOLORS",
+      "slug": "zuno-strix-azul-multicolors",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/AabOnglcFvCOomqA.webp"
+    },
+    {
+      "id": "30016",
+      "name": "ZUNO STRIX MARROM VERDE",
+      "slug": "zuno-strix-marrom-verde",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/lhvvPHoCipIFYCep.webp"
+    },
+    {
+      "id": "30017",
+      "name": "ZUNO VEYRON AZUL MULTICOLORS PRETO",
+      "slug": "zuno-veyron-azul-multicolors-preto",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/CXUHfzvxYjdedWmx.webp"
+    },
+    {
+      "id": "30018",
+      "name": "ZUNO VEYRON AMARELO MULTICOLORS",
+      "slug": "zuno-veyron-amarelo-multicolors",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/eJiQPlcgVbksdyrR.webp"
+    },
+    {
+      "id": "30019",
+      "name": "ZUNO VEYRON VERDE MULTICOLORS",
+      "slug": "zuno-veyron-verde-multicolors",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/AGDPXTsOdTIXCRyS.webp"
+    },
+    {
+      "id": "30020",
+      "name": "ZUNO VEYRON PRETO FOSCO",
+      "slug": "zuno-veyron-preto-fosco",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/leKpfZRRWqJulhNp.webp"
+    },
+    {
+      "id": "30021",
+      "name": "ZUNO INFINITY MIRROR",
+      "slug": "zuno-infinity-mirror",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/zuvDiGULMnMGSewd.webp"
+    },
+    {
+      "id": "30022",
+      "name": "ZUNO KAIZEN AZUL ESCURO PRETO",
+      "slug": "zuno-kaizen-azul-escuro-preto",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OYwedCVbIsIKiAyd.webp"
+    },
+    {
+      "id": "30023",
+      "name": "ZUNO KAIZEN VERDE PRETO",
+      "slug": "zuno-kaizen-verde-preto",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/MMTrovRVcLzYNbrl.webp"
+    },
+    {
+      "id": "30024",
+      "name": "ZUNO NOXIS PRETO VERDE",
+      "slug": "zuno-noxis-preto-verde",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/tkrjXwiOwPLUHSDq.webp"
+    },
+    {
+      "id": "30025",
+      "name": "ZUNO NOXIS BRANCO ROSA",
+      "slug": "zuno-noxis-branco-rosa",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/lhCzJAazeAKoTUoz.webp"
+    },
+    {
+      "id": "30026",
+      "name": "ZUNO NOXIS BRANCO AZUL CLARO",
+      "slug": "zuno-noxis-branco-azul-claro",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OCKCBZaIEwHTnvsR.webp"
+    },
+    {
+      "id": "30027",
+      "name": "ZUNO OBSIDIAN",
+      "slug": "zuno-obsidian",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/RlVRLUEXhvNsBJoW.webp"
+    },
+    {
+      "id": "30028",
+      "name": "ZUNO MISTRAL",
+      "slug": "zuno-mistral",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/HXUdOgjuIWkMLNUo.webp"
+    },
+    {
+      "id": "30029",
+      "name": "ZUNO VORTEXA",
+      "slug": "zuno-vortexa",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/FqDYhqndjFgDwbQX.webp"
+    },
+    {
+      "id": "30030",
+      "name": "ZUNO KAORI",
+      "slug": "zuno-kaori",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/aRCUjpWcpsInxLwY.webp"
+    },
+    {
+      "id": "30031",
+      "name": "ZUNO APEX",
+      "slug": "zuno-apex",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/waisoKJuDBcEtgUJ.webp"
+    },
+    {
+      "id": "30032",
+      "name": "ZUNO VENZA AZUL",
+      "slug": "zuno-venza-azul",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/aTlkVweaggTVYNAt.webp"
+    },
+    {
+      "id": "30033",
+      "name": "ZUNO VENZA PRETO DEGRADÊ BRANCO",
+      "slug": "zuno-venza-preto-degrade-branco",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/eTiGaAWeKMmbMSzO.webp"
+    },
+    {
+      "id": "30034",
+      "name": "ZUNO ALTIS",
+      "slug": "zuno-altis",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/JmEEDHedgJOlPHRW.webp"
+    },
+    {
+      "id": "30035",
+      "name": "ZUNO AXIOM",
+      "slug": "zuno-axiom",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ueELSIwGoNnPmVFT.webp"
+    },
+    {
+      "id": "30036",
+      "name": "ZUNO TITAN",
+      "slug": "zuno-titan",
+      "image_url": "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/DiamondPremiumPretoDegradê_a4f535f9.webp"
+    },
+    {
+      "id": "30037",
+      "name": "ZUNO SOLARIS",
+      "slug": "zuno-solaris",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/jqwhqmiWeuMTlkxf.webp"
+    },
+    {
+      "id": "30038",
+      "name": "ZUNO ORVIK",
+      "slug": "zuno-orvik",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/MalBtfibJcezoRMj.webp"
+    },
+    {
+      "id": "30039",
+      "name": "ZUNO NEROZ",
+      "slug": "zuno-neroz",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OiHsaiAQTqQlutFe.webp"
+    },
+    {
+      "id": "30040",
+      "name": "ZUNO INFINITY X PRETO DOURADO",
+      "slug": "zuno-infinity-x-preto-dourado",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/dPOZzjqntbrUSZEZ.webp"
+    },
+    {
+      "id": "30041",
+      "name": "ZUNO INFINITY X MARROM DEGRADÊ ROSE",
+      "slug": "zuno-infinity-x-marrom-degrade-rose",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ZfpBmCXvPuBcACYt.webp"
+    },
+    {
+      "id": "30042",
+      "name": "ZUNO INFINITY X MARROM DEGRADÊ PRETO",
+      "slug": "zuno-infinity-x-marrom-degrade-preto",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/uOTAkFLWjrpCBDvz.webp"
+    },
+    {
+      "id": "30043",
+      "name": "ZUNO LUMEA",
+      "slug": "zuno-lumea",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/DhtgkbcLQAMTEEkd.webp"
+    },
+    {
+      "id": "30044",
+      "name": "ZUNO SAVIK",
+      "slug": "zuno-savik",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/wrPCbEZEkyeihXpy.webp"
+    },
+    {
+      "id": "30045",
+      "name": "ZUNO ARVEN",
+      "slug": "zuno-arven",
+      "image_url": "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/YptsnQbODzfyLiuf.webp"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tslug\timage_url\n30014\tZUNO STRIX\tzuno-strix\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/uYQLlQyNuJReIwzd.webp\n30015\tZUNO STRIX AZUL MULTICOLORS\tzuno-strix-azul-multicolors\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/AabOnglcFvCOomqA.webp\n30016\tZUNO STRIX MARROM VERDE\tzuno-strix-marrom-verde\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/lhvvPHoCipIFYCep.webp\n30017\tZUNO VEYRON AZUL MULTICOLORS PRETO\tzuno-veyron-azul-multicolors-preto\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/CXUHfzvxYjdedWmx.webp\n30018\tZUNO VEYRON AMARELO MULTICOLORS\tzuno-veyron-amarelo-multicolors\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/eJiQPlcgVbksdyrR.webp\n30019\tZUNO VEYRON VERDE MULTICOLORS\tzuno-veyron-verde-multicolors\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/AGDPXTsOdTIXCRyS.webp\n30020\tZUNO VEYRON PRETO FOSCO\tzuno-veyron-preto-fosco\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/leKpfZRRWqJulhNp.webp\n30021\tZUNO INFINITY MIRROR\tzuno-infinity-mirror\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/zuvDiGULMnMGSewd.webp\n30022\tZUNO KAIZEN AZUL ESCURO PRETO\tzuno-kaizen-azul-escuro-preto\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OYwedCVbIsIKiAyd.webp\n30023\tZUNO KAIZEN VERDE PRETO\tzuno-kaizen-verde-preto\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/MMTrovRVcLzYNbrl.webp\n30024\tZUNO NOXIS PRETO VERDE\tzuno-noxis-preto-verde\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/tkrjXwiOwPLUHSDq.webp\n30025\tZUNO NOXIS BRANCO ROSA\tzuno-noxis-branco-rosa\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/lhCzJAazeAKoTUoz.webp\n30026\tZUNO NOXIS BRANCO AZUL CLARO\tzuno-noxis-branco-azul-claro\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OCKCBZaIEwHTnvsR.webp\n30027\tZUNO OBSIDIAN\tzuno-obsidian\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/RlVRLUEXhvNsBJoW.webp\n30028\tZUNO MISTRAL\tzuno-mistral\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/HXUdOgjuIWkMLNUo.webp\n30029\tZUNO VORTEXA\tzuno-vortexa\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/FqDYhqndjFgDwbQX.webp\n30030\tZUNO KAORI\tzuno-kaori\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/aRCUjpWcpsInxLwY.webp\n30031\tZUNO APEX\tzuno-apex\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/waisoKJuDBcEtgUJ.webp\n30032\tZUNO VENZA AZUL\tzuno-venza-azul\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/aTlkVweaggTVYNAt.webp\n30033\tZUNO VENZA PRETO DEGRADÊ BRANCO\tzuno-venza-preto-degrade-branco\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/eTiGaAWeKMmbMSzO.webp\n30034\tZUNO ALTIS\tzuno-altis\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/JmEEDHedgJOlPHRW.webp\n30035\tZUNO AXIOM\tzuno-axiom\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ueELSIwGoNnPmVFT.webp\n30036\tZUNO TITAN\tzuno-titan\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/DiamondPremiumPretoDegradê_a4f535f9.webp\n30037\tZUNO SOLARIS\tzuno-solaris\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/jqwhqmiWeuMTlkxf.webp\n30038\tZUNO ORVIK\tzuno-orvik\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/MalBtfibJcezoRMj.webp\n30039\tZUNO NEROZ\tzuno-neroz\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OiHsaiAQTqQlutFe.webp\n30040\tZUNO INFINITY X PRETO DOURADO\tzuno-infinity-x-preto-dourado\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/dPOZzjqntbrUSZEZ.webp\n30041\tZUNO INFINITY X MARROM DEGRADÊ ROSE\tzuno-infinity-x-marrom-degrade-rose\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ZfpBmCXvPuBcACYt.webp\n30042\tZUNO INFINITY X MARROM DEGRADÊ PRETO\tzuno-infinity-x-marrom-degrade-preto\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/uOTAkFLWjrpCBDvz.webp\n30043\tZUNO LUMEA\tzuno-lumea\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/DhtgkbcLQAMTEEkd.webp\n30044\tZUNO SAVIK\tzuno-savik\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/wrPCbEZEkyeihXpy.webp\n30045\tZUNO ARVEN\tzuno-arven\thttps://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/YptsnQbODzfyLiuf.webp\n",
+  "stderr": "",
+  "execution_time_ms": 354
+}
