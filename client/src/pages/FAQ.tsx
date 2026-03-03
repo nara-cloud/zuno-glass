@@ -139,7 +139,7 @@ export default function FAQ() {
             Nosso suporte está disponível via WhatsApp. Atendimento direto, sem robô, sem espera.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/558791122558" target="_blank" rel="noopener noreferrer">
               <Button className="bg-primary text-black hover:bg-white font-display font-bold px-8 h-12 clip-corner tracking-wider">
                 <MessageCircle className="w-4 h-4 mr-2" />
                 FALAR NO WHATSAPP

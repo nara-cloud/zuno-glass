@@ -67,10 +67,10 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-display font-bold text-white text-sm mb-1">WHATSAPP</h3>
-                <a href="https://wa.me/5500000000000" target="_blank" rel="noopener noreferrer" className="text-gray-300 font-body hover:text-primary transition-colors">
-                  (00) 00000-0000
+                <a href="https://wa.me/558791122558" target="_blank" rel="noopener noreferrer" className="text-gray-300 font-body hover:text-primary transition-colors">
+                  (87) 9112-2558
                 </a>
-                <p className="text-gray-500 font-body text-xs mt-1">Em breve</p>
+                <p className="text-gray-500 font-body text-xs mt-1">Resposta rápida</p>
               </div>
             </div>
 
