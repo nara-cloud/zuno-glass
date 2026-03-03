@@ -355,3 +355,4 @@
 - [x] BUG: Erro no pagamento por cartão - redirecionado para Checkout Pro do Mercado Pago
 - [x] BUG: Produtos não carregam no mobile - card inteiro agora é clicável
 - [ ] Verificar se todas as fotos enviadas foram atualizadas no banco
+- [x] Publicação urgente - lançamento 03/03/2026
