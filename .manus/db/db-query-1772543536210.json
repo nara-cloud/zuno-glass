@@ -1,0 +1,9 @@
+{
+  "query": "INSERT IGNORE INTO user_roles (user_id, role_id, assigned_at) VALUES (3, 1, NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute INSERT IGNORE INTO user_roles (user_id, role_id, assigned_at) VALUES (3, 1, NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 436
+}

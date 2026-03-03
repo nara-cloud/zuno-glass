@@ -186,8 +186,8 @@
 - [ ] Mercado Pago: endpoints de PIX, boleto e cartão no servidor
 - [ ] Mercado Pago: página de checkout transparente no frontend
 - [ ] Mercado Pago: webhook para salvar pedidos no banco
-- [ ] Admin: página /admin/products com os 30 SKUs (custo, margem, estoque)
-- [ ] Admin: filtros por categoria e busca por nome/SKU na página de produtos
+- [x] Admin: página /admin/products com os 30 SKUs (custo, margem, estoque)
+- [x] Admin: filtros por categoria e busca por nome/SKU na página de produtos
 - [ ] E-mail transacional: configurar Resend para confirmação de pedido
 - [ ] E-mail transacional: template HTML de confirmação de pedido
 - [ ] E-mail transacional: disparar após pagamento confirmado (MP + Stripe)
@@ -195,3 +195,7 @@
 - [x] Atualizar logo: remover fundo preto, gerar PNG transparente, atualizar site e favicon
 - [x] Corrigir Navbar: botão ENTRAR usar login próprio (sem Manus OAuth)
 - [ ] Hero da Home: atualizar tagline para "PARA QUEM VIVE NO LIMITE DA LUZ" com estilo outline neon
+- [ ] Tela de loading: usar logo circular amarela (zzuno.png)
+
+## Gestão de Utilizadores
+- [x] Promover nara@triadeconstrutorabr.com a administrador

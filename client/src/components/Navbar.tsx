@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, X, LogIn, LogOut } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, User, Package, Shield, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -10,9 +10,11 @@ const LOGO_URL = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJ
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [location] = useLocation();
   const { totalItems, openCart } = useCart();
   const { user, isAuthenticated, logout } = useAuthContext();
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,6 +22,17 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const navLinks = [
@@ -30,6 +43,9 @@ export default function Navbar() {
     { name: 'APP', path: '/app' },
     { name: 'FAQ', path: '/faq' },
   ];
+
+  const isAdmin = user?.roles?.includes('admin') || user?.roles?.includes('ops');
+  const firstName = user?.name?.split(' ')[0] ?? '';
 
   return (
     <nav 
@@ -68,20 +84,66 @@ export default function Navbar() {
         {/* Actions */}
         <div className="hidden md:flex items-center gap-3">
           {isAuthenticated ? (
-            <div className="flex items-center gap-2">
-              <Link href="/minha-conta">
-                <span className="font-body text-xs text-gray-300 hidden lg:block hover:text-white transition-colors cursor-pointer">
-                  {user?.name?.split(' ')[0]}
-                </span>
-              </Link>
+            <div className="relative" ref={userMenuRef}>
+              {/* Botão do utilizador com dropdown */}
               <button
-                onClick={logout}
-                className="flex items-center gap-1.5 font-display font-bold text-xs tracking-wider text-gray-400 hover:text-white transition-colors px-3 py-1.5 border border-white/10 hover:border-white/30"
-                title="Sair"
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-1.5 font-display font-bold text-xs tracking-wider text-gray-300 hover:text-white transition-colors px-3 py-1.5 border border-white/10 hover:border-white/30"
               >
-                <LogOut className="w-3.5 h-3.5" />
-                SAIR
+                <User className="w-3.5 h-3.5" />
+                {firstName}
+                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
               </button>
+
+              {/* Dropdown menu */}
+              {isUserMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-52 bg-black border border-white/20 shadow-xl z-50">
+                  {/* Cabeçalho do dropdown */}
+                  <div className="px-4 py-3 border-b border-white/10">
+                    <p className="font-display font-bold text-xs text-white truncate">{user?.name}</p>
+                    <p className="text-xs text-gray-500 truncate mt-0.5">{user?.email}</p>
+                  </div>
+
+                  {/* Opções */}
+                  <div className="py-1">
+                    <Link href="/minha-conta" onClick={() => setIsUserMenuOpen(false)}>
+                      <div className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-white/5 transition-colors cursor-pointer">
+                        <User className="w-3.5 h-3.5 text-gray-400" />
+                        <span className="font-display text-xs tracking-wider text-gray-300">MINHA CONTA</span>
+                      </div>
+                    </Link>
+                    <Link href="/minha-conta" onClick={() => setIsUserMenuOpen(false)}>
+                      <div className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-white/5 transition-colors cursor-pointer">
+                        <Package className="w-3.5 h-3.5 text-gray-400" />
+                        <span className="font-display text-xs tracking-wider text-gray-300">MEUS PEDIDOS</span>
+                      </div>
+                    </Link>
+
+                    {/* Acesso Admin */}
+                    {isAdmin && (
+                      <>
+                        <div className="border-t border-white/10 my-1" />
+                        <Link href="/admin" onClick={() => setIsUserMenuOpen(false)}>
+                          <div className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-primary/10 transition-colors cursor-pointer">
+                            <Shield className="w-3.5 h-3.5 text-primary" />
+                            <span className="font-display text-xs tracking-wider text-primary">PAINEL ADMIN</span>
+                          </div>
+                        </Link>
+                      </>
+                    )}
+
+                    {/* Sair */}
+                    <div className="border-t border-white/10 my-1" />
+                    <button
+                      onClick={() => { logout(); setIsUserMenuOpen(false); }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 hover:bg-white/5 transition-colors text-left"
+                    >
+                      <LogOut className="w-3.5 h-3.5 text-gray-400" />
+                      <span className="font-display text-xs tracking-wider text-gray-400">SAIR</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <Link href="/entrar">
@@ -123,11 +185,6 @@ export default function Navbar() {
             {link.name}
           </Link>
         ))}
-        <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)}>
-          <span className="font-display font-bold text-3xl text-white hover:text-primary hover:italic transition-all">
-            MEUS PEDIDOS
-          </span>
-        </Link>
         <Link href="/try-on" onClick={() => setIsMobileMenuOpen(false)}>
           <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-black font-display tracking-wider font-bold mt-4">
             TRY-ON VIRTUAL
@@ -140,6 +197,19 @@ export default function Navbar() {
                 MINHA CONTA
               </span>
             </Link>
+            <Link href="/minha-conta" onClick={() => setIsMobileMenuOpen(false)}>
+              <span className="font-display font-bold text-xl text-gray-300 hover:text-primary transition-all">
+                MEUS PEDIDOS
+              </span>
+            </Link>
+            {isAdmin && (
+              <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                <span className="font-display font-bold text-xl text-primary hover:text-white transition-all flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  PAINEL ADMIN
+                </span>
+              </Link>
+            )}
             <button
               onClick={() => { logout(); setIsMobileMenuOpen(false); }}
               className="font-display font-bold text-xl text-gray-400 hover:text-white transition-all flex items-center gap-2"

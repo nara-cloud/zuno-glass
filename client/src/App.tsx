@@ -32,6 +32,7 @@ import AdminOrders from "./pages/AdminOrders";
 import AdminOrderDetail from "./pages/AdminOrderDetail";
 import AdminStock from "./pages/AdminStock";
 import AdminUsers from "./pages/AdminUsers";
+import AdminProducts from "./pages/AdminProducts";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MinhaConta from "./pages/MinhaConta";
@@ -69,6 +70,7 @@ function Router() {
       <Route path={"/admin/orders/:id"} component={AdminOrderDetail} />
       <Route path={"/admin/stock"} component={AdminStock} />
       <Route path={"/admin/users"} component={AdminUsers} />
+      <Route path={"/admin/products"} component={AdminProducts} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
