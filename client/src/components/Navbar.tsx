@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogIn, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/hooks/useAuth';
+import { getLoginUrl } from '@/const';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
   const { totalItems, openCart } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,6 +62,26 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-3">
+          {isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <span className="font-body text-xs text-gray-400 hidden lg:block">{user?.name?.split(' ')[0]}</span>
+              <button
+                onClick={logout}
+                className="flex items-center gap-1.5 font-display font-bold text-xs tracking-wider text-gray-400 hover:text-white transition-colors px-3 py-1.5 border border-white/10 hover:border-white/30"
+                title="Sair"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                SAIR
+              </button>
+            </div>
+          ) : (
+            <a href={getLoginUrl()}>
+              <Button variant="outline" size="sm" className="border-white/30 text-white hover:bg-white hover:text-black font-display font-bold text-xs tracking-wider gap-1.5">
+                <LogIn className="w-3.5 h-3.5" />
+                ENTRAR
+              </Button>
+            </a>
+          )}
           <Link href="/try-on">
             <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-black font-display font-bold text-xs tracking-wider">
               TRY-ON
@@ -102,6 +125,22 @@ export default function Navbar() {
             TRY-ON VIRTUAL
           </Button>
         </Link>
+        {isAuthenticated ? (
+          <button
+            onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+            className="font-display font-bold text-xl text-gray-400 hover:text-white transition-all flex items-center gap-2"
+          >
+            <LogOut className="w-5 h-5" />
+            SAIR
+          </button>
+        ) : (
+          <a href={getLoginUrl()} onClick={() => setIsMobileMenuOpen(false)}>
+            <span className="font-display font-bold text-3xl text-white hover:text-primary hover:italic transition-all flex items-center gap-2">
+              <LogIn className="w-7 h-7" />
+              ENTRAR
+            </span>
+          </a>
+        )}
       </div>
     </nav>
   );

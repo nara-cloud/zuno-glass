@@ -92,6 +92,28 @@ const performanceMembers: SquadMember[] = [
     activities: ["Fisioterapia Esportiva", "Maratona", "CrossFit"]
   },
   {
+    id: 9,
+    name: "LEONNARDO ARAÚJO",
+    category: "PERFORMANCE",
+    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/leonnardo-araujo_594ba69b.jpeg",
+    bio: "Arquiteto que vive intensamente. Ama viagens e promove um estilo de vida ativo e saudável com intensidade e dedicação.",
+    instagram: "https://instagram.com/leonnardoaraujo",
+    instagramHandle: "@leonnardoaraujo",
+    city: "Salvador, BA",
+    activities: ["Performance", "Lifestyle", "Vida Ativa & Inspiração"]
+  },
+  {
+    id: 10,
+    name: "BRUNO OLIUZA",
+    category: "PERFORMANCE",
+    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/bruno-oliuza_cdbc5dcd.jpeg",
+    bio: "Advogado estratégico, construindo soluções sólidas e resultados consistentes para pessoas e empresas. Performance jurídica com visão de futuro.",
+    instagram: "https://instagram.com/brunooliuza",
+    instagramHandle: "@brunooliuza",
+    city: "Petrolina, PE",
+    activities: ["Estratégia & Estrutura", "Direito Empresarial", "Alta Performance"]
+  },
+  {
     id: 8,
     name: "BEATRIZ POSSIDIO",
     category: "PERFORMANCE",
