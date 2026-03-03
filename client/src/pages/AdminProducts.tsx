@@ -86,7 +86,8 @@ export default function AdminProducts() {
       });
       if (res.ok) {
         const data = await res.json();
-        setProducts(data);
+        // API returns { products: [...] }
+        setProducts(Array.isArray(data) ? data : (data.products || []));
       } else {
         toast.error('Erro ao carregar produtos');
       }

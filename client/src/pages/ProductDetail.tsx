@@ -136,11 +136,21 @@ export default function ProductDetail() {
                   ESGOTADO
                 </div>
               )}
-              <img 
-                src={currentImage} 
-                alt={`${product.name} - ${currentVariant?.colorName || ''}`} 
-                className={`w-full h-full object-contain drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-500 ${!variantInStock ? 'grayscale' : ''}`}
-              />
+              {currentImage ? (
+                <img 
+                  src={currentImage} 
+                  alt={`${product.name} - ${currentVariant?.colorName || ''}`} 
+                  onError={(e) => { const el = e.target as HTMLImageElement; el.style.display='none'; el.nextElementSibling?.classList.remove('hidden'); }}
+                  className={`w-full h-full object-contain drop-shadow-2xl transform group-hover:scale-105 transition-transform duration-500 ${!variantInStock ? 'grayscale' : ''}`}
+                />
+              ) : null}
+              <div className={`${currentImage ? 'hidden' : 'flex'} flex-col items-center justify-center gap-4 w-full h-full`}>
+                <div className="w-24 h-24 border border-primary/20 flex items-center justify-center">
+                  <span className="font-display font-bold text-4xl text-primary/30">Z</span>
+                </div>
+                <span className="font-display text-xs tracking-[0.4em] text-gray-700">ZUNO GLASS</span>
+                <span className="font-body text-xs text-gray-600">Imagem em breve</span>
+              </div>
             </div>
             {/* Variant thumbnails */}
             {product.variants.length > 1 && (
@@ -156,7 +166,11 @@ export default function ProductDetail() {
                         selectedVariant === i ? 'border-primary' : 'border-white/10 hover:border-white/30'
                       } ${!vAvailable ? 'opacity-40' : ''}`}
                     >
-                      <img src={variant.image} alt={variant.colorName} className="w-full h-full object-contain opacity-70 hover:opacity-100 transition-opacity" />
+                      {variant.image ? (
+                        <img src={variant.image} alt={variant.colorName} className="w-full h-full object-contain opacity-70 hover:opacity-100 transition-opacity" />
+                      ) : (
+                        <span className="font-display font-bold text-xs text-primary/30">Z</span>
+                      )}
                       {!vAvailable && vStock !== -1 && (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="w-full h-[1px] bg-red-500 rotate-45 absolute"></div>
@@ -349,18 +363,25 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {/* Try On */}
-            <Link href="/try-on">
-              <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white hover:text-black font-display font-bold h-12 tracking-wider mb-8">
+            {/* Try On - Em breve */}
+            <div className="relative mb-8">
+              <Button
+                variant="outline"
+                disabled
+                className="w-full border-white/10 text-gray-600 font-display font-bold h-12 tracking-wider cursor-not-allowed opacity-50"
+              >
                 EXPERIMENTAR AGORA (TRY-ON VIRTUAL)
               </Button>
-            </Link>
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-display font-bold px-2 py-0.5 tracking-widest whitespace-nowrap">
+                EM BREVE
+              </span>
+            </div>
 
             {/* Payment Methods Info */}
             <div className="bg-white/5 border border-white/10 p-4 mb-8 flex items-center gap-4">
               <CreditCard className="w-5 h-5 text-gray-500 flex-shrink-0" />
               <div>
-                <span className="font-body text-sm text-gray-400">Pagamento seguro via Stripe. Aceitamos Visa, Mastercard, Elo e PIX.</span>
+                <span className="font-body text-sm text-gray-400">Pagamento seguro via Mercado Pago. Aceitamos Visa, Mastercard, Elo e PIX.</span>
               </div>
             </div>
 
@@ -377,7 +398,7 @@ export default function ProductDetail() {
             {/* Trust Badges */}
             <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8">
               {[
-                { icon: Shield, text: "Garantia de 2 Anos" },
+                { icon: Shield, text: "Garantia de 3 Meses" },
                 { icon: Truck, text: "Envio para todo o Brasil" },
                 { icon: RotateCcw, text: "30 Dias para Troca" }
               ].map((item, i: number) => (

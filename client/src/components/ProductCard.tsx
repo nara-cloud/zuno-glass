@@ -17,10 +17,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { getProductStock, isInStock } = useStock();
   // Defensive: ensure variants is always an array
   const variants = Array.isArray(product.variants) ? product.variants : [];
-  // Defensive: use placeholder when image is empty/null
-  const imageSrc = product.image && product.image.trim() !== '' 
-    ? product.image 
-    : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWExYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNDQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+U0VNIElNQUdFTTwvdGV4dD48L3N2Zz4=';
+  // Defensive: use variant image as fallback, then branded placeholder
+  const variantImage = (variants as any[]).find(v => v.image_url)?.image_url || (variants as any[]).find(v => v.imageUrl)?.imageUrl || '';
+  const rawImage = product.image || variantImage || '';
+  const hasImage = rawImage.trim() !== '';
+  const imageSrc = hasImage ? rawImage : '';
 
   const totalStock = getProductStock(product.id);
   const inStock = isInStock(product.id);
@@ -71,11 +72,21 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-b from-white/5 to-transparent p-6 flex items-center justify-center">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
-        <img 
-          src={imageSrc} 
-          alt={product.name}
-          className={`w-full h-full object-contain transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-700 ease-out z-10 drop-shadow-2xl ${!inStock ? 'grayscale' : ''}`}
-        />
+        {hasImage ? (
+          <img 
+            src={imageSrc} 
+            alt={product.name}
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden'); }}
+            className={`w-full h-full object-contain transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-700 ease-out z-10 drop-shadow-2xl ${!inStock ? 'grayscale' : ''}`}
+          />
+        ) : null}
+        {/* Branded placeholder shown when no image or image fails to load */}
+        <div className={`${hasImage ? 'hidden' : 'flex'} absolute inset-0 flex-col items-center justify-center gap-3 z-10`}>
+          <div className="w-16 h-16 border border-primary/20 flex items-center justify-center">
+            <span className="font-display font-bold text-2xl text-primary/30">Z</span>
+          </div>
+          <span className="font-display text-[10px] tracking-[0.3em] text-gray-700">ZUNO GLASS</span>
+        </div>
         
         {/* Quick Actions Overlay */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 z-20">

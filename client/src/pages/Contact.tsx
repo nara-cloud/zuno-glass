@@ -3,8 +3,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Mail, Phone, MapPin, Instagram, Clock, Send, MessageSquare } from 'lucide-react';
-import { toast } from 'sonner';
+import { Mail, Phone, MapPin, Instagram, Clock, Send, MessageSquare, CheckCircle2 } from 'lucide-react';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -14,6 +13,7 @@ export default function Contact() {
     message: '',
   });
   const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,8 +21,7 @@ export default function Contact() {
 
     // Simular envio — no futuro integrar com backend
     setTimeout(() => {
-      toast.success('Mensagem enviada! Responderemos em até 24h.');
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setSent(true);
       setSending(false);
     }, 1000);
   };
@@ -114,75 +113,104 @@ export default function Contact() {
           {/* Formulário */}
           <div className="lg:col-span-3">
             <div className="border border-white/10 bg-white/5 p-8">
-              <h2 className="font-display font-bold text-xl text-white mb-2">ENVIE SUA MENSAGEM</h2>
-              <p className="text-gray-400 font-body mb-8">Preencha o formulário e retornaremos o mais breve possível.</p>
-
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="font-display text-white text-sm mb-2 block">NOME</label>
-                    <Input
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Seu nome"
-                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-body rounded-none h-12 focus:border-primary focus:ring-0"
-                    />
+              {sent ? (
+                /* ─── Tela de Confirmação ─── */
+                <div className="flex flex-col items-center justify-center py-12 text-center gap-6 animate-in fade-in zoom-in duration-500">
+                  <div className="w-20 h-20 bg-primary/10 border border-primary/30 flex items-center justify-center">
+                    <CheckCircle2 className="w-10 h-10 text-primary" />
                   </div>
                   <div>
-                    <label className="font-display text-white text-sm mb-2 block">EMAIL</label>
-                    <Input
-                      required
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="seu@email.com"
-                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-body rounded-none h-12 focus:border-primary focus:ring-0"
-                    />
+                    <h3 className="font-display font-bold text-2xl text-white tracking-wider mb-2">
+                      MENSAGEM ENVIADA!
+                    </h3>
+                    <p className="text-gray-400 font-body max-w-sm">
+                      Recebemos o seu contato. Nossa equipe responderá em até <span className="text-white font-bold">24 horas úteis</span>.
+                    </p>
                   </div>
+                  <Button
+                    onClick={() => {
+                      setSent(false);
+                      setFormData({ name: '', email: '', subject: '', message: '' });
+                    }}
+                    variant="outline"
+                    className="border-white/20 text-white hover:bg-white hover:text-black font-display font-bold tracking-wider"
+                  >
+                    ENVIAR OUTRA MENSAGEM
+                  </Button>
                 </div>
+              ) : (
+                <>
+                  <h2 className="font-display font-bold text-xl text-white mb-2">ENVIE SUA MENSAGEM</h2>
+                  <p className="text-gray-400 font-body mb-8">Preencha o formulário e retornaremos o mais breve possível.</p>
 
-                <div>
-                  <label className="font-display text-white text-sm mb-2 block">ASSUNTO</label>
-                  <Input
-                    required
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="Sobre o que gostaria de falar?"
-                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-body rounded-none h-12 focus:border-primary focus:ring-0"
-                  />
-                </div>
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="font-display text-white text-sm mb-2 block">NOME</label>
+                        <Input
+                          required
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          placeholder="Seu nome"
+                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-body rounded-none h-12 focus:border-primary focus:ring-0"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-display text-white text-sm mb-2 block">EMAIL</label>
+                        <Input
+                          required
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          placeholder="seu@email.com"
+                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-body rounded-none h-12 focus:border-primary focus:ring-0"
+                        />
+                      </div>
+                    </div>
 
-                <div>
-                  <label className="font-display text-white text-sm mb-2 block">MENSAGEM</label>
-                  <textarea
-                    required
-                    rows={5}
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Escreva sua mensagem aqui..."
-                    className="w-full bg-white/5 border border-white/10 text-white placeholder:text-gray-600 font-body rounded-none p-3 focus:border-primary focus:ring-0 focus:outline-none resize-none"
-                  />
-                </div>
+                    <div>
+                      <label className="font-display text-white text-sm mb-2 block">ASSUNTO</label>
+                      <Input
+                        required
+                        value={formData.subject}
+                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                        placeholder="Sobre o que gostaria de falar?"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 font-body rounded-none h-12 focus:border-primary focus:ring-0"
+                      />
+                    </div>
 
-                <Button
-                  type="submit"
-                  disabled={sending}
-                  className="w-full bg-primary text-black hover:bg-white font-display font-bold h-14 rounded-none text-lg tracking-wider"
-                >
-                  {sending ? (
-                    <span className="flex items-center gap-2">
-                      <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
-                      ENVIANDO...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <Send className="w-5 h-5" />
-                      ENVIAR MENSAGEM
-                    </span>
-                  )}
-                </Button>
-              </form>
+                    <div>
+                      <label className="font-display text-white text-sm mb-2 block">MENSAGEM</label>
+                      <textarea
+                        required
+                        rows={5}
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        placeholder="Escreva sua mensagem aqui..."
+                        className="w-full bg-white/5 border border-white/10 text-white placeholder:text-gray-600 font-body rounded-none p-3 focus:border-primary focus:ring-0 focus:outline-none resize-none"
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={sending}
+                      className="w-full bg-primary text-black hover:bg-white font-display font-bold h-14 rounded-none text-lg tracking-wider"
+                    >
+                      {sending ? (
+                        <span className="flex items-center gap-2">
+                          <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
+                          ENVIANDO...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Send className="w-5 h-5" />
+                          ENVIAR MENSAGEM
+                        </span>
+                      )}
+                    </Button>
+                  </form>
+                </>
+              )}
             </div>
 
             {/* Assuntos específicos */}

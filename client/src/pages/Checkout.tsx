@@ -579,12 +579,12 @@ export default function Checkout() {
               <div className="bg-white/5 border border-white/10 p-6 space-y-4">
                 <h2 className="font-display font-bold text-lg text-white tracking-wider">DADOS DO CARTÃO</h2>
                 <p className="font-body text-xs text-gray-500">
-                  Você será redirecionado para a página de pagamento seguro Stripe para inserir os dados do cartão.
+                  Insira os dados do cartão abaixo. O pagamento é processado com segurança via Mercado Pago.
                 </p>
                 <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 p-3">
                   <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
                   <span className="font-body text-xs text-primary">
-                    Pagamento processado com segurança via Stripe. Seus dados do cartão nunca passam pelo nosso servidor.
+                    Pagamento processado com segurança via Mercado Pago. Seus dados do cartão nunca passam pelo nosso servidor.
                   </span>
                 </div>
 

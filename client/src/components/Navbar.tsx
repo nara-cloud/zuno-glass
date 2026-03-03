@@ -153,11 +153,19 @@ export default function Navbar() {
               </Button>
             </Link>
           )}
-          <Link href="/try-on">
-            <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-black font-display font-bold text-xs tracking-wider">
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled
+              className="border-primary/20 text-primary/40 font-display font-bold text-xs tracking-wider cursor-not-allowed opacity-50"
+            >
               TRY-ON
             </Button>
-          </Link>
+            <span className="absolute -top-2 -right-2 bg-primary text-black text-[8px] font-display font-bold px-1 py-0.5 tracking-widest leading-none">
+              EM BREVE
+            </span>
+          </div>
         </div>
 
         {/* Mobile Actions */}
@@ -185,11 +193,19 @@ export default function Navbar() {
             {link.name}
           </Link>
         ))}
-        <Link href="/try-on" onClick={() => setIsMobileMenuOpen(false)}>
-          <Button variant="outline" size="lg" className="border-primary text-primary hover:bg-primary hover:text-black font-display tracking-wider font-bold mt-4">
+        <div className="relative mt-4">
+          <Button
+            variant="outline"
+            size="lg"
+            disabled
+            className="border-primary/20 text-primary/40 font-display tracking-wider font-bold cursor-not-allowed opacity-50"
+          >
             TRY-ON VIRTUAL
           </Button>
-        </Link>
+          <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-black text-[9px] font-display font-bold px-2 py-0.5 tracking-widest whitespace-nowrap">
+            EM BREVE
+          </span>
+        </div>
         {isAuthenticated ? (
           <>
             <Link href="/minha-conta" onClick={() => setIsMobileMenuOpen(false)}>

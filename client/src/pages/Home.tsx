@@ -77,11 +77,19 @@ export default function Home() {
                   VER COLEÇÃO
                 </Button>
               </Link>
-              <Link href="/try-on">
-                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black font-display font-bold text-lg px-10 h-14 clip-corner tracking-wider">
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  disabled
+                  className="border-white/20 text-white/40 font-display font-bold text-lg px-10 h-14 clip-corner tracking-wider cursor-not-allowed opacity-50"
+                >
                   TRY-ON VIRTUAL
                 </Button>
-              </Link>
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-black text-[10px] font-display font-bold px-2 py-0.5 tracking-widest whitespace-nowrap">
+                  EM BREVE
+                </span>
+              </div>
             </div>
           </div>
         </div>

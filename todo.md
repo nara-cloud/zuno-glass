@@ -292,3 +292,30 @@
 - [x] Endpoint POST /api/admin/users para criar utilizador directamente pelo admin
 - [x] Endpoint DELETE /api/admin/users/:id para remover utilizador
 - [ ] Publicar versão mais recente (checkpoint)
+
+## Correções Urgentes (03/03/2026)
+- [ ] Desabilitar botão TRY-ON na Navbar (mostrar "Em breve" em vez de link)
+- [ ] Desabilitar botão TRY-ON VIRTUAL na ProductDetail.tsx (mostrar tooltip "Em breve")
+- [ ] Desabilitar botão TRY-ON VIRTUAL na Home.tsx
+- [ ] Corrigir garantia de "2 Anos" para "3 Meses" no ProductDetail.tsx
+- [ ] Corrigir "Garantia Estendida" para "Garantia 3 Meses" nos features dos produtos
+- [ ] Corrigir "30 Dias para Troca" para "30 Dias para Troca" (manter) no ProductDetail.tsx
+- [ ] Trocar "Pagamento seguro via Stripe" por "Mercado Pago" no ProductDetail.tsx
+- [ ] Trocar "Pagamento seguro via Stripe" por "Mercado Pago" no CartDrawer.tsx
+- [ ] Trocar referências Stripe por Mercado Pago no Checkout.tsx
+- [ ] Diagnosticar e corrigir checkout (Mercado Pago PIX/Boleto/Cartão)
+- [ ] Adicionar mensagem de confirmação visual no Contact.tsx (substituir toast por tela de sucesso)
+- [ ] Verificar e melhorar confirmação no WaitlistForm.tsx
+- [ ] Verificar e melhorar confirmação no PartnerForm.tsx
+- [ ] Adicionar confirmação no LeadCapturePopup.tsx
+
+## Correcções 03/03/2026
+- [x] Corrigir erro flatMap is not a function no AdminProducts (setProducts recebia objecto em vez de array)
+- [x] Corrigir imagens quebradas na página de coleção (placeholder elegante para produtos sem imagem)
+- [x] Corrigir imagens quebradas no ProductDetail (placeholder com fallback onError)
+- [x] Usar imagem da variante como fallback quando produto não tem image_url
+- [x] Corrigir garantia: 2 anos → 3 meses em ProductDetail
+- [x] Desabilitar botão TRY-ON (ainda não disponível) em Navbar e Home
+- [x] Trocar referências Stripe → Mercado Pago no Checkout e CartDrawer
+- [x] Corrigir endpoint /api/checkout para usar Mercado Pago Checkout Pro
+- [x] Criar página /admin/integrations (corrige 404)

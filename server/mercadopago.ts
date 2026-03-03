@@ -228,3 +228,59 @@ export async function getPaymentStatus(paymentId: number) {
     approved: result.date_approved,
   };
 }
+
+// ─── Create Checkout Pro Preference ───
+export async function createPreference(params: {
+  items: MPPaymentItem[];
+  externalReference?: string;
+  notificationUrl?: string;
+  successUrl: string;
+  failureUrl: string;
+  pendingUrl: string;
+  payerEmail?: string;
+  shippingCost?: number;
+}) {
+  const { Preference } = await import("mercadopago");
+  const client = getMercadoPagoClient();
+  const preference = new Preference(client);
+
+  const body: any = {
+    items: params.items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      quantity: item.quantity,
+      unit_price: Math.round(item.unit_price * 100) / 100,
+      currency_id: "BRL",
+    })),
+    back_urls: {
+      success: params.successUrl,
+      failure: params.failureUrl,
+      pending: params.pendingUrl,
+    },
+    auto_return: "approved",
+    external_reference: params.externalReference,
+    notification_url: params.notificationUrl,
+    payment_methods: {
+      installments: 3,
+    },
+  };
+
+  if (params.payerEmail) {
+    body.payer = { email: params.payerEmail };
+  }
+
+  if (params.shippingCost && params.shippingCost > 0) {
+    body.shipments = {
+      cost: Math.round(params.shippingCost * 100) / 100,
+      mode: "not_specified",
+    };
+  }
+
+  const result = await preference.create({ body });
+
+  return {
+    id: result.id,
+    init_point: result.init_point,
+    sandbox_init_point: result.sandbox_init_point,
+  };
+}

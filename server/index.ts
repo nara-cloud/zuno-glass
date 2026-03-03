@@ -257,14 +257,10 @@ async function startServer() {
     }
   });
 
-  // ─── Stripe Checkout Session (Multi-item cart with shipping) ───
+  // ─── Mercado Pago Checkout Pro (Multi-item cart with shipping) ───
   app.post("/api/checkout", async (req, res) => {
-    if (!stripe) {
-      return res.status(503).json({ error: "Stripe not configured" });
-    }
-
     try {
-      const { items, productId, variantColor, quantity = 1, shippingCost = 0, shippingRegion, shippingEstimate } = req.body;
+      const { items, productId, variantColor, quantity = 1, shippingCost = 0, shippingRegion, payerEmail } = req.body;
       const { getProductById } = await import("../shared/products.js");
       const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
 
@@ -307,121 +303,56 @@ async function startServer() {
         });
       }
 
-      let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-      let metadataItems: string[] = [];
+      // Build MP items list
+      const mpItems: { id: string; title: string; quantity: number; unit_price: number }[] = [];
+      let externalRef: string[] = [];
 
-      // Multi-item cart checkout
       if (items && Array.isArray(items) && items.length > 0) {
         for (const item of items) {
           const product = getProductById(item.productId);
           if (!product) continue;
-
-          lineItems.push({
-            price_data: {
-              currency: "brl",
-              product_data: {
-                name: `ZUNO GLASS — ${product.name}`,
-                description: item.variantColor
-                  ? `Modelo ${product.name} — Cor: ${item.variantColor}`
-                  : `Modelo ${product.name}`,
-                images: [],
-              },
-              unit_amount: Math.round(product.price * 100),
-            },
+          mpItems.push({
+            id: item.productId,
+            title: `ZUNO GLASS — ${product.name}${item.variantColor ? ` (${item.variantColor})` : ''}`,
             quantity: item.quantity || 1,
+            unit_price: product.price,
           });
-
-          metadataItems.push(
-            `${product.name}|${item.variantColor || "default"}|${item.quantity || 1}`
-          );
+          externalRef.push(`${item.productId}|${item.variantColor || 'default'}|${item.quantity || 1}`);
         }
-      }
-      // Single item checkout (backward compatible)
-      else if (productId) {
+      } else if (productId) {
         const product = getProductById(productId);
-        if (!product) {
-          return res.status(404).json({ error: "Product not found" });
-        }
-
-        lineItems.push({
-          price_data: {
-            currency: "brl",
-            product_data: {
-              name: `ZUNO GLASS — ${product.name}`,
-              description: variantColor
-                ? `Modelo ${product.name} — Cor: ${variantColor}`
-                : `Modelo ${product.name}`,
-              images: [],
-            },
-            unit_amount: Math.round(product.price * 100),
-          },
+        if (!product) return res.status(404).json({ error: "Product not found" });
+        mpItems.push({
+          id: productId,
+          title: `ZUNO GLASS — ${product.name}${variantColor ? ` (${variantColor})` : ''}`,
           quantity,
+          unit_price: product.price,
         });
-
-        metadataItems.push(`${product.name}|${variantColor || "default"}|${quantity}`);
+        externalRef.push(`${productId}|${variantColor || 'default'}|${quantity}`);
       } else {
         return res.status(400).json({ error: "items or productId is required" });
       }
 
-      if (lineItems.length === 0) {
+      if (mpItems.length === 0) {
         return res.status(400).json({ error: "No valid products found" });
       }
 
-      // Build shipping options based on calculated shipping
-      const shippingAmountCents = Math.round((shippingCost || 0) * 100);
-      const isFreeShipping = shippingAmountCents === 0;
-
-      // Parse estimate for Stripe delivery estimate
-      let minDays = 5;
-      let maxDays = 10;
-      if (shippingEstimate) {
-        const match = shippingEstimate.match(/(\d+)\s*a\s*(\d+)/);
-        if (match) {
-          minDays = parseInt(match[1], 10);
-          maxDays = parseInt(match[2], 10);
-        }
-      }
-
-      const shippingOptions: Stripe.Checkout.SessionCreateParams.ShippingOption[] = [
-        {
-          shipping_rate_data: {
-            type: "fixed_amount",
-            fixed_amount: { amount: shippingAmountCents, currency: "brl" },
-            display_name: isFreeShipping
-              ? "Frete Grátis"
-              : `Envio para ${shippingRegion || "Brasil"}`,
-            delivery_estimate: {
-              minimum: { unit: "business_day", value: minDays },
-              maximum: { unit: "business_day", value: maxDays },
-            },
-          },
-        },
-      ];
-
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        mode: "payment",
-        allow_promotion_codes: true,
-        shipping_address_collection: {
-          allowed_countries: ["BR"],
-        },
-        shipping_options: shippingOptions,
-        phone_number_collection: { enabled: true },
-        line_items: lineItems,
-        metadata: {
-          items: metadataItems.join(";"),
-          item_count: String(lineItems.length),
-          shipping_region: shippingRegion || "Brasil",
-          shipping_estimate: shippingEstimate || `${minDays} a ${maxDays} dias úteis`,
-        },
-        success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/products`,
+      const { createPreference } = await import("./mercadopago.js");
+      const preference = await createPreference({
+        items: mpItems,
+        externalReference: externalRef.join(';'),
+        successUrl: `${origin}/checkout/success`,
+        failureUrl: `${origin}/checkout?error=payment_failed`,
+        pendingUrl: `${origin}/checkout/success?pending=true`,
+        payerEmail: payerEmail || undefined,
+        shippingCost: shippingCost || 0,
+        notificationUrl: `${origin}/api/mp/webhook`,
       });
 
-      res.json({ url: session.url });
+      res.json({ url: preference.init_point });
     } catch (err: any) {
-      console.error("[Checkout] Error creating session:", err.message);
-      res.status(500).json({ error: "Failed to create checkout session" });
+      console.error("[Checkout MP] Error creating preference:", err.message);
+      res.status(500).json({ error: "Erro ao criar sessão de pagamento" });
     }
   });
 

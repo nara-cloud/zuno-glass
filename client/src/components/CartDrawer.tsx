@@ -326,7 +326,7 @@ export default function CartDrawer() {
             <div className="flex items-center gap-2 bg-white/5 p-3 border border-white/10">
               <CreditCard className="w-4 h-4 text-gray-500 flex-shrink-0" />
               <span className="font-body text-xs text-gray-500">
-                Pagamento seguro via Stripe. Visa, Mastercard, Elo e PIX.
+                Pagamento seguro via Mercado Pago. Visa, Mastercard, Elo e PIX.
               </span>
             </div>
 
