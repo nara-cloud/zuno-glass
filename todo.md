@@ -323,3 +323,13 @@
 - [x] Placeholder elegante "Z" para produtos sem imagem na coleção e detalhe
 - [x] Corrigir flatMap is not a function no AdminProducts
 - [x] Upload das 32 fotos de produtos para CDN e actualização da base de dados
+
+## Melhorias de Conversão (8 pontos)
+- [x] Bloco de Garantia Forte na Home e ProductDetail
+- [ ] Secção "Por que ZUNO?" com comparação implícita (4 colunas)
+- [ ] Bloco de vídeo em movimento (placeholder para vídeo real)
+- [ ] Lista VIP mais agressiva com incentivo real
+- [ ] CTAs dominantes: "GARANTIR O MEU", "ENTRAR PARA O MOVIMENTO"
+- [ ] Bloco institucional humano (fundadores, autoridade)
+- [ ] FAQ estratégico com perguntas anti-objecção
+- [ ] Secção de fotos em movimento (squad/bastidor)

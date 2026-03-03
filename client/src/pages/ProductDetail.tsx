@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { products } from '@/lib/products';
 import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Check, Shield, Truck, RotateCcw, CreditCard, Loader2, ShoppingBag, Minus, Plus, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Check, Shield, Truck, RotateCcw, CreditCard, Loader2, ShoppingBag, Minus, Plus, AlertTriangle, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCart } from '@/contexts/CartContext';
 import { useStock } from '@/hooks/useStock';
@@ -339,7 +339,7 @@ export default function ProductDetail() {
                           PROCESSANDO...
                         </>
                       ) : (
-                        'COMPRAR AGORA'
+                        'GARANTIR O MEU'
                       )}
                     </Button>
                   </>
@@ -395,18 +395,25 @@ export default function ProductDetail() {
               ))}
             </div>
 
-            {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8">
-              {[
-                { icon: Shield, text: "Garantia de 3 Meses" },
-                { icon: Truck, text: "Envio para todo o Brasil" },
-                { icon: RotateCcw, text: "30 Dias para Troca" }
-              ].map((item, i: number) => (
-                <div key={i} className="flex flex-col items-center text-center gap-2">
-                  <item.icon className="w-6 h-6 text-gray-500" />
-                  <span className="font-display text-xs text-gray-500 uppercase tracking-wider">{item.text}</span>
-                </div>
-              ))}
+            {/* Garantia Forte */}
+            <div className="bg-primary/5 border border-primary/20 p-6 clip-corner">
+              <p className="font-display font-bold text-primary text-sm tracking-widest mb-4">COMPRA PROTEGIDA</p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { icon: RotateCcw, title: "30 DIAS SEM RISCO", desc: "Teste e devolva se não amar" },
+                  { icon: CheckCircle2, title: "TROCA FÁCIL", desc: "Sem burocracia, sem complicação" },
+                  { icon: Shield, title: "GARANTIA 3 MESES", desc: "Contra defeitos de fabricação" },
+                  { icon: MessageCircle, title: "SUPORTE WHATSAPP", desc: "Atendimento direto e humano" },
+                ].map((item, i: number) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <item.icon className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-display text-white text-xs tracking-wider">{item.title}</p>
+                      <p className="font-body text-gray-500 text-xs">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
