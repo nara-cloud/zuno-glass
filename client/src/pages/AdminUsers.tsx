@@ -3,10 +3,10 @@ import { useAdminAuth } from '@/hooks/useAdminAuth';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import {
   Users, Search, Shield, UserCheck, UserX,
-  ChevronLeft, ChevronRight, RefreshCw, Edit2, Save, X
+  ChevronLeft, ChevronRight, RefreshCw, X,
+  UserPlus, Trash2, Eye, EyeOff
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -49,6 +49,15 @@ export default function AdminUsers() {
   const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
   const [editRoles, setEditRoles] = useState<string[]>([]);
   const [savingRoles, setSavingRoles] = useState(false);
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newUser, setNewUser] = useState({ name: '', email: '', password: '', roles: ['customer'] as string[] });
+  const [addingUser, setAddingUser] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<UserRecord | null>(null);
+
   const perPage = 20;
 
   useEffect(() => {
@@ -114,6 +123,69 @@ export default function AdminUsers() {
       toast.error('Erro de conexão.');
     } finally {
       setSavingRoles(false);
+    }
+  };
+
+  const toggleNewRole = (role: string) => {
+    setNewUser(prev => ({
+      ...prev,
+      roles: prev.roles.includes(role) ? prev.roles.filter(r => r !== role) : [...prev.roles, role],
+    }));
+  };
+
+  const handleAddUser = async () => {
+    if (!newUser.name.trim() || !newUser.email.trim() || !newUser.password.trim()) {
+      toast.error('Preencha nome, e-mail e senha.');
+      return;
+    }
+    if (newUser.password.length < 6) {
+      toast.error('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+    setAddingUser(true);
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        credentials: 'include',
+        body: JSON.stringify(newUser),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(`Utilizador "${newUser.name}" criado com sucesso!`);
+        setShowAddModal(false);
+        setNewUser({ name: '', email: '', password: '', roles: ['customer'] });
+        fetchUsers();
+      } else {
+        toast.error(data.error || 'Erro ao criar utilizador.');
+      }
+    } catch {
+      toast.error('Erro de conexão.');
+    } finally {
+      setAddingUser(false);
+    }
+  };
+
+  const handleDeleteUser = async (user: UserRecord) => {
+    setDeletingUserId(user.id);
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
+      });
+      if (res.ok) {
+        toast.success(`Utilizador "${user.name}" removido.`);
+        setConfirmDelete(null);
+        fetchUsers();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Erro ao remover utilizador.');
+      }
+    } catch {
+      toast.error('Erro de conexão.');
+    } finally {
+      setDeletingUserId(null);
     }
   };
 
@@ -194,6 +266,14 @@ export default function AdminUsers() {
         >
           <RefreshCw className="w-3 h-3" />
           Atualizar
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => setShowAddModal(true)}
+          className="bg-primary text-black hover:bg-primary/90 font-display font-bold tracking-wider text-xs gap-2"
+        >
+          <UserPlus className="w-3.5 h-3.5" />
+          ADICIONAR USUÁRIO
         </Button>
       </div>
 
@@ -276,6 +356,13 @@ export default function AdminUsers() {
                         >
                           {user.isActive ? <UserCheck className="w-3.5 h-3.5" /> : <UserX className="w-3.5 h-3.5" />}
                         </button>
+                        <button
+                          onClick={() => setConfirmDelete(user)}
+                          className="p-1.5 text-gray-400 hover:text-red-400 transition-colors"
+                          title="Remover utilizador"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -311,6 +398,98 @@ export default function AdminUsers() {
           </div>
         )}
       </div>
+
+      {/* ─── Add User Modal ─── */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#111] border border-white/20 p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="font-display font-bold text-white tracking-tight flex items-center gap-2">
+                  <UserPlus className="w-4 h-4 text-primary" />
+                  ADICIONAR UTILIZADOR
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">Crie uma nova conta de acesso</p>
+              </div>
+              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="text-xs text-gray-400 font-display tracking-wider mb-1.5 block">NOME COMPLETO *</label>
+                <Input
+                  value={newUser.name}
+                  onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))}
+                  placeholder="Ex: João Silva"
+                  className="bg-black border-white/10 text-white placeholder:text-gray-600"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-400 font-display tracking-wider mb-1.5 block">E-MAIL *</label>
+                <Input
+                  type="email"
+                  value={newUser.email}
+                  onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))}
+                  placeholder="email@exemplo.com"
+                  className="bg-black border-white/10 text-white placeholder:text-gray-600"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-400 font-display tracking-wider mb-1.5 block">SENHA *</label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    value={newUser.password}
+                    onChange={e => setNewUser(p => ({ ...p, password: e.target.value }))}
+                    placeholder="Mínimo 6 caracteres"
+                    className="bg-black border-white/10 text-white placeholder:text-gray-600 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(p => !p)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-gray-400 font-display tracking-wider mb-2 block">PAPÉIS</label>
+                <div className="space-y-2">
+                  {ALL_ROLES.map(role => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => toggleNewRole(role)}
+                      className={`w-full flex items-center justify-between p-2.5 border transition-colors text-left ${
+                        newUser.roles.includes(role)
+                          ? 'border-primary/50 bg-primary/10 text-white'
+                          : 'border-white/10 text-gray-400 hover:border-white/20'
+                      }`}
+                    >
+                      <span className="font-display text-xs tracking-wider">{ROLE_LABELS[role]}</span>
+                      {newUser.roles.includes(role) && (
+                        <div className="w-3.5 h-3.5 bg-primary rounded-full flex items-center justify-center">
+                          <div className="w-1.5 h-1.5 bg-black rounded-full" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setShowAddModal(false)} className="flex-1 border-white/10 text-gray-400 hover:text-white">
+                Cancelar
+              </Button>
+              <Button onClick={handleAddUser} disabled={addingUser} className="flex-1 bg-primary text-black hover:bg-primary/90 font-display tracking-wider text-xs">
+                {addingUser ? 'CRIANDO...' : 'CRIAR CONTA'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Roles Modal */}
       {editingUser && (
@@ -361,6 +540,37 @@ export default function AdminUsers() {
                 className="flex-1 bg-primary text-black hover:bg-primary/90 font-display tracking-wider text-xs"
               >
                 {savingRoles ? 'SALVANDO...' : 'SALVAR'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ─── Confirm Delete Modal ─── */}
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#111] border border-red-500/30 p-6 w-full max-w-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-500/20 flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-red-400" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-white text-sm tracking-tight">REMOVER UTILIZADOR</h3>
+                <p className="text-xs text-gray-400">Esta acção é irreversível</p>
+              </div>
+            </div>
+            <p className="text-gray-300 text-sm mb-6">
+              Tem a certeza que deseja remover <span className="text-white font-bold">{confirmDelete.name}</span>?
+            </p>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setConfirmDelete(null)} className="flex-1 border-white/10 text-gray-400 hover:text-white">
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => handleDeleteUser(confirmDelete)}
+                disabled={deletingUserId === confirmDelete.id}
+                className="flex-1 bg-red-500 text-white hover:bg-red-600 font-display tracking-wider text-xs"
+              >
+                {deletingUserId === confirmDelete.id ? 'REMOVENDO...' : 'CONFIRMAR'}
               </Button>
             </div>
           </div>

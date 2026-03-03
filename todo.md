@@ -285,3 +285,10 @@
 - [x] Corrigir categoria do ZUNO VORTEXA: mudar de performance para lifestyle (casual)
 - [x] Corrigir slogan hero: PARA QUEM VIVE NO / LIMITE DA LUZ
 - [ ] Formulário de parceria na página /partners com botão FALE CONOSCO rolando até o formulário
+
+## Gestão de Utilizadores e Integrações (Mar 2026)
+- [x] Criar página /admin/integrations (corrigir erro 404)
+- [x] Adicionar funcionalidade de convidar/adicionar utilizadores no painel admin (/admin/users)
+- [x] Endpoint POST /api/admin/users para criar utilizador directamente pelo admin
+- [x] Endpoint DELETE /api/admin/users/:id para remover utilizador
+- [ ] Publicar versão mais recente (checkpoint)

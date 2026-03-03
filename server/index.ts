@@ -921,6 +921,61 @@ async function startServer() {
     res.json({ ok: true });
   });
 
+  // ─── Admin: Create User ───
+  app.post('/api/admin/users', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
+      const { db } = await import('./db/connection.js');
+      const { users: usersTable, roles: rolesTable, userRoles: userRolesTable } = await import('../drizzle/schema.js');
+      const { eq, inArray } = await import('drizzle-orm');
+      const bcrypt = await import('bcryptjs');
+      const { name, email, password, roles: newRoles } = req.body;
+      if (!name || !email || !password) return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios.' });
+      if (password.length < 6) return res.status(400).json({ error: 'A senha deve ter pelo menos 6 caracteres.' });
+      const existing = await db.select({ id: usersTable.id }).from(usersTable).where(eq(usersTable.email, email.toLowerCase()));
+      if (existing.length > 0) return res.status(409).json({ error: 'Já existe um utilizador com este e-mail.' });
+      const passwordHash = await bcrypt.hash(password, 10);
+      const [result] = await db.insert(usersTable).values({
+        name: name.trim(),
+        email: email.toLowerCase().trim(),
+        passwordHash,
+        emailVerified: true,
+      });
+      const userId = (result as any).insertId;
+      if (newRoles && newRoles.length > 0) {
+        const roleRows = await db.select().from(rolesTable).where(inArray(rolesTable.name, newRoles));
+        if (roleRows.length > 0) {
+          await db.insert(userRolesTable).values(roleRows.map((r: any) => ({ userId, roleId: r.id })));
+        }
+      }
+      res.json({ ok: true, userId });
+    } catch (err: any) {
+      console.error('[Admin Create User]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ─── Admin: Delete User ───
+  app.delete('/api/admin/users/:id', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
+      const { db } = await import('./db/connection.js');
+      const { users: usersTable } = await import('../drizzle/schema.js');
+      const { eq } = await import('drizzle-orm');
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) return res.status(400).json({ error: 'ID inválido.' });
+      await db.delete(usersTable).where(eq(usersTable.id, userId));
+      res.json({ ok: true });
+    } catch (err: any) {
+      console.error('[Admin Delete User]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   async function requireAdmin(req: any, res: any): Promise<boolean> {
     const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
     const token = extractAdminToken(req);
