@@ -621,39 +621,46 @@ async function startServer() {
         if ((payment.status === 'approved' || payment.status === 'in_process') && payment.external_reference) {
           try {
             const { createOrder, generateOrderNumber, getOrderByNumber } = await import('./db/orders.js');
-            const { productCatalog } = await import('../shared/products.js');
-
             // Idempotency: avoid duplicate orders
             const existingOrder = await getOrderByNumber(`MP-${payment.id}`);
             if (!existingOrder) {
               const parts = payment.external_reference.split(';');
               const orderItems: any[] = [];
               let subtotal = 0;
-
+              // Use local DB to look up products instead of static catalog
+              const mysql2mp = await import('mysql2/promise');
+              const mpPool = mysql2mp.createPool(process.env.DATABASE_URL || '');
               for (const part of parts) {
-                const [productId, variantColor, qtyStr] = part.split('|');
+                const [productSlug, variantColor, qtyStr] = part.split('|');
                 const qty = parseInt(qtyStr, 10) || 1;
-                const product = (productCatalog as any[]).find((p: any) => p.id === productId);
-                if (product) {
-                  const p = product as any;
-                  const variantObj = p.variants?.find((v: any) =>
-                    v.color === variantColor || v.colorName === variantColor
-                  );
-                  const unitPrice = product.price;
+                // Look up product and variant from local DB
+                const [productRows] = await mpPool.execute(
+                  `SELECT cp.id, cp.name, cp.slug, cp.image_url,
+                          cv.color_name, cv.price, cv.image_url as variant_image
+                   FROM catalog_products cp
+                   LEFT JOIN catalog_variants cv ON cv.product_id = cp.id
+                   WHERE cp.slug = ? AND (cv.color_name = ? OR cv.color_name IS NULL)
+                   LIMIT 1`,
+                  [productSlug, variantColor]
+                ) as any[];
+                if (productRows.length > 0) {
+                  const row = productRows[0];
+                  const unitPrice = parseFloat(row.price) || 0;
                   const totalPrice = unitPrice * qty;
                   subtotal += totalPrice;
                   orderItems.push({
-                    productId: product.id,
-                    productName: product.name,
+                    productId: row.slug,
+                    productName: row.name,
                     variantColor: variantColor !== 'default' ? variantColor : undefined,
-                    variantColorName: variantObj?.colorName || (variantColor !== 'default' ? variantColor : undefined),
+                    variantColorName: row.color_name || (variantColor !== 'default' ? variantColor : undefined),
                     quantity: qty,
                     unitPrice,
                     totalPrice,
-                    imageUrl: p.images?.[0] || undefined,
+                    imageUrl: row.variant_image || row.image_url || undefined,
                   });
                 }
               }
+              await mpPool.end();
 
               const total = payment.amount || subtotal;
               const paymentMethodId = payment.payment_method || 'pix';
