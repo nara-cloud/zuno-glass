@@ -1411,6 +1411,8 @@ async function startServer() {
         'limited': 'limited',
         'edicao_limitada': 'limited',
       };
+      // VORTEXA is lifestyle not performance
+      const forceLifestyle = ['zuno-vortexa'];
       const variantsByProduct: Record<number, any[]> = {};
       for (const v of variants as any[]) {
         if (!variantsByProduct[v.product_id]) variantsByProduct[v.product_id] = [];
@@ -1428,7 +1430,7 @@ async function startServer() {
           ...p,
           id: p.slug, // use slug as id for stock compatibility
           dbId: p.id,
-          category: categoryMap[p.category] || p.category,
+          category: forceLifestyle.includes(p.slug) ? 'lifestyle' : (categoryMap[p.category] || p.category),
           image: mainImage,
           images: parsedImages,
           features: (() => { try { return JSON.parse(p.features || '[]'); } catch { return []; } })(),

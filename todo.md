@@ -277,3 +277,9 @@
 - [x] AdminCatalog completo com editor de produtos (fotos, variantes, preços, estoque, SEO)
 - [x] Tabelas BD: investments, partners, coupons, affiliates criadas
 - [x] Estoque actualizado com CSV (32 SKUs correctos)
+
+## 32 Produtos Individuais na Loja
+- [x] Reestruturar BD: cada SKU do CSV vira um produto independente com nome próprio
+- [x] Actualizar /api/catalog para retornar 32 produtos (um por SKU)
+- [x] Actualizar loja para exibir os 32 cards de produtos
+- [x] Corrigir categoria do ZUNO VORTEXA: mudar de performance para lifestyle (casual)
