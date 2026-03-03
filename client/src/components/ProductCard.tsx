@@ -15,6 +15,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const installment = price > 0 ? (price / 3).toFixed(2) : null;
   const { addItem } = useCart();
   const { getProductStock, isInStock } = useStock();
+  // Defensive: ensure variants is always an array
+  const variants = Array.isArray(product.variants) ? product.variants : [];
 
   const totalStock = getProductStock(product.id);
   const inStock = isInStock(product.id);
@@ -30,7 +32,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       return;
     }
 
-    const defaultVariant = product.variants[0];
+    const defaultVariant = variants[0];
     addItem({
       productId: product.id,
       name: product.name,
@@ -122,7 +124,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Color Dots from variants */}
         <div className="flex gap-2 mt-4">
-          {product.variants.map((variant, i: number) => (
+          {variants.map((variant, i: number) => (
             <div 
               key={i} 
               className="w-3 h-3 rounded-full border border-white/20"

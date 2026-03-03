@@ -1,18 +1,29 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Eye, Shield, Feather } from 'lucide-react';
 import LeadCapturePopup from '@/components/LeadCapturePopup';
 
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
 
   useEffect(() => {
     document.title = 'ZUNO GLASS | Óculos Esportivos de Alta Performance';
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/catalog')
+      .then(r => r.json())
+      .then(data => {
+        const arr = Array.isArray(data) ? data : [];
+        // Show 6 featured products (mix of performance and lifestyle)
+        setFeaturedProducts(arr.slice(0, 6));
+      })
+      .catch(() => setFeaturedProducts([]));
   }, []);
 
   useEffect(() => {
@@ -25,8 +36,6 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const featuredProducts = products.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
