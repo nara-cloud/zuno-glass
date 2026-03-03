@@ -312,9 +312,9 @@ export default function Home() {
       {/* ─── BIG IMAGE ────────────────────────────────────────── */}
       <section className="h-[80vh] relative flex items-center overflow-hidden">
         <img 
-          src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/ZRnyhYPsnkScXGDq.jpeg" 
-          alt="Embalagem ZUNO GLASS" 
-          className="absolute inset-0 w-full h-full object-cover"
+          src="https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/IMG_2484_047aed5d.jpeg" 
+          alt="Natália com óculos ZUNO GLASS em movimento" 
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="container relative z-10 flex justify-end">
