@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import {
   LayoutDashboard, Package, BarChart3, Boxes,
-  LogOut, Menu, X, Store, ChevronRight, ShieldCheck
+  LogOut, Menu, X, Store, ChevronRight, ShieldCheck, Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -12,6 +12,7 @@ const navItems = [
   { href: '/admin/orders', label: 'Pedidos', icon: Package },
   { href: '/admin/stock', label: 'Estoque', icon: Boxes },
   { href: '/admin/sales', label: 'Relatórios', icon: BarChart3 },
+  { href: '/admin/users', label: 'Usuários', icon: Users },
 ];
 
 interface AdminLayoutProps {

@@ -114,6 +114,28 @@ const performanceMembers: SquadMember[] = [
     activities: ["Estratégia & Estrutura", "Direito Empresarial", "Alta Performance"]
   },
   {
+    id: 13,
+    name: "BEATRIZ MENDES",
+    category: "LIFESTYLE",
+    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/beatriz-mendes_2dc989b8.jpeg",
+    bio: "Advogada, apaixonada pela vida. Construindo conhecimento, disciplina e equilíbrio todos os dias.",
+    instagram: "https://instagram.com/beatrizmendes",
+    instagramHandle: "@beatrizmendes",
+    city: "Petrolina, PE",
+    activities: ["Vida", "Lifestyle", "Viagens"]
+  },
+  {
+    id: 12,
+    name: "LARYZZA LEAL",
+    category: "PERFORMANCE",
+    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/laryzza-leal_36a7ad7c.jpeg",
+    bio: "Atleta movida pela disciplina e pelo estilo de vida saudável. Eleva a performance a cada treino e desafio superado.",
+    instagram: "https://instagram.com/laryzza.leal",
+    instagramHandle: "@laryzza.leal",
+    city: "Petrolina, PE",
+    activities: ["Performance & Disciplina", "Vida Saudável", "Corrida"]
+  },
+  {
     id: 11,
     name: "RENATA SOUZA",
     category: "PERFORMANCE",

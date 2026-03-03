@@ -153,14 +153,31 @@
 - [ ] Email transacional: confirmação de pedido com Resend
 
 ## Plataforma de Gestão do E-commerce (Admin)
-- [ ] Criar schema de pedidos no banco de dados (tabelas: orders, order_items)
-- [ ] Criar rotas de API para pedidos (listar, detalhar, atualizar status)
-- [ ] Criar rotas de API para admin (stats, produtos, estoque)
-- [ ] Criar layout do painel admin com sidebar de navegação
-- [ ] Página admin: Dashboard com KPIs reais (pedidos, receita, estoque)
-- [ ] Página admin: Gestão de Pedidos (listar, filtrar, atualizar status)
-- [ ] Página admin: Detalhe do Pedido (itens, cliente, endereço, pagamento)
-- [ ] Página admin: Gestão de Estoque (sincronizado com ZUNO Gestão)
-- [ ] Página admin: Relatório de Vendas com gráficos reais
-- [ ] Integrar checkout para salvar pedidos no banco de dados
-- [ ] Autenticação admin via senha fixa (sem dependência de OAuth)
+- [x] Criar schema de pedidos no banco de dados (tabelas: orders, order_items)
+- [x] Criar rotas de API para pedidos (listar, detalhar, atualizar status)
+- [x] Criar rotas de API para admin (stats, produtos, estoque)
+- [x] Criar layout do painel admin com sidebar de navegação
+- [x] Página admin: Dashboard com KPIs reais (pedidos, receita, estoque)
+- [x] Página admin: Gestão de Pedidos (listar, filtrar, atualizar status)
+- [x] Página admin: Detalhe do Pedido (itens, cliente, endereço, pagamento)
+- [x] Página admin: Gestão de Estoque (sincronizado com ZUNO Gestão)
+- [x] Página admin: Relatório de Vendas com gráficos reais
+- [x] Integrar checkout para salvar pedidos no banco de dados
+- [x] Autenticação admin via senha fixa (sem dependência de OAuth)
+
+## Sistema de Autenticação Própria (SSO)
+- [x] Schema do banco: tabelas users, roles, user_roles, refresh_tokens
+- [x] Backend de autenticação: registro, login, JWT, refresh token, logout
+- [x] RBAC com 5 papéis: admin, ops, creator_partner, customer, community_member
+- [x] Middleware de proteção de rotas (requireAuth, requireRole)
+- [x] Página de Login (/entrar) com design ZUNO
+- [x] Página de Cadastro (/cadastro) com design ZUNO
+- [x] Área do Cliente (/minha-conta): dashboard, pedidos, perfil
+- [x] Plataforma Admin: gestão de usuários (/admin/users) com RBAC
+- [x] Rotas de admin/users no servidor (listar, editar papéis, toggle status)
+- [x] Botão ENTRAR no cabeçalho (Navbar)
+- [x] AuthProvider e AuthContext global
+- [x] Membros Squad: Beatriz Possidio, Leonnardo Araújo, Bruno Oliuza, Renata Souza, Laryzza Leal, Beatriz Mendes
+- [ ] Testes unitários para autenticação
+- [ ] Login social (Google/Apple) — fase 2
+- [ ] MFA para admin — fase 2

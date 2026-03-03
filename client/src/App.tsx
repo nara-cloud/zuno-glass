@@ -5,6 +5,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import CartDrawer from "./components/CartDrawer";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
@@ -30,6 +31,10 @@ import AdminSales from "./pages/AdminSales";
 import AdminOrders from "./pages/AdminOrders";
 import AdminOrderDetail from "./pages/AdminOrderDetail";
 import AdminStock from "./pages/AdminStock";
+import AdminUsers from "./pages/AdminUsers";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import MinhaConta from "./pages/MinhaConta";
 
 function Router() {
   return (
@@ -53,11 +58,17 @@ function Router() {
       <Route path={"/warranty"} component={Warranty} />
       <Route path={"/size-guide"} component={SizeGuide} />
       <Route path={"/contact"} component={Contact} />
+      {/* Auth routes */}
+      <Route path={"/entrar"} component={Login} />
+      <Route path={"/cadastro"} component={Register} />
+      <Route path={"/minha-conta"} component={MinhaConta} />
+      {/* Admin routes */}
       <Route path={"/admin"} component={Admin} />
       <Route path={"/admin/sales"} component={AdminSales} />
       <Route path={"/admin/orders"} component={AdminOrders} />
       <Route path={"/admin/orders/:id"} component={AdminOrderDetail} />
       <Route path={"/admin/stock"} component={AdminStock} />
+      <Route path={"/admin/users"} component={AdminUsers} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -77,13 +88,15 @@ function App() {
         defaultTheme="dark"
         // switchable
       >
-        <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <CartDrawer />
-            <Router />
-          </TooltipProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <Toaster />
+              <CartDrawer />
+              <Router />
+            </TooltipProvider>
+          </CartProvider>
+        </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

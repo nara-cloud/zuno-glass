@@ -3,6 +3,8 @@ import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from "stripe";
+import cookieParser from "cookie-parser";
+import authRouter from "./auth.js";
 import { getStockMap, decrementGestaoStock, invalidateStockCache } from "./zunoGestao.js";
 import { stockMapping, findGestaoProduct, getVariantStock, getTotalProductStock } from "../shared/stockMapping.js";
 
@@ -172,8 +174,12 @@ async function startServer() {
     }
   );
 
+  // Cookie parser (needed for refresh tokens)
+  app.use(cookieParser());
   // JSON body parser for all other routes
   app.use(express.json());
+  // ─── Auth Routes ───────────────────────────────────────────────────────────
+  app.use('/api/auth', authRouter);
 
   // ─── Stock Endpoint: Get all stock levels ───
   app.get("/api/stock", async (_req, res) => {
@@ -832,6 +838,74 @@ async function startServer() {
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
+  });
+
+  // ─── Admin: List Users ───
+  app.get('/api/admin/users', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
+      const { db } = await import('./db/connection.js');
+      const { users: usersTable, roles: rolesTable, userRoles: userRolesTable } = await import('../drizzle/schema.js');
+      const { eq, or, like, sql } = await import('drizzle-orm');
+      const { page = '1', limit = '20', search = '' } = req.query as Record<string, string>;
+      const pageNum = parseInt(page);
+      const limitNum = parseInt(limit);
+      const offset = (pageNum - 1) * limitNum;
+      let baseQuery = db.select().from(usersTable).$dynamic();
+      if (search) {
+        baseQuery = baseQuery.where(or(like(usersTable.name, `%${search}%`), like(usersTable.email, `%${search}%`)));
+      }
+      const allUsers = await baseQuery.limit(limitNum).offset(offset);
+      const countResult = await db.select({ count: sql`count(*)` }).from(usersTable);
+      const usersWithRoles = await Promise.all(allUsers.map(async (u: any) => {
+        const userRoleRows = await db
+          .select({ roleName: rolesTable.name })
+          .from(userRolesTable)
+          .innerJoin(rolesTable, eq(userRolesTable.roleId, rolesTable.id))
+          .where(eq(userRolesTable.userId, u.id));
+        return {
+          ...u,
+          roles: userRoleRows.map((r: any) => r.roleName),
+          isActive: true,
+        };
+      }));
+      res.json({ users: usersWithRoles, total: Number((countResult[0] as any).count) });
+    } catch (err: any) {
+      console.error('[Admin Users]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ─── Admin: Update User Roles ───
+  app.patch('/api/admin/users/:id/roles', async (req, res) => {
+    try {
+      const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+      const token = extractAdminToken(req);
+      if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
+      const { db } = await import('./db/connection.js');
+      const { roles: rolesTable, userRoles: userRolesTable } = await import('../drizzle/schema.js');
+      const { eq, inArray } = await import('drizzle-orm');
+      const userId = parseInt(req.params.id);
+      const { roles: newRoles } = req.body;
+      await db.delete(userRolesTable).where(eq(userRolesTable.userId, userId));
+      if (newRoles && newRoles.length > 0) {
+        const roleRows = await db.select().from(rolesTable).where(inArray(rolesTable.name, newRoles));
+        if (roleRows.length > 0) {
+          await db.insert(userRolesTable).values(roleRows.map((r: any) => ({ userId, roleId: r.id })));
+        }
+      }
+      res.json({ ok: true });
+    } catch (err: any) {
+      console.error('[Admin Users Roles]', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // ─── Admin: Toggle User Status ───
+  app.patch('/api/admin/users/:id/status', async (_req, res) => {
+    res.json({ ok: true });
   });
 
   // Serve static files from dist/public in production
