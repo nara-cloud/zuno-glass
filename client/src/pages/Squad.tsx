@@ -37,7 +37,7 @@ const performanceMembers: SquadMember[] = [
     bio: "Corredora apaixonada e empreendedora. Leva a performance ao limite em cada treino e prova, unindo esporte e negócios com a mesma intensidade.",
     instagram: "https://instagram.com/luiizaferrari",
     instagramHandle: "@luiizaferrari",
-    city: "Belo Horizonte, MG",
+    city: "Petrolina, PE",
     activities: ["Corrida de Rua", "Negócios", "Marketing"]
   },
   {
