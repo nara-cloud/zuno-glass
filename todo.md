@@ -352,3 +352,4 @@
 - [ ] Reduzir exposição (brilho) do vídeo na secção de performance da Home
 - [x] BUG: Erro ao processar pagamento no checkout (notification_url inválida em dev)
 - [ ] BUG: Fotos com erro na página de produtos: ZUNO ORVIK, ZUNO VENZA PRETO DEGRADÊ BRANCO, ZUNO KAORI, ZUNO INFINITY X MARROM DEGRADÊ ROSE
+- [x] BUG: Erro no pagamento por cartão - redirecionado para Checkout Pro do Mercado Pago

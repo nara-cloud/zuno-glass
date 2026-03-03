@@ -231,49 +231,28 @@ export default function Checkout() {
   };
 
   const handleCardPayment = async () => {
-    const cpfClean = payer.cpf.replace(/\D/g, '');
-    if (!payer.email || cpfClean.length !== 11) {
-      toast.error('E-mail e CPF são obrigatórios.');
+    if (!payer.email) {
+      toast.error('Informe seu e-mail para continuar.');
       return;
     }
-    if (!cardNumber || !cardExpiry || !cardCvv || !cardName) {
-      toast.error('Preencha todos os dados do cartão.');
-      return;
-    }
-    // Card payment via Mercado Pago
     setIsProcessing(true);
     try {
-      // Tokenize card via Mercado Pago SDK (window.Mercadopago)
-      // For now, use /api/mp/card with the raw data (MP handles tokenization server-side)
-      const res = await fetch('/api/mp/card', {
+      const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: buildItems(),
-          payer: {
-            email: payer.email,
-            first_name: payer.firstName,
-            last_name: payer.lastName,
-            cpf: cpfClean,
-          },
-          token: cardNumber.replace(/\s/g, ''), // raw card number as token placeholder
-          installments: installments || 1,
-          paymentMethodId: 'visa', // will be detected server-side
-          externalReference: buildExternalRef(),
+          payerEmail: payer.email,
+          shippingCost: shippingCost || 0,
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erro ao processar pagamento');
-      if (data.status === 'approved') {
-        setCardSuccess(true);
-        clearCart();
-        toast.success('Pagamento aprovado!');
-      } else if (data.status === 'in_process') {
-        setCardSuccess(true);
-        clearCart();
-        toast.info('Pagamento em análise. Você receberá uma confirmação por e-mail.');
+      if (!res.ok) throw new Error(data.error || 'Erro ao criar sessão de pagamento');
+      if (data.url) {
+        toast.info('Redirecionando para o Mercado Pago...');
+        window.open(data.url, '_blank');
       } else {
-        toast.error('Pagamento recusado. Verifique os dados do cartão.');
+        throw new Error('URL de pagamento não retornada');
       }
     } catch (err: any) {
       toast.error('Erro no pagamento', { description: err.message });
