@@ -194,3 +194,4 @@
 - [x] Try-On Virtual: atualizar página para exibir tela "Em Desenvolvimento"
 - [x] Atualizar logo: remover fundo preto, gerar PNG transparente, atualizar site e favicon
 - [x] Corrigir Navbar: botão ENTRAR usar login próprio (sem Manus OAuth)
+- [ ] Hero da Home: atualizar tagline para "PARA QUEM VIVE NO LIMITE DA LUZ" com estilo outline neon
