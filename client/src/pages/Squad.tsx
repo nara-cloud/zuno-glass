@@ -20,7 +20,7 @@ const performanceMembers: SquadMember[] = [
     id: 1,
     name: "NARA FERRARI",
     category: "PERFORMANCE",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/CqbaZlrSJEggSwZA.jpg",
+    image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/a634238d-3a43-4cb7-b1fd-b0f68267bdbf_9a6bc72f.jpeg",
     bio: "Empreendedora e atleta de Petrolina. Engenheira e estrategista de marketing, está sempre em movimento transformando ideias em realidade.",
     instagram: "https://instagram.com/naraferrari",
     instagramHandle: "@naraferrari",
