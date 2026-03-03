@@ -6,6 +6,7 @@ import ProductCard from '@/components/ProductCard';
 import { products } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Eye, Shield, Feather } from 'lucide-react';
+import LeadCapturePopup from '@/components/LeadCapturePopup';
 
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -30,6 +31,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Navbar />
+      <LeadCapturePopup />
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center overflow-hidden bg-background">
@@ -50,6 +52,7 @@ export default function Home() {
         {/* Hero Content - left side, below navbar */}
         <div className="container relative z-20 pt-44 md:pt-48">
           <div className="max-w-xl">
+            <p className="font-display text-primary text-sm md:text-base tracking-[0.4em] uppercase mb-4 animate-in-up">Para quem vive</p>
             <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl leading-[0.9] text-white mb-8 animate-in-up delay-100">
               LIMITE <br/>
               <span className="text-transparent text-stroke-neon italic pr-4">DA LUZ</span>

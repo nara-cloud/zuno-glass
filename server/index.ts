@@ -908,6 +908,109 @@ async function startServer() {
     res.json({ ok: true });
   });
 
+  // ─── Admin: ZUNO Gestão Proxy Endpoints ───
+  const GESTAO_URL = process.env.ZUNO_GESTAO_API_URL || 'https://zunogestao-gh3xjvgt.manus.space';
+  const GESTAO_KEY = process.env.ZUNO_GESTAO_API_KEY || '';
+
+  async function gestaoGet(endpoint: string) {
+    const r = await fetch(`${GESTAO_URL}/api/trpc/${endpoint}`, { headers: { 'X-API-Key': GESTAO_KEY } });
+    const d = await r.json();
+    return d?.result?.data?.json;
+  }
+
+  async function gestaoPost(endpoint: string, body: any) {
+    const r = await fetch(`${GESTAO_URL}/api/trpc/${endpoint}`, {
+      method: 'POST',
+      headers: { 'X-API-Key': GESTAO_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ json: body }),
+    });
+    const d = await r.json();
+    return d?.result?.data?.json;
+  }
+
+  async function requireAdmin(req: any, res: any): Promise<boolean> {
+    const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
+    const token = extractAdminToken(req);
+    if (!token || !(await validateAdminToken(token))) {
+      res.status(401).json({ error: 'Não autorizado' });
+      return false;
+    }
+    return true;
+  }
+
+  // Sales
+  app.get('/api/admin/gestao/sales', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoGet('sales.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // Financial summary
+  app.get('/api/admin/gestao/financial', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoGet('financial.summary') || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // Investments
+  app.get('/api/admin/gestao/investments', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoGet('investments.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.post('/api/admin/gestao/investments', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoPost('investments.create', req.body) || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // Partners (Sócios)
+  app.get('/api/admin/gestao/partners', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoGet('partners.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // Coupons / Discounts
+  app.get('/api/admin/gestao/coupons', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoGet('coupons.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.post('/api/admin/gestao/coupons', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoPost('coupons.create', req.body) || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.patch('/api/admin/gestao/coupons/:id/toggle', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoPost('coupons.toggle', { id: parseInt(req.params.id) }) || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.delete('/api/admin/gestao/coupons/:id', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoPost('coupons.delete', { id: parseInt(req.params.id) }) || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // Affiliates
+  app.get('/api/admin/gestao/affiliates', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoGet('affiliates.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // Products (full list with cost/margin)
+  app.get('/api/admin/gestao/products', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try { res.json(await gestaoGet('products.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.patch('/api/admin/gestao/products/:id/stock', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const { id } = req.params;
+      const { stock } = req.body;
+      const { updateGestaoStock: updateStock } = await import('./zunoGestao.js');
+      const ok = await updateStock(parseInt(id), stock);
+      res.json({ ok });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
   // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"

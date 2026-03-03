@@ -33,6 +33,15 @@ import AdminOrderDetail from "./pages/AdminOrderDetail";
 import AdminStock from "./pages/AdminStock";
 import AdminUsers from "./pages/AdminUsers";
 import AdminProducts from "./pages/AdminProducts";
+import AdminFinancial from "./pages/AdminFinancial";
+import AdminInvestments from "./pages/AdminInvestments";
+import AdminPartners from "./pages/AdminPartners";
+import AdminDiscounts from "./pages/AdminDiscounts";
+import AdminAffiliates from "./pages/AdminAffiliates";
+import AdminClients from "./pages/AdminClients";
+import AdminCollections from "./pages/AdminCollections";
+import AdminCashflow from "./pages/AdminCashflow";
+import AdminPermissions from "./pages/AdminPermissions";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MinhaConta from "./pages/MinhaConta";
@@ -71,6 +80,15 @@ function Router() {
       <Route path={"/admin/stock"} component={AdminStock} />
       <Route path={"/admin/users"} component={AdminUsers} />
       <Route path={"/admin/products"} component={AdminProducts} />
+      <Route path={"/admin/financial"} component={AdminFinancial} />
+      <Route path={"/admin/investments"} component={AdminInvestments} />
+      <Route path={"/admin/partners"} component={AdminPartners} />
+      <Route path={"/admin/discounts"} component={AdminDiscounts} />
+      <Route path={"/admin/affiliates"} component={AdminAffiliates} />
+      <Route path={"/admin/clients"} component={AdminClients} />
+      <Route path={"/admin/collections"} component={AdminCollections} />
+      <Route path={"/admin/cashflow"} component={AdminCashflow} />
+      <Route path={"/admin/permissions"} component={AdminPermissions} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

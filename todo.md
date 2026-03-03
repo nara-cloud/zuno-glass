@@ -199,3 +199,47 @@
 
 ## Gestão de Utilizadores
 - [x] Promover nara@triadeconstrutorabr.com a administrador
+
+## Gestão de Permissões
+- [ ] Criar página /admin/permissions com gestão de papéis (roles) e membros do Squad
+- [ ] Listar todos os utilizadores com seus papéis actuais
+- [ ] Permitir atribuir/revogar papéis (admin, ops, creator_partner, customer, community_member)
+- [ ] Secção especial para membros do Squad (community_member + squad_member)
+- [ ] Adicionar item "Permissões" ao menu do AdminLayout
+
+## Correcção de Estoque
+- [ ] Auditar API ZUNO Gestão e verificar produtos reais disponíveis
+- [ ] Corrigir mapeamento stockMapping.ts com IDs e SKUs correctos
+- [ ] Testar sincronização de estoque em tempo real
+
+## Painel Admin Completo (substituir ZUNO Gestão)
+- [ ] Expandir AdminLayout com todos os menus (Gestão, Financeiro, Marketing, Admin)
+- [ ] Adicionar endpoints proxy no servidor para todas as APIs do ZUNO Gestão
+- [ ] Página /admin/clients — gestão de clientes
+- [ ] Página /admin/collections — gestão de coleções
+- [ ] Página /admin/financial — financeiro (receita, custos, lucro)
+- [ ] Página /admin/cashflow — fluxo de caixa
+- [ ] Página /admin/investments — investimentos
+- [ ] Página /admin/payments — pagamentos recebidos
+- [ ] Página /admin/discounts — cupons e descontos
+- [ ] Página /admin/affiliates — programa de afiliados
+- [ ] Página /admin/scenarios — cenários de rentabilidade
+- [ ] Página /admin/profitability — análise de rentabilidade por produto
+- [ ] Página /admin/partners — sócios
+- [ ] Página /admin/permissions — gestão de permissões e roles
+- [ ] Corrigir mapeamento stockMapping.ts com nomes correctos (ZUNO STRIX = DEVON APEX)
+- [x] Reactivar popup de inscrição para newsletter na homepage
+
+## Painel Admin Completo (substituição do ZUNO Gestão)
+- [x] Página admin: Financeiro (/admin/financial) — resumo financeiro e vendas
+- [x] Página admin: Investimentos (/admin/investments) — controlo de despesas
+- [x] Página admin: Sócios (/admin/partners) — participações e investimentos
+- [x] Página admin: Descontos (/admin/discounts) — cupons e promoções
+- [x] Página admin: Afiliados (/admin/affiliates) — programa de afiliados
+- [x] Página admin: Clientes (/admin/clients) — utilizadores registados
+- [x] Página admin: Coleções (/admin/collections) — gestão de coleções
+- [x] Página admin: Fluxo de Caixa (/admin/cashflow) — entradas e saídas
+- [x] AdminLayout expandido com todos os menus agrupados (Gestão, Financeiro, Marketing, Administração)
+- [x] Popup de newsletter reactivado na homepage
+- [x] Linha "Para quem vive" adicionada acima de "LIMITE" na hero
+- [x] Promoção de nara@triadeconstrutorabr.com a administrador
