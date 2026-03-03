@@ -1,0 +1,8 @@
+{
+  "query": "\nALTER TABLE catalog_products \n  ADD COLUMN IF NOT EXISTS image TEXT DEFAULT NULL AFTER features,\n  ADD COLUMN IF NOT EXISTS active TINYINT(1) DEFAULT 1 AFTER image;\n\nALTER TABLE catalog_variants\n  ADD COLUMN IF NOT EXISTS image TEXT DEFAULT NULL AFTER cost;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute \nALTER TABLE catalog_products \n  ADD COLUMN IF NOT EXISTS image TEXT DEFAULT NULL AFTER features,\n  ADD COLUMN IF NOT EXISTS active TINYINT(1) DEFAULT 1 AFTER image;\n\nALTER TABLE catalog_variants\n  ADD COLUMN IF NOT EXISTS image TEXT DEFAULT NULL AFTER cost;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'image' in 'catalog_products'"
+  ]
+}

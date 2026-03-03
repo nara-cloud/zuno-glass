@@ -12,8 +12,8 @@ interface Transaction {
   category?: string;
 }
 
-function fmt(cents: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100);
+function fmt(value: number) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value) || 0);
 }
 
 export default function AdminCashflow() {
@@ -29,20 +29,20 @@ export default function AdminCashflow() {
 
       (Array.isArray(sales) ? sales : []).forEach((s: any) => {
         txs.push({
-          date: s.sale?.createdAt || s.createdAt,
-          description: `Venda: ${s.product?.name || `Produto #${s.sale?.productId}`}`,
+          date: s.created_at || s.createdAt,
+          description: `Venda #${s.order_number || s.id}: ${s.items || s.customer_name || 'Pedido'}`,
           type: 'entrada',
-          amount: s.sale?.salePrice || 0,
+          amount: Number(s.total) || 0,
           category: 'venda',
         });
       });
 
       (Array.isArray(investments) ? investments : []).forEach((inv: any) => {
         txs.push({
-          date: inv.date || inv.createdAt,
+          date: inv.date || inv.created_at,
           description: inv.description,
           type: 'saida',
-          amount: inv.amount,
+          amount: Number(inv.amount) || 0,
           category: inv.category,
         });
       });

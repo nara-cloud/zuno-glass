@@ -6,12 +6,12 @@ import { PiggyBank } from 'lucide-react';
 
 interface Investment {
   id: number;
-  partnerId: number;
   amount: number;
   description: string;
   category: string;
   date: string;
-  createdAt: string;
+  notes: string | null;
+  created_at: string;
 }
 
 const categoryColors: Record<string, string> = {
@@ -22,8 +22,8 @@ const categoryColors: Record<string, string> = {
   outros: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
 };
 
-function fmt(cents: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100);
+function fmt(value: number) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value) || 0);
 }
 
 export default function AdminInvestments() {

@@ -2,25 +2,22 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UserCheck, Instagram, Link } from 'lucide-react';
+import { UserCheck, Link } from 'lucide-react';
 
 interface Affiliate {
   id: number;
   name: string;
-  email: string | null;
-  phone: string | null;
-  instagram: string | null;
-  referralCode: string;
-  commissionType: string;
-  commissionValue: number;
-  totalSales: number;
-  totalCommission: number;
-  isActive: boolean;
-  createdAt: string;
+  email: string;
+  code: string;
+  commission_rate: number;
+  total_sales: number;
+  total_earnings: number;
+  is_active: boolean;
+  created_at: string;
 }
 
-function fmt(cents: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100);
+function fmt(value: number) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value) || 0);
 }
 
 export default function AdminAffiliates() {
@@ -42,7 +39,7 @@ export default function AdminAffiliates() {
           <p className="font-body text-xs text-gray-500">Total</p>
         </div>
         <div className="text-center">
-          <p className="font-display font-bold text-2xl text-green-400">{affiliates.filter(a => a.isActive).length}</p>
+          <p className="font-display font-bold text-2xl text-green-400">{affiliates.filter(a => a.is_active).length}</p>
           <p className="font-body text-xs text-gray-500">Activos</p>
         </div>
       </div>
@@ -78,30 +75,23 @@ export default function AdminAffiliates() {
                         {a.email && <p className="text-gray-500 text-[10px]">{a.email}</p>}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
-                      {a.instagram ? (
-                        <div className="flex items-center gap-1 text-pink-400">
-                          <Instagram className="w-3 h-3" />
-                          <span>{a.instagram}</span>
-                        </div>
-                      ) : '—'}
-                    </td>
+                    <td className="px-4 py-3 text-gray-500">—</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1 text-primary font-display font-bold">
                         <Link className="w-3 h-3" />
-                        {a.referralCode}
+                        {a.code}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-gray-400">
-                      {a.commissionValue}{a.commissionType === 'percentual' ? '%' : ' R$'}
+                      {a.commission_rate}%
                     </td>
-                    <td className="px-4 py-3 text-gray-400">{a.totalSales}</td>
-                    <td className="px-4 py-3 text-primary font-bold">{fmt(a.totalCommission)}</td>
+                    <td className="px-4 py-3 text-gray-400">{a.total_sales}</td>
+                    <td className="px-4 py-3 text-primary font-bold">{fmt(a.total_earnings)}</td>
                     <td className="px-4 py-3">
-                      <Badge className={a.isActive
+                      <Badge className={a.is_active
                         ? 'bg-green-500/20 text-green-400 border-green-500/30 text-[10px]'
                         : 'bg-red-500/20 text-red-400 border-red-500/30 text-[10px]'}>
-                        {a.isActive ? 'Activo' : 'Inactivo'}
+                        {a.is_active ? 'Activo' : 'Inactivo'}
                       </Badge>
                     </td>
                   </tr>

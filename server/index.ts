@@ -5,8 +5,7 @@ import { fileURLToPath } from "url";
 import Stripe from "stripe";
 import cookieParser from "cookie-parser";
 import authRouter from "./auth.js";
-import { getStockMap, decrementGestaoStock, invalidateStockCache } from "./zunoGestao.js";
-import { stockMapping, findGestaoProduct, getVariantStock, getTotalProductStock } from "../shared/stockMapping.js";
+// Note: ZUNO Gestão API removed - stock managed via local DB (catalog_variants table)
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -129,35 +128,29 @@ async function startServer() {
             console.error('[Webhook] Failed to save order to DB:', dbErr.message);
           }
 
-          // ─── Decrement stock in ZUNO Gestão ───
+          // ─── Decrement stock in local DB ───
           if (session.metadata?.items) {
             const itemEntries = session.metadata.items.split(";");
+            const mysql2 = await import('mysql2/promise');
+            const pool = mysql2.createPool(process.env.DATABASE_URL || '');
             for (const entry of itemEntries) {
               const [productName, variantColor, quantityStr] = entry.split("|");
               const quantity = parseInt(quantityStr, 10) || 1;
-
-              // Find the matching e-commerce product by name
-              const { productCatalog } = await import("../shared/products.js");
-              const ecomProduct = productCatalog.find(
-                (p: any) => p.name === productName
-              );
-
-              if (ecomProduct) {
-                const gestaoEntry = findGestaoProduct(ecomProduct.id, variantColor);
-                if (gestaoEntry) {
-                  const success = await decrementGestaoStock(gestaoEntry.gestaoProductId, quantity);
-                  console.log(
-                    `[Webhook] Stock update for ${gestaoEntry.gestaoName}: ${success ? "OK" : "FAILED"} (qty: -${quantity})`
-                  );
-                } else {
-                  console.warn(
-                    `[Webhook] No stock mapping found for ${productName} / ${variantColor}`
-                  );
-                }
-              } else {
-                console.warn(`[Webhook] Product not found in catalog: ${productName}`);
+              try {
+                // Find product by name and decrement variant stock
+                const [rows] = await pool.execute(
+                  `UPDATE catalog_variants cv
+                   JOIN catalog_products cp ON cv.product_id = cp.id
+                   SET cv.stock = GREATEST(0, cv.stock - ?)
+                   WHERE cp.name = ? AND cv.color_name = ?`,
+                  [quantity, productName, variantColor]
+                ) as any[];
+                console.log(`[Webhook] Stock decremented for ${productName} / ${variantColor} (qty: -${quantity})`);
+              } catch (stockErr: any) {
+                console.warn(`[Webhook] Failed to decrement stock for ${productName} / ${variantColor}:`, stockErr.message);
               }
             }
+            await pool.end();
           }
           break;
         }
@@ -181,71 +174,65 @@ async function startServer() {
   // ─── Auth Routes ───────────────────────────────────────────────────────────
   app.use('/api/auth', authRouter);
 
-  // ─── Stock Endpoint: Get all stock levels ───
+  // ─── Stock Endpoint: Get all stock levels (from local DB) ───
   app.get("/api/stock", async (_req, res) => {
     try {
-      const stockMap = await getStockMap();
-
-      // Build response: for each e-commerce product, return stock per variant
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+      const [rows] = await pool.execute(
+        `SELECT cv.color_name, cv.stock, cp.slug as product_slug
+         FROM catalog_variants cv
+         JOIN catalog_products cp ON cv.product_id = cp.id
+         WHERE cv.is_active = 1 AND cp.is_active = 1`
+      ) as any[];
+      await pool.end();
       const stockData: Record<string, { total: number; variants: Record<string, number> }> = {};
-
-      // Get unique product IDs
-      const productIds = Array.from(new Set(stockMapping.map((m) => m.ecommerceProductId)));
-
-      for (const productId of productIds) {
-        const total = getTotalProductStock(productId, stockMap);
-        const variants: Record<string, number> = {};
-
-        const entries = stockMapping.filter((m) => m.ecommerceProductId === productId);
-        for (const entry of entries) {
-          variants[entry.ecommerceColorName] = stockMap.get(entry.gestaoProductId) || 0;
-        }
-
-        stockData[productId] = { total, variants };
+      for (const v of rows) {
+        const slug = v.product_slug;
+        if (!stockData[slug]) stockData[slug] = { total: 0, variants: {} };
+        stockData[slug].variants[v.color_name] = Number(v.stock);
+        stockData[slug].total += Number(v.stock);
       }
-
-      res.json({ stock: stockData, cached: true });
+      res.json({ stock: stockData, cached: false });
     } catch (err: any) {
-      console.error("[Stock] Error fetching stock:", err.message);
+      console.error("[Stock] Error fetching stock from DB:", err.message);
       res.status(500).json({ error: "Erro ao buscar estoque" });
     }
   });
 
-  // ─── Stock Endpoint: Get stock for specific product ───
+  // ─── Stock Endpoint: Get stock for specific product (from local DB) ───
   app.get("/api/stock/:productId", async (req, res) => {
     try {
       const { productId } = req.params;
-      const stockMap = await getStockMap();
-
-      const total = getTotalProductStock(productId, stockMap);
-      const variants: Record<string, number> = {};
-
-      const entries = stockMapping.filter((m) => m.ecommerceProductId === productId);
-      if (entries.length === 0) {
-        return res.status(404).json({ error: "Produto não encontrado no mapeamento de estoque" });
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+      const [rows] = await pool.execute(
+        `SELECT cv.color_name, cv.stock
+         FROM catalog_variants cv
+         JOIN catalog_products cp ON cv.product_id = cp.id
+         WHERE cp.slug = ? AND cv.is_active = 1 AND cp.is_active = 1`,
+        [productId]
+      ) as any[];
+      await pool.end();
+      if ((rows as any[]).length === 0) {
+        return res.status(404).json({ error: "Produto não encontrado" });
       }
-
-      for (const entry of entries) {
-        variants[entry.ecommerceColorName] = stockMap.get(entry.gestaoProductId) || 0;
+      const variantMap: Record<string, number> = {};
+      let total = 0;
+      for (const v of rows as any[]) {
+        variantMap[v.color_name] = Number(v.stock);
+        total += Number(v.stock);
       }
-
-      res.json({ productId, total, variants });
+      res.json({ productId, total, variants: variantMap });
     } catch (err: any) {
-      console.error("[Stock] Error fetching product stock:", err.message);
+      console.error("[Stock] Error fetching product stock from DB:", err.message);
       res.status(500).json({ error: "Erro ao buscar estoque do produto" });
     }
   });
 
-  // ─── Stock Endpoint: Force refresh cache ───
+  // ─── Stock Endpoint: Force refresh (no-op for DB) ───
   app.post("/api/stock/refresh", async (_req, res) => {
-    try {
-      invalidateStockCache();
-      const stockMap = await getStockMap(true);
-      res.json({ success: true, productCount: stockMap.size });
-    } catch (err: any) {
-      console.error("[Stock] Error refreshing stock:", err.message);
-      res.status(500).json({ error: "Erro ao atualizar estoque" });
-    }
+    res.json({ success: true, message: 'Estoque sincronizado com a base de dados local' });
   });
 
   // ─── Shipping Quote Endpoint ───
@@ -281,32 +268,37 @@ async function startServer() {
       const { getProductById } = await import("../shared/products.js");
       const origin = req.headers.origin || `${req.protocol}://${req.get("host")}`;
 
-      // ─── Stock validation before checkout ───
-      const stockMap = await getStockMap();
+      // ─── Stock validation before checkout (local DB) ───
       const stockErrors: string[] = [];
+      const mysql2 = await import('mysql2/promise');
+      const stockPool = mysql2.createPool(process.env.DATABASE_URL || '');
+
+      const checkStock = async (prodId: string, color: string, qty: number, prodName: string) => {
+        const [rows] = await stockPool.execute(
+          `SELECT cv.stock FROM catalog_variants cv
+           JOIN catalog_products cp ON cv.product_id = cp.id
+           WHERE cp.slug = ? AND cv.color_name = ? AND cv.is_active = 1`,
+          [prodId, color]
+        ) as any[];
+        const available = rows.length > 0 ? Number(rows[0].stock) : -1;
+        if (available !== -1 && available < qty) {
+          stockErrors.push(`${prodName} (${color || 'padrão'}): apenas ${available} em estoque`);
+        }
+      };
 
       if (items && Array.isArray(items) && items.length > 0) {
         for (const item of items) {
           const product = getProductById(item.productId);
           if (!product) continue;
-          const variantStock = getVariantStock(item.productId, item.variantColor || '', stockMap);
-          if (variantStock < (item.quantity || 1)) {
-            stockErrors.push(
-              `${product.name} (${item.variantColor || 'padrão'}): apenas ${variantStock} em estoque`
-            );
-          }
+          await checkStock(item.productId, item.variantColor || '', item.quantity || 1, product.name);
         }
       } else if (productId) {
         const product = getProductById(productId);
         if (product) {
-          const variantStock = getVariantStock(productId, variantColor || '', stockMap);
-          if (variantStock < quantity) {
-            stockErrors.push(
-              `${product.name} (${variantColor || 'padrão'}): apenas ${variantStock} em estoque`
-            );
-          }
+          await checkStock(productId, variantColor || '', quantity, product.name);
         }
       }
+      await stockPool.end();
 
       if (stockErrors.length > 0) {
         return res.status(409).json({
@@ -692,22 +684,30 @@ async function startServer() {
           }
         }
 
-        // Decrement stock on approved payment
+        // Decrement stock on approved payment (local DB)
         if (payment.status === "approved" && payment.external_reference) {
           console.log(`[MP Webhook] Payment approved, ref: ${payment.external_reference}`);
           // external_reference format: "productId|variantColor|quantity"
           const parts = payment.external_reference.split(";");
+          const mysql2 = await import('mysql2/promise');
+          const pool = mysql2.createPool(process.env.DATABASE_URL || '');
           for (const part of parts) {
-            const [productId, variantColor, qtyStr] = part.split("|");
+            const [productSlug, variantColor, qtyStr] = part.split("|");
             const quantity = parseInt(qtyStr, 10) || 1;
-            const { findGestaoProduct } = await import("../shared/stockMapping.js");
-            const { decrementGestaoStock } = await import("./zunoGestao.js");
-            const gestaoEntry = findGestaoProduct(productId, variantColor);
-            if (gestaoEntry) {
-              await decrementGestaoStock(gestaoEntry.gestaoProductId, quantity);
-              console.log(`[MP Webhook] Stock decremented for ${gestaoEntry.gestaoName}`);
+            try {
+              await pool.execute(
+                `UPDATE catalog_variants cv
+                 JOIN catalog_products cp ON cv.product_id = cp.id
+                 SET cv.stock = GREATEST(0, cv.stock - ?)
+                 WHERE cp.slug = ? AND cv.color_name = ?`,
+                [quantity, productSlug, variantColor]
+              );
+              console.log(`[MP Webhook] Stock decremented for ${productSlug} / ${variantColor} (qty: -${quantity})`);
+            } catch (stockErr: any) {
+              console.warn(`[MP Webhook] Failed to decrement stock for ${productSlug} / ${variantColor}:`, stockErr.message);
             }
           }
+          await pool.end();
         }
       }
 
@@ -823,18 +823,24 @@ async function startServer() {
     }
   });
 
-  // ─── Admin: Stock (from ZUNO Gestão) ───
+  // ─── Admin: Stock (from local DB) ───
   app.get('/api/admin/stock', async (req, res) => {
     try {
       const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
       const token = extractAdminToken(req);
       if (!token || !(await validateAdminToken(token))) return res.status(401).json({ error: 'Não autorizado' });
-      const stockMap = await getStockMap();
-      const result = stockMapping.map(m => ({
-        ...m,
-        currentStock: stockMap.get(m.gestaoProductId) || 0,
-      }));
-      res.json(result);
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+      const [rows] = await pool.execute(
+        `SELECT cv.sku, cv.color_name as ecommerceColorName, cv.stock as currentStock,
+                cp.slug as ecommerceProductId, cp.name as productName, cp.category
+         FROM catalog_variants cv
+         JOIN catalog_products cp ON cv.product_id = cp.id
+         WHERE cv.is_active = 1 AND cp.is_active = 1
+         ORDER BY cp.name, cv.color_name`
+      ) as any[];
+      await pool.end();
+      res.json(rows);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
@@ -908,26 +914,6 @@ async function startServer() {
     res.json({ ok: true });
   });
 
-  // ─── Admin: ZUNO Gestão Proxy Endpoints ───
-  const GESTAO_URL = process.env.ZUNO_GESTAO_API_URL || 'https://zunogestao-gh3xjvgt.manus.space';
-  const GESTAO_KEY = process.env.ZUNO_GESTAO_API_KEY || '';
-
-  async function gestaoGet(endpoint: string) {
-    const r = await fetch(`${GESTAO_URL}/api/trpc/${endpoint}`, { headers: { 'X-API-Key': GESTAO_KEY } });
-    const d = await r.json();
-    return d?.result?.data?.json;
-  }
-
-  async function gestaoPost(endpoint: string, body: any) {
-    const r = await fetch(`${GESTAO_URL}/api/trpc/${endpoint}`, {
-      method: 'POST',
-      headers: { 'X-API-Key': GESTAO_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ json: body }),
-    });
-    const d = await r.json();
-    return d?.result?.data?.json;
-  }
-
   async function requireAdmin(req: any, res: any): Promise<boolean> {
     const { extractAdminToken, validateAdminToken } = await import('./adminAuth.js');
     const token = extractAdminToken(req);
@@ -937,157 +923,520 @@ async function startServer() {
     }
     return true;
   }
+  async function getPool() {
+    const mysql2 = await import('mysql2/promise');
+    return mysql2.createPool(process.env.DATABASE_URL || '');
+  }
 
-  // Sales
+  // ─── Admin: Sales (from orders table) ───────────────────────────────────────
   app.get('/api/admin/gestao/sales', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoGet('sales.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const pool = await getPool();
+      const [rows] = await pool.execute(
+        `SELECT o.id, o.order_number, o.customer_name, o.customer_email, o.total,
+                o.payment_status, o.status, o.payment_method, o.created_at,
+                GROUP_CONCAT(oi.product_name SEPARATOR ', ') as items
+         FROM orders o
+         LEFT JOIN order_items oi ON oi.order_id = o.id
+         WHERE o.payment_status = 'paid'
+         GROUP BY o.id
+         ORDER BY o.created_at DESC
+         LIMIT 200`
+      );
+      await pool.end();
+      res.json(rows);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  // Financial summary
+  // ─── Admin: Financial Summary ────────────────────────────────────────────────
   app.get('/api/admin/gestao/financial', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoGet('financial.summary') || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const pool = await getPool();
+      const [[summary]] = await pool.execute(
+        `SELECT
+           COUNT(*) as total_orders,
+           SUM(CASE WHEN payment_status='paid' THEN total ELSE 0 END) as total_revenue,
+           SUM(CASE WHEN payment_status='paid' AND MONTH(created_at)=MONTH(NOW()) AND YEAR(created_at)=YEAR(NOW()) THEN total ELSE 0 END) as revenue_this_month,
+           SUM(CASE WHEN payment_status='paid' AND DATE(created_at)=DATE(NOW()) THEN total ELSE 0 END) as revenue_today,
+           SUM(CASE WHEN payment_status='pending' THEN total ELSE 0 END) as pending_revenue
+         FROM orders`
+      ) as any[];
+      const [[investTotal]] = await pool.execute(
+        `SELECT COALESCE(SUM(amount),0) as total_invested FROM investments`
+      ) as any[];
+      await pool.end();
+      res.json({ ...summary, total_invested: investTotal.total_invested });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  // Investments
+  // ─── Admin: Investments ──────────────────────────────────────────────────────
   app.get('/api/admin/gestao/investments', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoGet('investments.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const pool = await getPool();
+      const [rows] = await pool.execute(`SELECT * FROM investments ORDER BY date DESC, created_at DESC`);
+      await pool.end();
+      res.json(rows);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
-
   app.post('/api/admin/gestao/investments', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoPost('investments.create', req.body) || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const { description, amount, category, date, notes } = req.body;
+      const pool = await getPool();
+      const [result] = await pool.execute(
+        `INSERT INTO investments (description, amount, category, date, notes) VALUES (?,?,?,?,?)`,
+        [description, amount, category || 'geral', date, notes || null]
+      ) as any[];
+      const [rows] = await pool.execute(`SELECT * FROM investments WHERE id = ?`, [result.insertId]);
+      await pool.end();
+      res.json((rows as any[])[0]);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+  app.delete('/api/admin/gestao/investments/:id', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const pool = await getPool();
+      await pool.execute(`DELETE FROM investments WHERE id = ?`, [req.params.id]);
+      await pool.end();
+      res.json({ ok: true });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  // Partners (Sócios)
+  // ─── Admin: Partners ─────────────────────────────────────────────────────────
   app.get('/api/admin/gestao/partners', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoGet('partners.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const pool = await getPool();
+      const [rows] = await pool.execute(`SELECT * FROM partners ORDER BY name`);
+      await pool.end();
+      res.json(rows);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+  app.post('/api/admin/gestao/partners', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const { name, email, phone, commissionRate, notes } = req.body;
+      const pool = await getPool();
+      const [result] = await pool.execute(
+        `INSERT INTO partners (name, email, phone, commission_rate, notes) VALUES (?,?,?,?,?)`,
+        [name, email || null, phone || null, commissionRate || 0, notes || null]
+      ) as any[];
+      const [rows] = await pool.execute(`SELECT * FROM partners WHERE id = ?`, [result.insertId]);
+      await pool.end();
+      res.json((rows as any[])[0]);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+  app.patch('/api/admin/gestao/partners/:id', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const { name, email, phone, commissionRate, isActive, notes } = req.body;
+      const pool = await getPool();
+      await pool.execute(
+        `UPDATE partners SET name=?, email=?, phone=?, commission_rate=?, is_active=?, notes=? WHERE id=?`,
+        [name, email || null, phone || null, commissionRate || 0, isActive !== false ? 1 : 0, notes || null, req.params.id]
+      );
+      const [rows] = await pool.execute(`SELECT * FROM partners WHERE id = ?`, [req.params.id]);
+      await pool.end();
+      res.json((rows as any[])[0]);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+  app.delete('/api/admin/gestao/partners/:id', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const pool = await getPool();
+      await pool.execute(`DELETE FROM partners WHERE id = ?`, [req.params.id]);
+      await pool.end();
+      res.json({ ok: true });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  // Coupons / Discounts
+  // ─── Admin: Coupons ──────────────────────────────────────────────────────────
   app.get('/api/admin/gestao/coupons', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoGet('coupons.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const pool = await getPool();
+      const [rows] = await pool.execute(`SELECT * FROM coupons ORDER BY created_at DESC`);
+      await pool.end();
+      res.json(rows);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
-
   app.post('/api/admin/gestao/coupons', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoPost('coupons.create', req.body) || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const { code, discountType, discountValue, minOrderValue, maxUses, expiresAt } = req.body;
+      const pool = await getPool();
+      const [result] = await pool.execute(
+        `INSERT INTO coupons (code, discount_type, discount_value, min_order_value, max_uses, expires_at) VALUES (?,?,?,?,?,?)`,
+        [code.toUpperCase(), discountType || 'percentage', discountValue, minOrderValue || null, maxUses || null, expiresAt || null]
+      ) as any[];
+      const [rows] = await pool.execute(`SELECT * FROM coupons WHERE id = ?`, [result.insertId]);
+      await pool.end();
+      res.json((rows as any[])[0]);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
-
   app.patch('/api/admin/gestao/coupons/:id/toggle', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoPost('coupons.toggle', { id: parseInt(req.params.id) }) || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const pool = await getPool();
+      await pool.execute(`UPDATE coupons SET is_active = NOT is_active WHERE id = ?`, [req.params.id]);
+      const [rows] = await pool.execute(`SELECT * FROM coupons WHERE id = ?`, [req.params.id]);
+      await pool.end();
+      res.json((rows as any[])[0]);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
-
   app.delete('/api/admin/gestao/coupons/:id', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoPost('coupons.delete', { id: parseInt(req.params.id) }) || {}); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const pool = await getPool();
+      await pool.execute(`DELETE FROM coupons WHERE id = ?`, [req.params.id]);
+      await pool.end();
+      res.json({ ok: true });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  // Affiliates
+  // ─── Admin: Affiliates ───────────────────────────────────────────────────────
   app.get('/api/admin/gestao/affiliates', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoGet('affiliates.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const pool = await getPool();
+      const [rows] = await pool.execute(`SELECT * FROM affiliates ORDER BY name`);
+      await pool.end();
+      res.json(rows);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+  app.post('/api/admin/gestao/affiliates', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const { name, email, code, commissionRate } = req.body;
+      const pool = await getPool();
+      const [result] = await pool.execute(
+        `INSERT INTO affiliates (name, email, code, commission_rate) VALUES (?,?,?,?)`,
+        [name, email, code.toUpperCase(), commissionRate || 10]
+      ) as any[];
+      const [rows] = await pool.execute(`SELECT * FROM affiliates WHERE id = ?`, [result.insertId]);
+      await pool.end();
+      res.json((rows as any[])[0]);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+  app.patch('/api/admin/gestao/affiliates/:id/toggle', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const pool = await getPool();
+      await pool.execute(`UPDATE affiliates SET is_active = NOT is_active WHERE id = ?`, [req.params.id]);
+      const [rows] = await pool.execute(`SELECT * FROM affiliates WHERE id = ?`, [req.params.id]);
+      await pool.end();
+      res.json((rows as any[])[0]);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+  app.delete('/api/admin/gestao/affiliates/:id', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const pool = await getPool();
+      await pool.execute(`DELETE FROM affiliates WHERE id = ?`, [req.params.id]);
+      await pool.end();
+      res.json({ ok: true });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  // Products (full list with cost/margin)
+  // ─── Admin: Products (from catalog_products) ─────────────────────────────────
   app.get('/api/admin/gestao/products', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
-    try { res.json(await gestaoGet('products.list') || []); } catch (e: any) { res.status(500).json({ error: e.message }); }
+    try {
+      const pool = await getPool();
+      const [rows] = await pool.execute(
+        `SELECT cp.id, cp.name, cp.slug, cp.category, cp.price, cp.cost_price,
+                cp.is_active, COALESCE(SUM(cv.stock),0) as total_stock
+         FROM catalog_products cp
+         LEFT JOIN catalog_variants cv ON cv.product_id = cp.id
+         GROUP BY cp.id
+         ORDER BY cp.name`
+      );
+      await pool.end();
+      res.json(rows);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
-
   app.patch('/api/admin/gestao/products/:id/stock', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
     try {
-      const { id } = req.params;
       const { stock } = req.body;
-      const { updateGestaoStock: updateStock } = await import('./zunoGestao.js');
-      const ok = await updateStock(parseInt(id), stock);
-      res.json({ ok });
+      const pool = await getPool();
+      await pool.execute(`UPDATE catalog_variants SET stock = ? WHERE product_id = ?`, [parseInt(stock), req.params.id]);
+      await pool.end();
+      res.json({ ok: true });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  // ─── Catalog Products CRUD ────────────────────────────────────────────────────
+  // ─── Validate Coupon (public) ────────────────────────────────────────────────
+  app.post('/api/coupons/validate', async (req, res) => {
+    try {
+      const { code, orderValue } = req.body;
+      const pool = await getPool();
+      const [rows] = await pool.execute(
+        `SELECT * FROM coupons WHERE code = ? AND is_active = 1 AND (expires_at IS NULL OR expires_at > NOW()) AND (max_uses IS NULL OR used_count < max_uses)`,
+        [code?.toUpperCase()]
+      ) as any[];
+      await pool.end();
+      if (!(rows as any[]).length) return res.status(404).json({ error: 'Cupom inválido ou expirado' });
+      const coupon = (rows as any[])[0];
+      if (coupon.min_order_value && orderValue < coupon.min_order_value) {
+        return res.status(400).json({ error: `Pedido mínimo de R$ ${coupon.min_order_value}` });
+      }
+      const discount = coupon.discount_type === 'percentage'
+        ? (orderValue * coupon.discount_value / 100)
+        : coupon.discount_value;
+      res.json({ valid: true, coupon, discount: Math.min(discount, orderValue) });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // ─── Catalog Products CRUD (completo) ────────────────────────────────────────
+
+  // GET /api/admin/catalog/products — lista todos os produtos com variantes
   app.get('/api/admin/catalog/products', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
     try {
-      const { db: catalogDb } = await import('./db/connection.js');
-      const { catalogProducts, catalogVariants } = await import('../drizzle/schema.js');
-      const products = await catalogDb.select().from(catalogProducts).orderBy(catalogProducts.createdAt);
-      const variants = await catalogDb.select().from(catalogVariants);
-      const result = products.map(p => ({
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+      const [products] = await pool.execute(
+        `SELECT * FROM catalog_products ORDER BY created_at DESC`
+      ) as any[];
+      const [variants] = await pool.execute(
+        `SELECT * FROM catalog_variants ORDER BY product_id, id`
+      ) as any[];
+      await pool.end();
+      const result = products.map((p: any) => ({
         ...p,
-        variants: variants.filter(v => v.productId === p.id),
+        images: p.images ? JSON.parse(p.images) : [],
+        tags: p.tags ? JSON.parse(p.tags) : [],
+        variants: variants.filter((v: any) => v.product_id === p.id),
       }));
-      res.json(result);
+      res.json({ products: result });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
+  // GET /api/admin/catalog/products/:id — detalhe de um produto
+  app.get('/api/admin/catalog/products/:id', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+      const [products] = await pool.execute(
+        `SELECT * FROM catalog_products WHERE id = ?`, [req.params.id]
+      ) as any[];
+      if (!products.length) { await pool.end(); return res.status(404).json({ error: 'Produto não encontrado' }); }
+      const [variants] = await pool.execute(
+        `SELECT * FROM catalog_variants WHERE product_id = ? ORDER BY id`, [req.params.id]
+      ) as any[];
+      await pool.end();
+      const p = products[0];
+      res.json({ ...p, images: p.images ? JSON.parse(p.images) : [], tags: p.tags ? JSON.parse(p.tags) : [], variants });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // POST /api/admin/catalog/products — cria produto
   app.post('/api/admin/catalog/products', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
     try {
-      const { db: catalogDb } = await import('./db/connection.js');
-      const { catalogProducts, catalogVariants } = await import('../drizzle/schema.js');
-      const { name, category, description, price, costPrice, imageUrl, isFeatured, variants } = req.body;
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now();
-      const [result] = await catalogDb.insert(catalogProducts).values({
-        name, slug, category: category || 'esportivo', description: description || null,
-        price: price.toString(), costPrice: costPrice?.toString() || null,
-        imageUrl: imageUrl || null, isFeatured: !!isFeatured,
-      });
-      const productId = (result as any).insertId;
-      if (variants && variants.length > 0) {
-        await catalogDb.insert(catalogVariants).values(variants.map((v: any) => ({
-          productId, sku: v.sku, colorName: v.colorName, colorHex: v.colorHex || null,
-          imageUrl: v.imageUrl || null, stock: parseInt(v.stock) || 0,
-          supplierCode: v.supplierCode || null, isActive: v.isActive !== false,
-        })));
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+      const b = req.body;
+      const baseSlug = (b.slug || b.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''));
+      const slug = baseSlug + '-' + Date.now();
+      const [result] = await pool.execute(
+        `INSERT INTO catalog_products (name, slug, category, description, short_description, price, compare_at_price, cost_price,
+          is_active, is_featured, image_url, images, meta_title, meta_description, weight, tags)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          b.name, slug, b.category || 'esportivo',
+          b.description || null, b.shortDescription || null,
+          b.price, b.compareAtPrice || null, b.costPrice || null,
+          b.isActive !== false ? 1 : 0, b.isFeatured ? 1 : 0,
+          b.imageUrl || null,
+          b.images ? JSON.stringify(b.images) : null,
+          b.metaTitle || null, b.metaDescription || null,
+          b.weight || null,
+          b.tags ? JSON.stringify(b.tags) : null,
+        ]
+      ) as any[];
+      const productId = result.insertId;
+      if (b.variants && b.variants.length > 0) {
+        for (const v of b.variants) {
+          const varSku = v.sku || `${baseSlug.substring(0,20)}-${Date.now()}-${Math.random().toString(36).substr(2,4)}`;
+          await pool.execute(
+            `INSERT INTO catalog_variants (product_id, sku, color_name, color_hex, image_url, stock, price, compare_at_price, supplier_code, barcode, weight, is_active)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [productId, varSku, v.colorName, v.colorHex || null, v.imageUrl || null,
+             parseInt(v.stock) || 0, v.price || null, v.compareAtPrice || null,
+             v.supplierCode || null, v.barcode || null, v.weight || null, v.isActive !== false ? 1 : 0]
+          );
+        }
       }
+      await pool.end();
       res.json({ ok: true, productId });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
+  // PUT /api/admin/catalog/products/:id — actualiza produto completo
   app.put('/api/admin/catalog/products/:id', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
     try {
-      const { db: catalogDb } = await import('./db/connection.js');
-      const { catalogProducts, catalogVariants } = await import('../drizzle/schema.js');
-      const { eq } = await import('drizzle-orm');
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
       const id = parseInt(req.params.id);
-      const { name, category, description, price, costPrice, imageUrl, isFeatured, isActive, variants } = req.body;
-      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + id;
-      await catalogDb.update(catalogProducts).set({
-        name, slug, category: category || 'esportivo', description: description || null,
-        price: price.toString(), costPrice: costPrice?.toString() || null,
-        imageUrl: imageUrl || null, isFeatured: !!isFeatured, isActive: isActive !== false,
-      }).where(eq(catalogProducts.id, id));
-      if (variants) {
-        await catalogDb.delete(catalogVariants).where(eq(catalogVariants.productId, id));
-        if (variants.length > 0) {
-          await catalogDb.insert(catalogVariants).values(variants.map((v: any) => ({
-            productId: id, sku: v.sku, colorName: v.colorName, colorHex: v.colorHex || null,
-            imageUrl: v.imageUrl || null, stock: parseInt(v.stock) || 0,
-            supplierCode: v.supplierCode || null, isActive: v.isActive !== false,
-          })));
+      const b = req.body;
+      const [existing] = await pool.execute(`SELECT slug FROM catalog_products WHERE id = ?`, [id]) as any[];
+      const slug = existing[0]?.slug || b.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + id;
+      await pool.execute(
+        `UPDATE catalog_products SET name=?, slug=?, category=?, description=?, short_description=?,
+          price=?, compare_at_price=?, cost_price=?, is_active=?, is_featured=?,
+          image_url=?, images=?, meta_title=?, meta_description=?, weight=?, tags=?
+         WHERE id=?`,
+        [
+          b.name, slug, b.category || 'esportivo',
+          b.description || null, b.shortDescription || null,
+          b.price, b.compareAtPrice || null, b.costPrice || null,
+          b.isActive !== false ? 1 : 0, b.isFeatured ? 1 : 0,
+          b.imageUrl || null,
+          b.images ? JSON.stringify(b.images) : null,
+          b.metaTitle || null, b.metaDescription || null,
+          b.weight || null,
+          b.tags ? JSON.stringify(b.tags) : null,
+          id
+        ]
+      );
+      if (b.variants !== undefined) {
+        const newIds = b.variants.filter((v: any) => v.id).map((v: any) => v.id);
+        if (newIds.length > 0) {
+          await pool.execute(
+            `DELETE FROM catalog_variants WHERE product_id = ? AND id NOT IN (${newIds.map(() => '?').join(',')})`,
+            [id, ...newIds]
+          );
+        } else {
+          await pool.execute(`DELETE FROM catalog_variants WHERE product_id = ?`, [id]);
+        }
+        for (const v of b.variants) {
+          if (v.id) {
+            await pool.execute(
+              `UPDATE catalog_variants SET sku=?, color_name=?, color_hex=?, image_url=?, stock=?,
+                price=?, compare_at_price=?, supplier_code=?, barcode=?, weight=?, is_active=?
+               WHERE id=? AND product_id=?`,
+              [v.sku, v.colorName, v.colorHex || null, v.imageUrl || null,
+               parseInt(v.stock) || 0, v.price || null, v.compareAtPrice || null,
+               v.supplierCode || null, v.barcode || null, v.weight || null,
+               v.isActive !== false ? 1 : 0, v.id, id]
+            );
+          } else {
+            const varSku = v.sku || `var-${id}-${Date.now()}-${Math.random().toString(36).substr(2,4)}`;
+            await pool.execute(
+              `INSERT INTO catalog_variants (product_id, sku, color_name, color_hex, image_url, stock, price, compare_at_price, supplier_code, barcode, weight, is_active)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              [id, varSku, v.colorName, v.colorHex || null, v.imageUrl || null,
+               parseInt(v.stock) || 0, v.price || null, v.compareAtPrice || null,
+               v.supplierCode || null, v.barcode || null, v.weight || null, v.isActive !== false ? 1 : 0]
+            );
+          }
         }
       }
+      await pool.end();
       res.json({ ok: true });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
+  // PATCH /api/admin/catalog/variants/:id/stock — actualiza apenas o estoque de uma variante
+  app.patch('/api/admin/catalog/variants/:id/stock', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+      const { stock } = req.body;
+      await pool.execute(`UPDATE catalog_variants SET stock = ? WHERE id = ?`, [parseInt(stock), req.params.id]);
+      await pool.end();
+      res.json({ ok: true });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // POST /api/admin/catalog/upload-image — upload de imagem para S3
+  app.post('/api/admin/catalog/upload-image', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const { storagePut } = await import('./storage.js');
+      const { imageData, mimeType } = req.body;
+      if (!imageData) return res.status(400).json({ error: 'imageData obrigatório' });
+      const buffer = Buffer.from(imageData.replace(/^data:[^;]+;base64,/, ''), 'base64');
+      const ext = (mimeType || 'image/jpeg').split('/')[1] || 'jpg';
+      const key = `products/${Date.now()}-${Math.random().toString(36).substr(2,8)}.${ext}`;
+      const { url } = await storagePut(key, buffer, mimeType || 'image/jpeg');
+      res.json({ ok: true, url });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // DELETE /api/admin/catalog/products/:id — remove produto
   app.delete('/api/admin/catalog/products/:id', async (req, res) => {
     if (!(await requireAdmin(req, res))) return;
     try {
-      const { db: catalogDb } = await import('./db/connection.js');
-      const { catalogProducts } = await import('../drizzle/schema.js');
-      const { eq } = await import('drizzle-orm');
-      const id = parseInt(req.params.id);
-      await catalogDb.delete(catalogProducts).where(eq(catalogProducts.id, id));
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+      await pool.execute(`DELETE FROM catalog_products WHERE id = ?`, [req.params.id]);
+      await pool.end();
       res.json({ ok: true });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+
+  // ─── Public Catalog API ────────────────────────────────────────────────────
+  app.get('/api/catalog', async (_req, res) => {
+    try {
+      const mysql2 = await import('mysql2/promise');
+      const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+      // Fetch products
+      const [products] = await pool.execute(
+        `SELECT id, name, slug, description, tagline, category, price, compare_at_price,
+                image_url, images, features
+         FROM catalog_products WHERE is_active = 1 ORDER BY name`
+      ) as any[];
+      // Fetch variants separately
+      const [variants] = await pool.execute(
+        `SELECT id, product_id, sku, color_name, color_hex, price, stock, image_url, is_active
+         FROM catalog_variants WHERE is_active = 1`
+      ) as any[];
+      await pool.end();
+      // Map DB categories to frontend categories
+      const categoryMap: Record<string, string> = {
+        'esportivo': 'performance',
+        'casual_masculino': 'lifestyle',
+        'casual_feminino': 'lifestyle',
+        'casual': 'lifestyle',
+        'limited': 'limited',
+        'edicao_limitada': 'limited',
+      };
+      const variantsByProduct: Record<number, any[]> = {};
+      for (const v of variants as any[]) {
+        if (!variantsByProduct[v.product_id]) variantsByProduct[v.product_id] = [];
+        variantsByProduct[v.product_id].push({
+          ...v,
+          color: v.color_hex,
+          colorName: v.color_name,
+        });
+      }
+      const mapped = (products as any[]).map((p: any) => {
+        const parsedImages = (() => { try { return JSON.parse(p.images || '[]'); } catch { return []; } })();
+        const productVariants = variantsByProduct[p.id] || [];
+        const mainImage = parsedImages[0] || p.image_url || productVariants[0]?.image_url || '';
+        return {
+          ...p,
+          id: p.slug, // use slug as id for stock compatibility
+          dbId: p.id,
+          category: categoryMap[p.category] || p.category,
+          image: mainImage,
+          images: parsedImages,
+          features: (() => { try { return JSON.parse(p.features || '[]'); } catch { return []; } })(),
+          variants: productVariants,
+          tagline: p.tagline || '',
+        };
+      });
+      res.json(mapped);
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 

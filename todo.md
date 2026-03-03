@@ -248,3 +248,32 @@
 - [x] Promover luiza@triadeconstrutorabr.com a administradora (pendente: ela precisa fazer login primeiro)
 - [x] Criar sistema de gestão de produtos no painel admin (CRUD completo com nome, SKU, variantes, preço, custo, estoque)
 - [x] Criar página /admin/catalog com CRUD completo de produtos e variantes
+
+## Migração: Eliminar dependência da API ZUNO Gestão
+- [x] Popular BD com os 32 produtos e variantes reais (esportivos + casuais)
+- [x] Substituir /api/stock por consulta à BD local (catalog_variants.stock)
+- [x] Substituir endpoints proxy do ZUNO Gestão por consultas à BD local
+- [x] Actualizar AdminStock para usar BD local
+- [ ] Actualizar AdminCollections para usar BD local
+- [x] Remover zunoGestao.ts e endpoints proxy do servidor
+
+## Migração ZUNO Gestão → BD Local (Fase Actual)
+- [x] Reescrever AdminProducts.tsx para usar /api/admin/stock (BD local)
+- [x] Reescrever AdminStock.tsx para usar /api/admin/stock (BD local)
+- [x] Reescrever AdminFinancial.tsx para usar BD local
+- [x] Reescrever AdminCashflow.tsx para usar BD local
+- [x] Reescrever AdminInvestments.tsx para usar BD local
+- [x] Reescrever AdminPartners.tsx para usar BD local
+- [x] Reescrever AdminDiscounts.tsx para usar BD local (coupons table)
+- [x] Reescrever AdminAffiliates.tsx para usar BD local
+- [x] Remover todos os endpoints /api/admin/gestao/* do server/index.ts (migrados para BD local)
+- [x] Remover server/zunoGestao.ts
+
+## Plataforma E-commerce Completa
+- [x] Endpoint público /api/catalog com 21 produtos e 32 variantes da BD local
+- [x] Categorias mapeadas: esportivo→performance, casual→lifestyle
+- [x] Página /products actualizada para usar /api/catalog (sem arquivo estático)
+- [x] ProductCard compatível com dados da BD (slug como id, image_url, color/colorName)
+- [x] AdminCatalog completo com editor de produtos (fotos, variantes, preços, estoque, SEO)
+- [x] Tabelas BD: investments, partners, coupons, affiliates criadas
+- [x] Estoque actualizado com CSV (32 SKUs correctos)

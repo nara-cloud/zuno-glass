@@ -1,23 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { products, categories as productCategories } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import { Filter, SlidersHorizontal } from 'lucide-react';
 
 export default function Products() {
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredProducts = activeCategory === 'all' 
-    ? products 
-    : products.filter(p => p.category === activeCategory);
+  useEffect(() => {
+    fetch('/api/catalog')
+      .then(r => r.json())
+      .then(d => setAllProducts(Array.isArray(d) ? d : []))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filteredProducts = activeCategory === 'all'
+    ? allProducts
+    : allProducts.filter(p => p.category === activeCategory);
 
   const categories = [
     { id: 'all', label: 'TODOS' },
-    { id: 'performance', label: productCategories.performance.label },
-    { id: 'lifestyle', label: productCategories.lifestyle.label },
-    { id: 'limited', label: productCategories.limited.label },
+    { id: 'performance', label: 'PERFORMANCE' },
+    { id: 'lifestyle', label: 'LIFESTYLE' },
   ];
 
   return (
@@ -66,11 +73,21 @@ export default function Products() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="font-display text-gray-500 text-lg">NENHUM MODELO ENCONTRADO</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </div>
 
       <Footer />

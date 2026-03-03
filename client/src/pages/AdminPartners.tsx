@@ -8,13 +8,16 @@ interface Partner {
   name: string;
   email: string | null;
   phone: string | null;
-  percentage: number;
-  totalInvestment: number;
-  createdAt: string;
+  commission_rate: number;
+  total_sales: number;
+  total_commission: number;
+  is_active: boolean;
+  notes: string | null;
+  created_at: string;
 }
 
-function fmt(cents: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100);
+function fmt(value: number) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value) || 0);
 }
 
 const partnerColors = ['text-primary', 'text-blue-400', 'text-purple-400'];
@@ -31,7 +34,7 @@ export default function AdminPartners() {
       .finally(() => setLoading(false));
   }, []);
 
-  const totalInvested = partners.reduce((s, p) => s + p.totalInvestment, 0);
+  const totalInvested = partners.reduce((s, p) => s + p.total_commission, 0);
 
   return (
     <AdminLayout title="SÓCIOS" subtitle="Gestão de sócios e participações">
@@ -60,18 +63,18 @@ export default function AdminPartners() {
                   </span>
                 </div>
                 <h3 className={`font-display font-bold text-lg ${partnerColors[i % 3]} mb-1`}>{p.name.toUpperCase()}</h3>
-                <p className="font-body text-xs text-gray-500 mb-4">Sócio desde {new Date(p.createdAt).toLocaleDateString('pt-BR')}</p>
+                <p className="font-body text-xs text-gray-500 mb-4">Sócio desde {new Date(p.created_at).toLocaleDateString('pt-BR')}</p>
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="font-body text-xs text-gray-500">Participação</span>
                     <span className={`font-display font-bold text-sm ${partnerColors[i % 3]}`}>
-                      {(p.percentage / 100).toFixed(1)}%
+                      {(p.commission_rate / 100).toFixed(1)}%
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="font-body text-xs text-gray-500">Total Investido</span>
-                    <span className="font-display font-bold text-sm text-white">{fmt(p.totalInvestment)}</span>
+                    <span className="font-display font-bold text-sm text-white">{fmt(p.total_commission)}</span>
                   </div>
                   {p.email && (
                     <div className="flex items-center gap-1.5 mt-3">
@@ -92,7 +95,7 @@ export default function AdminPartners() {
                   <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                     <div
                       className={`h-full ${i === 0 ? 'bg-primary' : i === 1 ? 'bg-blue-400' : 'bg-purple-400'}`}
-                      style={{ width: `${p.percentage / 100}%` }}
+                      style={{ width: `${p.commission_rate / 100}%` }}
                     />
                   </div>
                 </div>
@@ -108,7 +111,7 @@ export default function AdminPartners() {
                 <div className="relative w-32 h-32 flex-shrink-0">
                   <svg viewBox="0 0 32 32" className="w-full h-full -rotate-90">
                     {partners.reduce((acc, p, i) => {
-                      const pct = p.percentage / 100;
+                      const pct = p.commission_rate / 100;
                       const offset = acc.offset;
                       const colors = ['#E9FF00', '#60a5fa', '#a78bfa'];
                       acc.elements.push(
@@ -135,7 +138,7 @@ export default function AdminPartners() {
                       <div key={p.id} className="flex items-center gap-2">
                         <div className={`w-2.5 h-2.5 rounded-full ${dots[i % 3]}`} />
                         <span className="font-body text-xs text-gray-400">{p.name}</span>
-                        <span className={`font-display font-bold text-xs ${colors[i % 3]}`}>{(p.percentage / 100).toFixed(1)}%</span>
+                        <span className={`font-display font-bold text-xs ${colors[i % 3]}`}>{(p.commission_rate / 100).toFixed(1)}%</span>
                       </div>
                     );
                   })}

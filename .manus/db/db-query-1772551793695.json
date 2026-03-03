@@ -1,0 +1,145 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'catalog_products' ORDER BY ORDINAL_POSITION;\nSELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'catalog_variants' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute SELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'catalog_products' ORDER BY ORDINAL_POSITION;\nSELECT COLUMN_NAME, DATA_TYPE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'catalog_variants' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "DATA_TYPE": "bigint",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "name",
+      "DATA_TYPE": "varchar",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "tagline",
+      "DATA_TYPE": "varchar",
+      "COLUMN_DEFAULT": ""
+    },
+    {
+      "COLUMN_NAME": "slug",
+      "DATA_TYPE": "varchar",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "category",
+      "DATA_TYPE": "enum",
+      "COLUMN_DEFAULT": "esportivo"
+    },
+    {
+      "COLUMN_NAME": "description",
+      "DATA_TYPE": "text",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "features",
+      "DATA_TYPE": "text",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "price",
+      "DATA_TYPE": "decimal",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "cost_price",
+      "DATA_TYPE": "decimal",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "is_active",
+      "DATA_TYPE": "tinyint",
+      "COLUMN_DEFAULT": "1"
+    },
+    {
+      "COLUMN_NAME": "is_featured",
+      "DATA_TYPE": "tinyint",
+      "COLUMN_DEFAULT": "0"
+    },
+    {
+      "COLUMN_NAME": "image_url",
+      "DATA_TYPE": "varchar",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "created_at",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_DEFAULT": "CURRENT_TIMESTAMP"
+    },
+    {
+      "COLUMN_NAME": "updated_at",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_DEFAULT": "CURRENT_TIMESTAMP"
+    },
+    {
+      "COLUMN_NAME": "COLUMN_NAME",
+      "DATA_TYPE": "DATA_TYPE",
+      "COLUMN_DEFAULT": "COLUMN_DEFAULT"
+    },
+    {
+      "COLUMN_NAME": "id",
+      "DATA_TYPE": "bigint",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "product_id",
+      "DATA_TYPE": "bigint",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "sku",
+      "DATA_TYPE": "varchar",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "color_name",
+      "DATA_TYPE": "varchar",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "color_hex",
+      "DATA_TYPE": "varchar",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "image_url",
+      "DATA_TYPE": "varchar",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "stock",
+      "DATA_TYPE": "int",
+      "COLUMN_DEFAULT": "0"
+    },
+    {
+      "COLUMN_NAME": "supplier_code",
+      "DATA_TYPE": "varchar",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "cost",
+      "DATA_TYPE": "decimal",
+      "COLUMN_DEFAULT": "0"
+    },
+    {
+      "COLUMN_NAME": "is_active",
+      "DATA_TYPE": "tinyint",
+      "COLUMN_DEFAULT": "1"
+    },
+    {
+      "COLUMN_NAME": "created_at",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_DEFAULT": "CURRENT_TIMESTAMP"
+    },
+    {
+      "COLUMN_NAME": "updated_at",
+      "DATA_TYPE": "timestamp",
+      "COLUMN_DEFAULT": "CURRENT_TIMESTAMP"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\tCOLUMN_DEFAULT\nid\tbigint\tNULL\nname\tvarchar\tNULL\ntagline\tvarchar\t\nslug\tvarchar\tNULL\ncategory\tenum\tesportivo\ndescription\ttext\tNULL\nfeatures\ttext\tNULL\nprice\tdecimal\tNULL\ncost_price\tdecimal\tNULL\nis_active\ttinyint\t1\nis_featured\ttinyint\t0\nimage_url\tvarchar\tNULL\ncreated_at\ttimestamp\tCURRENT_TIMESTAMP\nupdated_at\ttimestamp\tCURRENT_TIMESTAMP\nCOLUMN_NAME\tDATA_TYPE\tCOLUMN_DEFAULT\nid\tbigint\tNULL\nproduct_id\tbigint\tNULL\nsku\tvarchar\tNULL\ncolor_name\tvarchar\tNULL\ncolor_hex\tvarchar\tNULL\nimage_url\tvarchar\tNULL\nstock\tint\t0\nsupplier_code\tvarchar\tNULL\ncost\tdecimal\t0\nis_active\ttinyint\t1\ncreated_at\ttimestamp\tCURRENT_TIMESTAMP\nupdated_at\ttimestamp\tCURRENT_TIMESTAMP\n",
+  "stderr": "",
+  "execution_time_ms": 423
+}

@@ -141,18 +141,31 @@ export const adminSessions = mysqlTable('admin_sessions', {
   expiresAt: timestamp('expires_at').notNull(),
 });
 
-// ─── Catalog Products ────────────────────────────────────────────────────────────
+// ─── Catalog Products ──────// ─── Catalog Products ──────────────────────────────────────────────
 export const catalogProducts = mysqlTable('catalog_products', {
   id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
   name: varchar('name', { length: 200 }).notNull(),
   slug: varchar('slug', { length: 200 }).notNull().unique(),
   category: mysqlEnum('category', ['esportivo', 'casual_masculino', 'casual_feminino', 'edicao_limitada']).notNull().default('esportivo'),
   description: text('description'),
+  shortDescription: varchar('short_description', { length: 500 }),
+  // Pricing
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  compareAtPrice: decimal('compare_at_price', { precision: 10, scale: 2 }),
   costPrice: decimal('cost_price', { precision: 10, scale: 2 }),
+  // Status
   isActive: boolean('is_active').notNull().default(true),
   isFeatured: boolean('is_featured').notNull().default(false),
+  // Images (JSON array of URLs)
   imageUrl: varchar('image_url', { length: 500 }),
+  images: text('images'), // JSON array of image URLs
+  // SEO
+  metaTitle: varchar('meta_title', { length: 200 }),
+  metaDescription: varchar('meta_description', { length: 500 }),
+  // Physical attributes
+  weight: decimal('weight', { precision: 8, scale: 3 }),
+  // Tags
+  tags: text('tags'), // JSON array of tags
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 }, (table) => ({
@@ -160,7 +173,7 @@ export const catalogProducts = mysqlTable('catalog_products', {
   categoryIdx: index('catalog_products_category_idx').on(table.category),
 }));
 
-// ─── Catalog Variants ─────────────────────────────────────────────────────────
+// ─── Catalog Variants ─────────────────────────────────────────────
 export const catalogVariants = mysqlTable('catalog_variants', {
   id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
   productId: bigint('product_id', { mode: 'number' }).notNull().references(() => catalogProducts.id, { onDelete: 'cascade' }),
@@ -169,7 +182,11 @@ export const catalogVariants = mysqlTable('catalog_variants', {
   colorHex: varchar('color_hex', { length: 20 }),
   imageUrl: varchar('image_url', { length: 500 }),
   stock: int('stock').notNull().default(0),
+  price: decimal('price', { precision: 10, scale: 2 }),
+  compareAtPrice: decimal('compare_at_price', { precision: 10, scale: 2 }),
   supplierCode: varchar('supplier_code', { length: 100 }),
+  barcode: varchar('barcode', { length: 100 }),
+  weight: decimal('weight', { precision: 8, scale: 3 }),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
@@ -177,6 +194,58 @@ export const catalogVariants = mysqlTable('catalog_variants', {
   productIdIdx: index('catalog_variants_product_idx').on(table.productId),
   skuIdx: index('catalog_variants_sku_idx').on(table.sku),
 }));
+
+// ─── Investments ───────────────────────────────────────────────────────────────
+export const investments = mysqlTable('investments', {
+  id: int('id').primaryKey().autoincrement(),
+  description: varchar('description', { length: 500 }).notNull(),
+  amount: decimal('amount', { precision: 12, scale: 2 }).notNull(),
+  category: varchar('category', { length: 100 }).notNull().default('geral'),
+  date: varchar('date', { length: 20 }).notNull(),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+// ─── Partners ───────────────────────────────────────────────────────────────────
+export const partners = mysqlTable('partners', {
+  id: int('id').primaryKey().autoincrement(),
+  name: varchar('name', { length: 200 }).notNull(),
+  email: varchar('email', { length: 200 }),
+  phone: varchar('phone', { length: 50 }),
+  commissionRate: decimal('commission_rate', { precision: 5, scale: 2 }).notNull().default('0.00'),
+  totalSales: int('total_sales').notNull().default(0),
+  totalCommission: decimal('total_commission', { precision: 12, scale: 2 }).notNull().default('0.00'),
+  isActive: boolean('is_active').notNull().default(true),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+// ─── Coupons ────────────────────────────────────────────────────────────────────
+export const coupons = mysqlTable('coupons', {
+  id: int('id').primaryKey().autoincrement(),
+  code: varchar('code', { length: 50 }).notNull().unique(),
+  discountType: varchar('discount_type', { length: 20 }).notNull().default('percentage'),
+  discountValue: decimal('discount_value', { precision: 10, scale: 2 }).notNull(),
+  minOrderValue: decimal('min_order_value', { precision: 10, scale: 2 }),
+  maxUses: int('max_uses'),
+  usedCount: int('used_count').notNull().default(0),
+  expiresAt: timestamp('expires_at'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+// ─── Affiliates ──────────────────────────────────────────────────────────────────
+export const affiliates = mysqlTable('affiliates', {
+  id: int('id').primaryKey().autoincrement(),
+  name: varchar('name', { length: 200 }).notNull(),
+  email: varchar('email', { length: 200 }).notNull(),
+  code: varchar('code', { length: 50 }).notNull().unique(),
+  commissionRate: decimal('commission_rate', { precision: 5, scale: 2 }).notNull().default('10.00'),
+  totalSales: int('total_sales').notNull().default(0),
+  totalEarnings: decimal('total_earnings', { precision: 12, scale: 2 }).notNull().default('0.00'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
 
 // ─── Auto-promote admin emails ─────────────────────────────────────────────────
 export const adminEmails = mysqlTable('admin_emails', {
