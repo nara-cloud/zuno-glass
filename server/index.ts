@@ -463,9 +463,27 @@ async function startServer() {
       if (!items || !payer?.email) {
         return res.status(400).json({ error: "items e payer.email são obrigatórios" });
       }
+      const { getProductById } = await import("../shared/products.js");
+      // Convert items with productId to MP format
+      const mpItems = items.map((item: any) => {
+        if (item.productId) {
+          const product = getProductById(item.productId);
+          if (!product) return null;
+          return {
+            id: item.productId,
+            title: `ZUNO GLASS — ${product.name}${item.variantColor ? ` (${item.variantColor})` : ''}`,
+            quantity: item.quantity || 1,
+            unit_price: item.unit_price || product.price,
+          };
+        }
+        return item; // already in MP format
+      }).filter(Boolean);
+      if (mpItems.length === 0) {
+        return res.status(400).json({ error: "No valid products found" });
+      }
       const { createPixPayment } = await import("./mercadopago.js");
       const result = await createPixPayment({
-        items,
+        items: mpItems,
         payer,
         address,
         externalReference,
@@ -488,9 +506,26 @@ async function startServer() {
       if (!address?.zip_code || !address?.street_name) {
         return res.status(400).json({ error: "Endereço completo é obrigatório para boleto" });
       }
+      const { getProductById } = await import("../shared/products.js");
+      const mpItems = items.map((item: any) => {
+        if (item.productId) {
+          const product = getProductById(item.productId);
+          if (!product) return null;
+          return {
+            id: item.productId,
+            title: `ZUNO GLASS — ${product.name}${item.variantColor ? ` (${item.variantColor})` : ''}`,
+            quantity: item.quantity || 1,
+            unit_price: item.unit_price || product.price,
+          };
+        }
+        return item;
+      }).filter(Boolean);
+      if (mpItems.length === 0) {
+        return res.status(400).json({ error: "No valid products found" });
+      }
       const { createBoletoPayment } = await import("./mercadopago.js");
       const result = await createBoletoPayment({
-        items,
+        items: mpItems,
         payer,
         address,
         externalReference,

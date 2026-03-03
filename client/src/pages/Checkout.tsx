@@ -144,10 +144,9 @@ export default function Checkout() {
   }, [items.length]);
 
   const buildItems = () => items.map(item => ({
-    id: item.productId,
-    title: `ZUNO ${item.name}${item.variantColorName ? ` — ${item.variantColorName}` : ''}`,
+    productId: item.productId,
+    variantColor: item.variantColorName || item.variantColor,
     quantity: item.quantity,
-    unit_price: item.price,
   }));
 
   const buildExternalRef = () =>
@@ -164,7 +163,12 @@ export default function Checkout() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: buildItems().map(i => ({ ...i, unit_price: paymentMethod === 'pix' ? i.unit_price * 0.95 : i.unit_price })),
+          items: items.map(item => ({
+            productId: item.productId,
+            variantColor: item.variantColorName || item.variantColor,
+            quantity: item.quantity,
+            unit_price: paymentMethod === 'pix' ? item.price * 0.95 : item.price,
+          })),
           payer: {
             email: payer.email,
             first_name: payer.firstName || undefined,

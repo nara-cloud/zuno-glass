@@ -1,0 +1,8 @@
+{
+  "query": "SELECT name, image_url FROM products WHERE name LIKE '%ORVIK%' OR name LIKE '%VENZA%' OR name LIKE '%KAORI%' OR name LIKE '%INFINITY%'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute SELECT name, image_url FROM products WHERE name LIKE '%ORVIK%' OR name LIKE '%VENZA%' OR name LIKE '%KAORI%' OR name LIKE '%INFINITY%'",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'nenrjrdsdns42xqatpd6gp.products' doesn't exist"
+  ]
+}

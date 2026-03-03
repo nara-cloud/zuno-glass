@@ -80,10 +80,9 @@ export default function CartDrawer() {
     setIsCheckingOut(true);
     try {
       const checkoutItems = items.map(item => ({
-        title: `${item.name} — ${item.variantColorName}`,
+        productId: item.productId,
+        variantColor: item.variantColorName || item.variantColor,
         quantity: item.quantity,
-        unit_price: item.price,
-        currency_id: 'BRL',
       }));
       const res = await fetch('/api/checkout', {
         method: 'POST',

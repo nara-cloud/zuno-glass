@@ -356,3 +356,7 @@
 - [x] BUG: Produtos não carregam no mobile - card inteiro agora é clicável
 - [ ] Verificar se todas as fotos enviadas foram atualizadas no banco
 - [x] Publicação urgente - lançamento 03/03/2026
+- [x] Corrigir erro checkout "No valid products found" (CartDrawer e Checkout.tsx enviavam title/unit_price em vez de productId)
+- [x] Corrigir endpoints PIX e Boleto para converter productId em items MP
+- [x] Atualizar imagens KAORI, ORVIK, VENZA no banco de dados (URLs corrompidas)
+- [ ] Atualizar imagem INFINITY X ROSE (foto original enviada é de outro produto - aguardando foto correta)
