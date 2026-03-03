@@ -141,10 +141,10 @@ export const products: Product[] = [
     price: 169.90,
     description: 'Perfil arredondado com personalidade forte. Transição perfeita do treino para a rua.',
     features: ['Transição Treino-Rua', 'Lentes Anti-reflexo', 'Armação Flexível', 'Estojo Incluído'],
-    image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/aksfQZUeelZUqYTB.webp',
+    image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/kaori_preto_1081eba1.webp',
     category: 'lifestyle',
     variants: [
-      { color: '#000000', colorName: 'Preto', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/aksfQZUeelZUqYTB.webp' },
+      { color: '#000000', colorName: 'Preto', image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/kaori_preto_1081eba1.webp' },
     ],
   },
   {
@@ -158,7 +158,7 @@ export const products: Product[] = [
     category: 'lifestyle',
     variants: [
       { color: '#2563eb', colorName: 'Azul', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/eWxVKgFdRqPppKgV.webp' },
-      { color: '#1a1a1a', colorName: 'Preto Degradê / Branco', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/rMjNHyklnEYtsqXg.webp' },
+      { color: '#1a1a1a', colorName: 'Preto Degradê / Branco', image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/venza_preto_degrade_branco_28a78fed.webp' },
     ],
   },
   {
@@ -233,10 +233,10 @@ export const products: Product[] = [
     price: 169.90,
     description: 'Formato hexagonal icónico com lentes degradê. Para quem vê o mundo de um ângulo diferente.',
     features: ['Formato Hexagonal', 'Lentes Marrom Degradê', 'Armação Metal', 'Design Icónico'],
-    image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OycOdSoWVVpWpNvg.webp',
+    image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/orvik_marrom_degrade_e68774c3.webp',
     category: 'lifestyle',
     variants: [
-      { color: '#854d0e', colorName: 'Marrom Degradê', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/OycOdSoWVVpWpNvg.webp' },
+      { color: '#854d0e', colorName: 'Marrom Degradê', image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/orvik_marrom_degrade_e68774c3.webp' },
     ],
   },
 
@@ -308,7 +308,7 @@ export const products: Product[] = [
     variants: [
       { color: '#b8860b', colorName: 'Preto Dourado', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/sLqDplNhTucIsqbF.webp' },
       { color: '#854d0e', colorName: 'Marrom Degradê / Preto', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/bEXoVbxaSLthStpz.webp' },
-      { color: '#f4a6c0', colorName: 'Marrom Degradê / Rosé', image: 'https://files.manuscdn.com/user_upload_by_module/session_file/310519663210798515/BpYhqeRqkzblMwLh.webp' },
+      { color: '#f4a6c0', colorName: 'Marrom Degradê / Rosé', image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/infinity_x_marrom_degrade_rose_29b1741b.webp' },
     ],
     isNew: true,
   },
