@@ -141,6 +141,50 @@ export const adminSessions = mysqlTable('admin_sessions', {
   expiresAt: timestamp('expires_at').notNull(),
 });
 
+// ─── Catalog Products ────────────────────────────────────────────────────────────
+export const catalogProducts = mysqlTable('catalog_products', {
+  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
+  name: varchar('name', { length: 200 }).notNull(),
+  slug: varchar('slug', { length: 200 }).notNull().unique(),
+  category: mysqlEnum('category', ['esportivo', 'casual_masculino', 'casual_feminino', 'edicao_limitada']).notNull().default('esportivo'),
+  description: text('description'),
+  price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  costPrice: decimal('cost_price', { precision: 10, scale: 2 }),
+  isActive: boolean('is_active').notNull().default(true),
+  isFeatured: boolean('is_featured').notNull().default(false),
+  imageUrl: varchar('image_url', { length: 500 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+}, (table) => ({
+  slugIdx: index('catalog_products_slug_idx').on(table.slug),
+  categoryIdx: index('catalog_products_category_idx').on(table.category),
+}));
+
+// ─── Catalog Variants ─────────────────────────────────────────────────────────
+export const catalogVariants = mysqlTable('catalog_variants', {
+  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
+  productId: bigint('product_id', { mode: 'number' }).notNull().references(() => catalogProducts.id, { onDelete: 'cascade' }),
+  sku: varchar('sku', { length: 100 }).notNull().unique(),
+  colorName: varchar('color_name', { length: 100 }).notNull(),
+  colorHex: varchar('color_hex', { length: 20 }),
+  imageUrl: varchar('image_url', { length: 500 }),
+  stock: int('stock').notNull().default(0),
+  supplierCode: varchar('supplier_code', { length: 100 }),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+}, (table) => ({
+  productIdIdx: index('catalog_variants_product_idx').on(table.productId),
+  skuIdx: index('catalog_variants_sku_idx').on(table.sku),
+}));
+
+// ─── Auto-promote admin emails ─────────────────────────────────────────────────
+export const adminEmails = mysqlTable('admin_emails', {
+  id: int('id').primaryKey().autoincrement(),
+  email: varchar('email', { length: 200 }).notNull().unique(),
+  addedAt: timestamp('added_at').notNull().defaultNow(),
+});
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -151,3 +195,7 @@ export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 export type OrderItem = typeof orderItems.$inferSelect;
 export type NewOrderItem = typeof orderItems.$inferInsert;
+export type CatalogProduct = typeof catalogProducts.$inferSelect;
+export type NewCatalogProduct = typeof catalogProducts.$inferInsert;
+export type CatalogVariant = typeof catalogVariants.$inferSelect;
+export type NewCatalogVariant = typeof catalogVariants.$inferInsert;

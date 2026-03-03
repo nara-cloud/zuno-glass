@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import {
   LayoutDashboard, Package, BarChart3, Boxes,
-  LogOut, Menu, X, Store, ChevronRight, ShieldCheck, Users, Tag,
+  LogOut, Menu, X, Store, ChevronRight, ShieldCheck, Users, Tag, BookOpen,
   DollarSign, TrendingUp, Wallet, PiggyBank, CreditCard,
   Percent, UserCheck, Bot, Target, LineChart, Handshake,
   Settings, Plug, FolderOpen, ChevronDown, ChevronUp,
@@ -32,6 +32,7 @@ const navGroups: NavGroup[] = [
     label: 'GESTÃO',
     items: [
       { href: '/admin/orders', label: 'Pedidos', icon: Package },
+      { href: '/admin/catalog', label: 'Catálogo', icon: BookOpen },
       { href: '/admin/products', label: 'Produtos', icon: Tag },
       { href: '/admin/stock', label: 'Estoque', icon: Boxes },
       { href: '/admin/clients', label: 'Clientes', icon: Users },

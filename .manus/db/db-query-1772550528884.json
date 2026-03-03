@@ -1,0 +1,94 @@
+{
+  "query": "SELECT COLUMN_NAME, COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = 'users' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute SELECT COLUMN_NAME, COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = 'users' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "COLUMN_TYPE": "bigint"
+    },
+    {
+      "COLUMN_NAME": "name",
+      "COLUMN_TYPE": "varchar(120)"
+    },
+    {
+      "COLUMN_NAME": "email",
+      "COLUMN_TYPE": "varchar(200)"
+    },
+    {
+      "COLUMN_NAME": "password_hash",
+      "COLUMN_TYPE": "varchar(200)"
+    },
+    {
+      "COLUMN_NAME": "phone",
+      "COLUMN_TYPE": "varchar(30)"
+    },
+    {
+      "COLUMN_NAME": "cpf",
+      "COLUMN_TYPE": "varchar(20)"
+    },
+    {
+      "COLUMN_NAME": "avatar_url",
+      "COLUMN_TYPE": "varchar(500)"
+    },
+    {
+      "COLUMN_NAME": "address_zip",
+      "COLUMN_TYPE": "varchar(10)"
+    },
+    {
+      "COLUMN_NAME": "address_street",
+      "COLUMN_TYPE": "varchar(200)"
+    },
+    {
+      "COLUMN_NAME": "address_number",
+      "COLUMN_TYPE": "varchar(20)"
+    },
+    {
+      "COLUMN_NAME": "address_complement",
+      "COLUMN_TYPE": "varchar(100)"
+    },
+    {
+      "COLUMN_NAME": "address_neighborhood",
+      "COLUMN_TYPE": "varchar(100)"
+    },
+    {
+      "COLUMN_NAME": "address_city",
+      "COLUMN_TYPE": "varchar(100)"
+    },
+    {
+      "COLUMN_NAME": "address_state",
+      "COLUMN_TYPE": "varchar(2)"
+    },
+    {
+      "COLUMN_NAME": "is_active",
+      "COLUMN_TYPE": "tinyint(1)"
+    },
+    {
+      "COLUMN_NAME": "email_verified",
+      "COLUMN_TYPE": "tinyint(1)"
+    },
+    {
+      "COLUMN_NAME": "reset_token",
+      "COLUMN_TYPE": "varchar(200)"
+    },
+    {
+      "COLUMN_NAME": "reset_token_expires_at",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "created_at",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "updated_at",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "last_login_at",
+      "COLUMN_TYPE": "timestamp"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tCOLUMN_TYPE\nid\tbigint\nname\tvarchar(120)\nemail\tvarchar(200)\npassword_hash\tvarchar(200)\nphone\tvarchar(30)\ncpf\tvarchar(20)\navatar_url\tvarchar(500)\naddress_zip\tvarchar(10)\naddress_street\tvarchar(200)\naddress_number\tvarchar(20)\naddress_complement\tvarchar(100)\naddress_neighborhood\tvarchar(100)\naddress_city\tvarchar(100)\naddress_state\tvarchar(2)\nis_active\ttinyint(1)\nemail_verified\ttinyint(1)\nreset_token\tvarchar(200)\nreset_token_expires_at\ttimestamp\ncreated_at\ttimestamp\nupdated_at\ttimestamp\nlast_login_at\ttimestamp\n",
+  "stderr": "",
+  "execution_time_ms": 371
+}

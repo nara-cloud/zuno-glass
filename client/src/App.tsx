@@ -42,6 +42,7 @@ import AdminClients from "./pages/AdminClients";
 import AdminCollections from "./pages/AdminCollections";
 import AdminCashflow from "./pages/AdminCashflow";
 import AdminPermissions from "./pages/AdminPermissions";
+import AdminCatalog from "./pages/AdminCatalog";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MinhaConta from "./pages/MinhaConta";
@@ -89,6 +90,7 @@ function Router() {
       <Route path={"/admin/collections"} component={AdminCollections} />
       <Route path={"/admin/cashflow"} component={AdminCashflow} />
       <Route path={"/admin/permissions"} component={AdminPermissions} />
+      <Route path={"/admin/catalog"} component={AdminCatalog} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

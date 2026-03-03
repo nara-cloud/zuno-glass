@@ -50,7 +50,7 @@ export default function Home() {
         </div>
 
         {/* Hero Content - left side, below navbar */}
-        <div className="container relative z-20 pt-44 md:pt-48">
+        <div className="container relative z-20 pt-20">
           <div className="max-w-xl">
             <p className="font-display text-primary text-sm md:text-base tracking-[0.4em] uppercase mb-4 animate-in-up">Para quem vive</p>
             <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl leading-[0.9] text-white mb-8 animate-in-up delay-100">

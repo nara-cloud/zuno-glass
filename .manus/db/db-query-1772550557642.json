@@ -1,0 +1,14 @@
+{
+  "query": "SELECT id, name FROM roles WHERE name = 'admin';\nSELECT id, email, name FROM users WHERE email = 'luiza@triadeconstrutorabr.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user EFQWm3YEjZYnEtW.efc9f3c7dfef --database NenRJRDsdnS42xQATPd6GP --execute SELECT id, name FROM roles WHERE name = 'admin';\nSELECT id, email, name FROM users WHERE email = 'luiza@triadeconstrutorabr.com';",
+  "rows": [
+    {
+      "id": "1",
+      "name": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n1\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 438
+}

@@ -243,3 +243,8 @@
 - [x] Popup de newsletter reactivado na homepage
 - [x] Linha "Para quem vive" adicionada acima de "LIMITE" na hero
 - [x] Promoção de nara@triadeconstrutorabr.com a administrador
+- [ ] Corrigir estoque/coleções: puxar dados reais da aba Coleções da API ZUNO Gestão
+- [x] Hero: afastar "PARA QUEM VIVE" do cabeçalho e corrigir proporções do título
+- [x] Promover luiza@triadeconstrutorabr.com a administradora (pendente: ela precisa fazer login primeiro)
+- [x] Criar sistema de gestão de produtos no painel admin (CRUD completo com nome, SKU, variantes, preço, custo, estoque)
+- [x] Criar página /admin/catalog com CRUD completo de produtos e variantes

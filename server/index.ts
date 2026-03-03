@@ -1011,6 +1011,86 @@ async function startServer() {
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
+  // ─── Catalog Products CRUD ────────────────────────────────────────────────────
+  app.get('/api/admin/catalog/products', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const { db: catalogDb } = await import('./db/connection.js');
+      const { catalogProducts, catalogVariants } = await import('../drizzle/schema.js');
+      const products = await catalogDb.select().from(catalogProducts).orderBy(catalogProducts.createdAt);
+      const variants = await catalogDb.select().from(catalogVariants);
+      const result = products.map(p => ({
+        ...p,
+        variants: variants.filter(v => v.productId === p.id),
+      }));
+      res.json(result);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.post('/api/admin/catalog/products', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const { db: catalogDb } = await import('./db/connection.js');
+      const { catalogProducts, catalogVariants } = await import('../drizzle/schema.js');
+      const { name, category, description, price, costPrice, imageUrl, isFeatured, variants } = req.body;
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now();
+      const [result] = await catalogDb.insert(catalogProducts).values({
+        name, slug, category: category || 'esportivo', description: description || null,
+        price: price.toString(), costPrice: costPrice?.toString() || null,
+        imageUrl: imageUrl || null, isFeatured: !!isFeatured,
+      });
+      const productId = (result as any).insertId;
+      if (variants && variants.length > 0) {
+        await catalogDb.insert(catalogVariants).values(variants.map((v: any) => ({
+          productId, sku: v.sku, colorName: v.colorName, colorHex: v.colorHex || null,
+          imageUrl: v.imageUrl || null, stock: parseInt(v.stock) || 0,
+          supplierCode: v.supplierCode || null, isActive: v.isActive !== false,
+        })));
+      }
+      res.json({ ok: true, productId });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.put('/api/admin/catalog/products/:id', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const { db: catalogDb } = await import('./db/connection.js');
+      const { catalogProducts, catalogVariants } = await import('../drizzle/schema.js');
+      const { eq } = await import('drizzle-orm');
+      const id = parseInt(req.params.id);
+      const { name, category, description, price, costPrice, imageUrl, isFeatured, isActive, variants } = req.body;
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + id;
+      await catalogDb.update(catalogProducts).set({
+        name, slug, category: category || 'esportivo', description: description || null,
+        price: price.toString(), costPrice: costPrice?.toString() || null,
+        imageUrl: imageUrl || null, isFeatured: !!isFeatured, isActive: isActive !== false,
+      }).where(eq(catalogProducts.id, id));
+      if (variants) {
+        await catalogDb.delete(catalogVariants).where(eq(catalogVariants.productId, id));
+        if (variants.length > 0) {
+          await catalogDb.insert(catalogVariants).values(variants.map((v: any) => ({
+            productId: id, sku: v.sku, colorName: v.colorName, colorHex: v.colorHex || null,
+            imageUrl: v.imageUrl || null, stock: parseInt(v.stock) || 0,
+            supplierCode: v.supplierCode || null, isActive: v.isActive !== false,
+          })));
+        }
+      }
+      res.json({ ok: true });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.delete('/api/admin/catalog/products/:id', async (req, res) => {
+    if (!(await requireAdmin(req, res))) return;
+    try {
+      const { db: catalogDb } = await import('./db/connection.js');
+      const { catalogProducts } = await import('../drizzle/schema.js');
+      const { eq } = await import('drizzle-orm');
+      const id = parseInt(req.params.id);
+      await catalogDb.delete(catalogProducts).where(eq(catalogProducts.id, id));
+      res.json({ ok: true });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
   // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"
