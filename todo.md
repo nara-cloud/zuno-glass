@@ -142,3 +142,4 @@
 - [x] Página de confirmação de pedido: endpoint para buscar detalhes do pedido
 - [x] Página de confirmação de pedido: layout com número do pedido e rastreamento
 - [x] Página de confirmação de pedido: integrar com checkout Stripe
+- [x] Corrigir favicon: ainda não está a aparecer no browser
