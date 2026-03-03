@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, X, LogIn, User, LogOut } from 'lucide-react';
+import { Menu, X, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/hooks/useAuth';
-import { getLoginUrl } from '@/const';
+import { useAuthContext } from '@/contexts/AuthContext';
+
+const LOGO_URL = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/logo-zuno-transparent_e9130bfd.png';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
   const { totalItems, openCart } = useCart();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuthContext();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,7 +40,11 @@ export default function Navbar() {
       <div className="container flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-            <img src="/images/logo-zuno.png" alt="ZUNO GLASS" className="h-14 md:h-16 w-auto object-contain brightness-0 invert" />
+          <img
+            src={LOGO_URL}
+            alt="ZUNO GLASS"
+            className="h-14 md:h-16 w-auto object-contain"
+          />
         </Link>
 
         {/* Desktop Nav */}
@@ -52,10 +57,10 @@ export default function Navbar() {
                 location === link.path ? 'text-primary' : 'text-white'
               }`}
             >
-                {link.name}
-                <span className={`absolute -bottom-1 left-0 w-full h-[2px] bg-primary transform origin-left transition-transform duration-300 ${
-                  location === link.path ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                }`}></span>
+              {link.name}
+              <span className={`absolute -bottom-1 left-0 w-full h-[2px] bg-primary transform origin-left transition-transform duration-300 ${
+                location === link.path ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+              }`}></span>
             </Link>
           ))}
         </div>
@@ -64,7 +69,11 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
-              <span className="font-body text-xs text-gray-400 hidden lg:block">{user?.name?.split(' ')[0]}</span>
+              <Link href="/minha-conta">
+                <span className="font-body text-xs text-gray-300 hidden lg:block hover:text-white transition-colors cursor-pointer">
+                  {user?.name?.split(' ')[0]}
+                </span>
+              </Link>
               <button
                 onClick={logout}
                 className="flex items-center gap-1.5 font-display font-bold text-xs tracking-wider text-gray-400 hover:text-white transition-colors px-3 py-1.5 border border-white/10 hover:border-white/30"
@@ -75,12 +84,12 @@ export default function Navbar() {
               </button>
             </div>
           ) : (
-            <a href={getLoginUrl()}>
+            <Link href="/entrar">
               <Button variant="outline" size="sm" className="border-white/30 text-white hover:bg-white hover:text-black font-display font-bold text-xs tracking-wider gap-1.5">
                 <LogIn className="w-3.5 h-3.5" />
                 ENTRAR
               </Button>
-            </a>
+            </Link>
           )}
           <Link href="/try-on">
             <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary hover:text-black font-display font-bold text-xs tracking-wider">
@@ -91,7 +100,6 @@ export default function Navbar() {
 
         {/* Mobile Actions */}
         <div className="flex md:hidden items-center gap-2">
-          {/* Mobile Toggle */}
           <button 
             className="text-white hover:text-primary transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -112,7 +120,7 @@ export default function Navbar() {
             className="font-display font-bold text-3xl text-white hover:text-primary hover:italic transition-all"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-              {link.name}
+            {link.name}
           </Link>
         ))}
         <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)}>
@@ -126,20 +134,27 @@ export default function Navbar() {
           </Button>
         </Link>
         {isAuthenticated ? (
-          <button
-            onClick={() => { logout(); setIsMobileMenuOpen(false); }}
-            className="font-display font-bold text-xl text-gray-400 hover:text-white transition-all flex items-center gap-2"
-          >
-            <LogOut className="w-5 h-5" />
-            SAIR
-          </button>
+          <>
+            <Link href="/minha-conta" onClick={() => setIsMobileMenuOpen(false)}>
+              <span className="font-display font-bold text-2xl text-white hover:text-primary transition-all">
+                MINHA CONTA
+              </span>
+            </Link>
+            <button
+              onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+              className="font-display font-bold text-xl text-gray-400 hover:text-white transition-all flex items-center gap-2"
+            >
+              <LogOut className="w-5 h-5" />
+              SAIR
+            </button>
+          </>
         ) : (
-          <a href={getLoginUrl()} onClick={() => setIsMobileMenuOpen(false)}>
+          <Link href="/entrar" onClick={() => setIsMobileMenuOpen(false)}>
             <span className="font-display font-bold text-3xl text-white hover:text-primary hover:italic transition-all flex items-center gap-2">
               <LogIn className="w-7 h-7" />
               ENTRAR
             </span>
-          </a>
+          </Link>
         )}
       </div>
     </nav>

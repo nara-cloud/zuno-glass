@@ -2,8 +2,9 @@ import { Link } from 'wouter';
 import { Instagram, Facebook, ArrowRight, Lock, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/hooks/useAuth';
-import { getLoginUrl } from '@/const';
+import { useAuthContext } from '@/contexts/AuthContext';
+
+const LOGO_URL = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663210798515/NenRJRDsdnS42xQATPd6GP/logo-zuno-transparent_e9130bfd.png';
 
 // Custom TikTok icon (not available in lucide-react)
 function TikTokIcon({ className }: { className?: string }) {
@@ -31,11 +32,11 @@ const socialLinks = [
 ];
 
 function AdminFooterButton() {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated, hasRole } = useAuthContext();
 
   if (loading) return null;
 
-  const hasAdminAccess = isAuthenticated && (user?.role === 'admin' || user?.role === 'manager');
+  const hasAdminAccess = isAuthenticated && (hasRole('admin') || hasRole('ops'));
 
   if (hasAdminAccess) {
     return (
@@ -49,13 +50,12 @@ function AdminFooterButton() {
   }
 
   return (
-    <a
-      href={getLoginUrl()}
-      className="flex items-center gap-1.5 font-body text-gray-600 text-sm hover:text-primary transition-colors group"
-    >
-      <Lock className="w-3.5 h-3.5 group-hover:text-primary transition-colors" />
-      <span>ACESSO RESTRITO</span>
-    </a>
+    <Link href="/entrar">
+      <span className="flex items-center gap-1.5 font-body text-gray-600 text-sm hover:text-primary transition-colors group cursor-pointer">
+        <Lock className="w-3.5 h-3.5 group-hover:text-primary transition-colors" />
+        <span>ACESSO RESTRITO</span>
+      </span>
+    </Link>
   );
 }
 
@@ -72,7 +72,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="md:col-span-4 flex flex-col gap-6">
             <div className="flex items-center gap-2">
-              <img src="/images/logo-zuno.png" alt="ZUNO GLASS" className="h-20 w-auto object-contain brightness-0 invert" />
+              <img src={LOGO_URL} alt="ZUNO GLASS" className="h-20 w-auto object-contain" />
             </div>
             <p className="font-body text-gray-400 max-w-xs text-lg leading-relaxed">
               PARA QUEM VIVE NO LIMITE DA LUZ.

@@ -192,3 +192,5 @@
 - [ ] E-mail transacional: template HTML de confirmação de pedido
 - [ ] E-mail transacional: disparar após pagamento confirmado (MP + Stripe)
 - [x] Try-On Virtual: atualizar página para exibir tela "Em Desenvolvimento"
+- [x] Atualizar logo: remover fundo preto, gerar PNG transparente, atualizar site e favicon
+- [x] Corrigir Navbar: botão ENTRAR usar login próprio (sem Manus OAuth)
