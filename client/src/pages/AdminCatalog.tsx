@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -90,7 +91,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   edicao_limitada: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
 };
 
-async function uploadImage(file: File): Promise<string> {
+async function uploadImage(file: File, authHeaders: HeadersInit = {}): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = async () => {
@@ -98,7 +99,7 @@ async function uploadImage(file: File): Promise<string> {
         const base64 = reader.result as string;
         const res = await fetch('/api/admin/catalog/upload-image', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
           credentials: 'include',
           body: JSON.stringify({ imageData: base64, mimeType: file.type }),
         });
@@ -112,6 +113,7 @@ async function uploadImage(file: File): Promise<string> {
 }
 
 export default function AdminCatalog() {
+  const { getAuthHeaders } = useAdminAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -132,7 +134,7 @@ export default function AdminCatalog() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/catalog/products', { credentials: 'include' });
+      const res = await fetch('/api/admin/catalog/products', { headers: getAuthHeaders(), credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setProducts(data.products || data);
@@ -171,7 +173,7 @@ export default function AdminCatalog() {
     if (!file || !editingProduct) return;
     setUploadingImage(true);
     try {
-      const url = await uploadImage(file);
+      const url = await uploadImage(file, getAuthHeaders());
       setEditingProduct(p => p ? { ...p, imageUrl: url, images: [url, ...(p.images || []).filter(u => u !== url)] } : p);
       toast.success('Imagem principal carregada');
     } catch (err: any) {
@@ -187,7 +189,7 @@ export default function AdminCatalog() {
     if (!files.length || !editingProduct) return;
     setUploadingImage(true);
     try {
-      const urls = await Promise.all(files.map(uploadImage));
+      const urls = await Promise.all(files.map(f => uploadImage(f, getAuthHeaders())));
       setEditingProduct(p => p ? { ...p, images: [...(p.images || []), ...urls] } : p);
       toast.success(`${urls.length} imagem(ns) adicionada(s)`);
     } catch (err: any) {
@@ -203,7 +205,7 @@ export default function AdminCatalog() {
     if (!file || !editingProduct) return;
     setUploadingVariantIdx(idx);
     try {
-      const url = await uploadImage(file);
+      const url = await uploadImage(file, getAuthHeaders());
       updateVariant(idx, 'imageUrl', url);
       toast.success('Imagem da variante carregada');
     } catch (err: any) {
@@ -237,7 +239,7 @@ export default function AdminCatalog() {
       const url = isEdit ? `/api/admin/catalog/products/${editingProduct.id}` : '/api/admin/catalog/products';
       const res = await fetch(url, {
         method: isEdit ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         credentials: 'include',
         body: JSON.stringify({ ...editingProduct, variants }),
       });
@@ -259,7 +261,7 @@ export default function AdminCatalog() {
   const handleDelete = async () => {
     if (!deletingId) return;
     try {
-      const res = await fetch(`/api/admin/catalog/products/${deletingId}`, { method: 'DELETE', credentials: 'include' });
+      const res = await fetch(`/api/admin/catalog/products/${deletingId}`, { method: 'DELETE', headers: getAuthHeaders(), credentials: 'include' });
       if (res.ok) {
         toast.success('Produto removido');
         setDeleteDialogOpen(false);
@@ -271,7 +273,7 @@ export default function AdminCatalog() {
   const toggleActive = async (product: Product) => {
     try {
       await fetch(`/api/admin/catalog/products/${product.id}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, credentials: 'include',
         body: JSON.stringify({ ...product, isActive: !product.isActive }),
       });
       toast.success(product.isActive ? 'Produto desactivado' : 'Produto activado');
@@ -282,7 +284,7 @@ export default function AdminCatalog() {
   const toggleFeatured = async (product: Product) => {
     try {
       await fetch(`/api/admin/catalog/products/${product.id}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, credentials: 'include',
         body: JSON.stringify({ ...product, isFeatured: !product.isFeatured }),
       });
       toast.success(product.isFeatured ? 'Removido dos destaques' : 'Adicionado aos destaques');
@@ -293,7 +295,7 @@ export default function AdminCatalog() {
   const updateStockInline = async (variantId: number, newStock: number) => {
     try {
       await fetch(`/api/admin/catalog/variants/${variantId}/stock`, {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        method: 'PATCH', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, credentials: 'include',
         body: JSON.stringify({ stock: newStock }),
       });
       fetchProducts();
