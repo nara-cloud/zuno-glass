@@ -181,3 +181,14 @@
 - [ ] Testes unitários para autenticação
 - [ ] Login social (Google/Apple) — fase 2
 - [ ] MFA para admin — fase 2
+
+## Melhorias Fase 2
+- [ ] Mercado Pago: endpoints de PIX, boleto e cartão no servidor
+- [ ] Mercado Pago: página de checkout transparente no frontend
+- [ ] Mercado Pago: webhook para salvar pedidos no banco
+- [ ] Admin: página /admin/products com os 30 SKUs (custo, margem, estoque)
+- [ ] Admin: filtros por categoria e busca por nome/SKU na página de produtos
+- [ ] E-mail transacional: configurar Resend para confirmação de pedido
+- [ ] E-mail transacional: template HTML de confirmação de pedido
+- [ ] E-mail transacional: disparar após pagamento confirmado (MP + Stripe)
+- [x] Try-On Virtual: atualizar página para exibir tela "Em Desenvolvimento"
