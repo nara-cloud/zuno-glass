@@ -2,8 +2,8 @@
   {
     "id": "zuno-arven",
     "name": "ZUNO ARVEN",
-    "price": 189.9,
-    "category": "performance",
+    "price": 169.9,
+    "category": "lifestyle",
     "image": "/images/products/Ares Premium  Preto.webp",
     "description": "Óculos de performance extrema com design aerodinâmico. Proteção UV400 e lentes anti-reflexo para visão cristalina.",
     "colors": [
@@ -14,8 +14,8 @@
   {
     "id": "zuno-infinity-mirror",
     "name": "ZUNO INFINITY MIRROR",
-    "price": 189.9,
-    "category": "performance",
+    "price": 169.9,
+    "category": "lifestyle",
     "image": "/images/products/Infinity  Prata Espelhado Preto.webp",
     "description": "Lentes espelhadas com tecnologia anti-reflexo. Design moderno e elegante para atletas urbanos.",
     "colors": [
@@ -78,8 +78,8 @@
   {
     "id": "zuno-solaris",
     "name": "ZUNO SOLARIS",
-    "price": 189.9,
-    "category": "performance",
+    "price": 169.9,
+    "category": "lifestyle",
     "image": "/images/products/Dune  Marrom.webp",
     "description": "Proteção máxima contra raios UV com lentes amareladas. Ideal para dias ensolarados.",
     "colors": [
@@ -90,8 +90,8 @@
   {
     "id": "zuno-kaizen",
     "name": "ZUNO KAIZEN",
-    "price": 189.9,
-    "category": "performance",
+    "price": 169.9,
+    "category": "lifestyle",
     "image": "/images/products/Madagascar Azul Escuro Preto.webp",
     "description": "Design minimalista japonês. Leveza extrema e conforto absoluto.",
     "colors": [
@@ -103,8 +103,8 @@
   {
     "id": "zuno-mistral",
     "name": "ZUNO MISTRAL",
-    "price": 169.9,
-    "category": "lifestyle",
+    "price": 189.9,
+    "category": "performance",
     "image": "/images/products/Aviador Light  Preto.webp",
     "description": "Inspirado em clássicos atemporais. Estilo que nunca sai de moda.",
     "colors": [
@@ -142,8 +142,8 @@
   {
     "id": "zuno-orvik",
     "name": "ZUNO ORVIK",
-    "price": 169.9,
-    "category": "lifestyle",
+    "price": 189.9,
+    "category": "performance",
     "image": "/images/products/Harper  Preto.webp",
     "description": "Design nórdico minimalista. Sofisticação escandinava.",
     "colors": [
@@ -180,8 +180,8 @@
   {
     "id": "zuno-apex",
     "name": "ZUNO APEX",
-    "price": 189.9,
-    "category": "performance",
+    "price": 169.9,
+    "category": "lifestyle",
     "image": "/images/products/Prime  Azul Multicolors Preto.webp",
     "description": "O topo da pirâmide de performance. Tecnologia de ponta em cada detalhe.",
     "colors": [
@@ -230,8 +230,8 @@
   {
     "id": "zuno-titan",
     "name": "ZUNO TITAN",
-    "price": 189.9,
-    "category": "performance",
+    "price": 169.9,
+    "category": "lifestyle",
     "image": "/images/products/Prime   Verde Multicolors Cinza Azul.webp",
     "description": "Força titânica em design compacto. Resistência extrema.",
     "colors": [
@@ -242,8 +242,8 @@
   {
     "id": "zuno-titan-premium",
     "name": "ZUNO TITAN PREMIUM",
-    "price": 189.9,
-    "category": "performance",
+    "price": 169.9,
+    "category": "lifestyle",
     "image": "/images/products/Devon  Preto Fosco.webp",
     "description": "Versão premium do Titan com acabamento de luxo. O máximo em qualidade.",
     "colors": [
@@ -290,8 +290,8 @@
   {
     "id": "zuno-devon",
     "name": "ZUNO DEVON",
-    "price": 189.9,
-    "category": "performance",
+    "price": 169.9,
+    "category": "lifestyle",
     "image": "/images/products/Devon  Marrom Verde.webp",
     "description": "Design versátil para múltiplas atividades. Confiável em qualquer situação.",
     "colors": [
