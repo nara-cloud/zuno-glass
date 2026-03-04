@@ -1,65 +1,98 @@
 {
-  "zuno-arven": {
+  "zuno-arven-preto": {
     "default": 99
   },
-  "zuno-infinity-mirror": {
+  "zuno-infinity-mirror-prata": {
     "default": 99
   },
-  "zuno-noxis": {
+  "zuno-noxis-branco-azul": {
     "default": 99
   },
-  "zuno-axiom": {
+  "zuno-axiom-preto-dourado": {
     "default": 99
   },
-  "zuno-obsidian": {
+  "zuno-noxis-branco-rosa": {
     "default": 99
   },
-  "zuno-venza": {
+  "zuno-noxis-preto-verde": {
     "default": 99
   },
-  "zuno-solaris": {
+  "zuno-obsidian-marrom-preto": {
     "default": 99
   },
-  "zuno-kaizen": {
+  "zuno-venza-azul": {
     "default": 99
   },
-  "zuno-mistral": {
+  "zuno-solaris-preto-dourado": {
     "default": 99
   },
-  "zuno-vortexa": {
+  "zuno-kaizen-azul-preto": {
     "default": 99
   },
-  "zuno-veyron": {
+  "zuno-kaizen-verde-preto": {
     "default": 99
   },
-  "zuno-orvik": {
+  "zuno-mistral-rosa-camuflado": {
     "default": 99
   },
-  "zuno-infinity-x": {
+  "zuno-venza-preto-degrade": {
     "default": 99
   },
-  "zuno-kaori": {
+  "zuno-vortexa-rosa-camuflado": {
     "default": 99
   },
-  "zuno-apex": {
+  "zuno-veyron-verde-multicolors": {
     "default": 99
   },
-  "zuno-strix": {
+  "zuno-orvik-marrom-degrade": {
     "default": 99
   },
-  "zuno-neroz": {
+  "zuno-veyron-azul-multicolors": {
     "default": 99
   },
-  "zuno-altis": {
+  "zuno-veyron-preto-fosco": {
     "default": 99
   },
-  "zuno-titan": {
+  "zuno-veyron-amarelo-multicolors": {
     "default": 99
   },
-  "zuno-titan-premium": {
+  "zuno-infinity-x-marrom-rose": {
     "default": 99
   },
-  "zuno-lumea": {
+  "zuno-infinity-x-preto-dourado": {
+    "default": 99
+  },
+  "zuno-kaori-preto": {
+    "default": 99
+  },
+  "zuno-infinity-x-marrom-preto": {
+    "default": 99
+  },
+  "zuno-apex-preto": {
+    "default": 99
+  },
+  "zuno-strix-marrom-verde": {
+    "default": 99
+  },
+  "zuno-strix-azul-multicolors": {
+    "default": 99
+  },
+  "zuno-strix-preto-fosco": {
+    "default": 99
+  },
+  "zuno-neroz-preto": {
+    "default": 99
+  },
+  "zuno-altis-preto": {
+    "default": 99
+  },
+  "zuno-titan-preto": {
+    "default": 99
+  },
+  "zuno-titan-premium-preto-degrade": {
+    "default": 99
+  },
+  "zuno-lumea-marrom": {
     "default": 99
   }
 }
