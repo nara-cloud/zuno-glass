@@ -19,7 +19,7 @@ interface UseStockReturn {
 
 let cachedStock: StockData | null = null;
 let cacheTimestamp = 0;
-const CACHE_TTL = 30_000; // 30 seconds client-side cache
+const CACHE_TTL = 300_000; // 5 minutes client-side cache
 
 export function useStock(): UseStockReturn {
   const [stock, setStock] = useState<StockData>(cachedStock || {});

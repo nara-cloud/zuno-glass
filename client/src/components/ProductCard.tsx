@@ -77,6 +77,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             <img 
               src={imageSrc} 
               alt={product.name}
+              loading="lazy"
+              decoding="async"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden'); }}
               className={`w-full h-full object-contain transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-700 ease-out z-10 drop-shadow-2xl ${!inStock ? 'grayscale' : ''}`}
             />
@@ -91,16 +93,16 @@ export default function ProductCard({ product }: ProductCardProps) {
           
           {/* Quick Actions Overlay - desktop hover only */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center gap-3 z-20">
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-black font-display tracking-wider clip-corner">
+            <span className="border border-primary text-primary hover:bg-primary hover:text-black font-display tracking-wider px-4 py-2 text-sm cursor-pointer transition-colors">
               VER DETALHES
-            </Button>
+            </span>
             {price > 0 && inStock && (
-              <Button 
+              <button
                 onClick={handleQuickAdd}
-                className="bg-primary text-black hover:bg-white font-display tracking-wider clip-corner"
+                className="bg-primary text-black hover:bg-white font-display tracking-wider p-2 transition-colors"
               >
                 <ShoppingBag className="w-4 h-4" />
-              </Button>
+              </button>
             )}
           </div>
         </div>

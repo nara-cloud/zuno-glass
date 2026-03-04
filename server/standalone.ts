@@ -102,9 +102,21 @@ app.put("/api/auth/profile", requireAuth, (req: any, res) => {
 });
 
 // ─── Catalog ──────────────────────────────────────────────────────────────────
+let _catalogCache: any[] | null = null;
+let _stockCache: any | null = null;
+
+async function getCatalog() {
+  if (!_catalogCache) {
+    const { catalog } = await import("../shared/catalog.js");
+    _catalogCache = catalog as any[];
+  }
+  return _catalogCache;
+}
+
 app.get("/api/catalog", async (_req, res) => {
   try {
-    const { catalog } = await import("../shared/catalog.js");
+    const catalog = await getCatalog();
+    res.setHeader('Cache-Control', 'public, max-age=300');
     res.json(catalog);
   } catch (e: any) {
     console.error("[Catalog] Error:", e.message);
@@ -115,18 +127,22 @@ app.get("/api/catalog", async (_req, res) => {
 // ─── Stock ──────────────────────────────────────────────────────────────────
 app.get("/api/stock", async (_req, res) => {
   try {
-    const { catalog } = await import("../shared/catalog.js");
-    const stock: any = {};
-    for (const p of (catalog as any[])) {
-      const variants: any = {};
-      if (p.variants) {
-        for (const v of p.variants) {
-          variants[v.colorName || v.color] = 99;
+    if (!_stockCache) {
+      const catalog = await getCatalog();
+      const stock: any = {};
+      for (const p of catalog) {
+        const variants: any = {};
+        if (p.variants) {
+          for (const v of p.variants) {
+            variants[v.colorName || v.color] = 99;
+          }
         }
+        stock[p.id] = { total: 99, variants };
       }
-      stock[p.id] = { total: 99, variants };
+      _stockCache = stock;
     }
-    res.json({ stock });
+    res.setHeader('Cache-Control', 'public, max-age=60');
+    res.json({ stock: _stockCache });
   } catch (e: any) { res.json({ stock: {} }); }
 });
 
