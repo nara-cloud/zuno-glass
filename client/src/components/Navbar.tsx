@@ -76,7 +76,6 @@ export default function Navbar() {
             src={LOGO_URL}
             alt="ZUNO GLASS"
             className="h-14 md:h-16 w-auto object-contain"
-            style={{ filter: 'brightness(0) invert(1)' }}
           />
         </Link>
 
@@ -236,7 +235,6 @@ export default function Navbar() {
                 src={LOGO_URL}
                 alt="ZUNO GLASS"
                 className="h-10 w-auto object-contain"
-                style={{ filter: 'brightness(0) invert(1)' }}
               />
             </Link>
             <button
