@@ -387,6 +387,20 @@ app.get("/api/payment/:id/status", async (req, res) => {
 });
 
 // ─── Admin: Produtos CRUD ────────────────────────────────────────────────────
+// Bulk replace all products at once
+app.put("/api/admin/products/bulk", async (req, res) => {
+  try {
+    const products = req.body;
+    if (!Array.isArray(products)) return res.status(400).json({ error: 'Array de produtos esperado' });
+    writeJSON(PRODUCTS_FILE, products);
+    _catalogCache = products;
+    const stock: any = {};
+    for (const p of products) { stock[p.id] = { default: 99 }; }
+    _stockCache = stock;
+    writeJSON(STOCK_FILE, stock);
+    res.json({ success: true, count: products.length });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
 app.get("/api/admin/products", async (_req, res) => {
   try { res.json(await getProducts()); } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
