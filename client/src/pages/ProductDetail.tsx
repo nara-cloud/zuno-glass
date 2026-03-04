@@ -4,7 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Check, Shield, RotateCcw, CreditCard, Loader2, ShoppingBag, Minus, Plus, AlertTriangle, MessageCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Check, Shield, RotateCcw, CreditCard, ShoppingBag, Minus, Plus, AlertTriangle, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCart } from '@/contexts/CartContext';
 import { useStock } from '@/hooks/useStock';
@@ -15,7 +15,6 @@ export default function ProductDetail() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(0);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const { getVariantStock, getProductStock, isInStock } = useStock();
@@ -100,49 +99,6 @@ export default function ProductDetail() {
     });
   };
 
-  const handleBuyNow = async () => {
-    if (isCheckingOut) return;
-    if (!variantInStock) {
-      toast.error('Variante esgotada', {
-        description: `${product.name} — ${currentVariant?.colorName || 'Padrão'} está indisponível.`,
-      });
-      return;
-    }
-    setIsCheckingOut(true);
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: product.id,
-          variantColor: currentVariant?.colorName || 'default',
-          quantity,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        if (res.status === 409) {
-          toast.error('Estoque insuficiente', {
-            description: data.details?.join(', ') || 'Produto indisponível.',
-          });
-          return;
-        }
-        throw new Error(data.error || 'Erro ao criar sessão de pagamento');
-      }
-      if (data.url) {
-        toast.info('Redirecionando para o checkout...', {
-          description: 'Você será levado à página de pagamento seguro.',
-        });
-        window.open(data.url, '_blank');
-      }
-    } catch (err: any) {
-      toast.error('Erro no checkout', {
-        description: err.message || 'Tente novamente em alguns instantes.',
-      });
-    } finally {
-      setIsCheckingOut(false);
-    }
-  };
 
   const maxQuantity = variantStock > 0 ? Math.min(10, variantStock) : 10;
 
@@ -363,29 +319,13 @@ export default function ProductDetail() {
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               {price > 0 ? (
                 variantInStock ? (
-                  <>
-                    <Button
-                      onClick={handleAddToCart}
-                      className="flex-1 bg-white/10 text-white hover:bg-white/20 font-display font-bold text-lg h-14 clip-corner tracking-wider border border-white/20"
-                    >
-                      <ShoppingBag className="w-5 h-5 mr-2" />
-                      ADICIONAR AO CARRINHO
-                    </Button>
-                    <Button
-                      onClick={handleBuyNow}
-                      disabled={isCheckingOut}
-                      className="flex-1 bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider disabled:opacity-70"
-                    >
-                      {isCheckingOut ? (
-                        <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          PROCESSANDO...
-                        </>
-                      ) : (
-                        'GARANTIR O MEU'
-                      )}
-                    </Button>
-                  </>
+                  <Button
+                    onClick={handleAddToCart}
+                    className="flex-1 bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider"
+                  >
+                    <ShoppingBag className="w-5 h-5 mr-2" />
+                    ADICIONAR AO CARRINHO
+                  </Button>
                 ) : (
                   <div className="flex-1">
                     <Button
