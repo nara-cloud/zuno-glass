@@ -69,7 +69,7 @@ export default function Navbar() {
     <>
     {/* Navbar estático (não sticky) */}
     <nav className="w-full z-50 bg-transparent border-b border-white/10" style={{position: 'absolute', top: 0, left: 0, right: 0, overflow: 'visible'}}>
-      <div className="container flex items-center justify-between py-3">
+      <div className="w-full flex items-center justify-between py-3 px-4 md:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group" onClick={closeMobileMenu}>
           <img
