@@ -68,14 +68,14 @@ export default function Navbar() {
   return (
     <>
     {/* Navbar estático (não sticky) */}
-    <nav className="w-full z-50 bg-background border-b border-white/10" style={{height: '64px', overflow: 'visible'}}>
-      <div className="container flex items-center justify-between h-full">
+    <nav className="w-full z-50 bg-transparent border-b border-white/10" style={{position: 'absolute', top: 0, left: 0, right: 0, overflow: 'visible'}}>
+      <div className="container flex items-center justify-between py-3">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group" onClick={closeMobileMenu}>
           <img
             src={LOGO_URL}
             alt="ZUNO GLASS"
-            className="h-24 md:h-28 w-auto object-contain" style={{marginTop: '2px', marginBottom: '2px'}}
+            className="w-[55vw] md:w-[30vw] max-w-[320px] h-auto object-contain"
           />
         </Link>
 
