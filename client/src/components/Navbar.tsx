@@ -75,7 +75,7 @@ export default function Navbar() {
           <img
             src={LOGO_URL}
             alt="ZUNO GLASS"
-            className="h-20 md:h-24 w-auto object-contain" style={{marginTop: '4px', marginBottom: '4px'}}
+            className="h-24 md:h-28 w-auto object-contain" style={{marginTop: '2px', marginBottom: '2px'}}
           />
         </Link>
 
