@@ -75,7 +75,7 @@ export default function Navbar() {
           <img
             src={LOGO_URL}
             alt="ZUNO GLASS"
-            className="h-14 md:h-16 w-auto object-contain"
+            className="h-20 md:h-24 w-auto object-contain"
           />
         </Link>
 
@@ -234,7 +234,7 @@ export default function Navbar() {
               <img
                 src={LOGO_URL}
                 alt="ZUNO GLASS"
-                className="h-10 w-auto object-contain"
+                className="h-14 w-auto object-contain"
               />
             </Link>
             <button
