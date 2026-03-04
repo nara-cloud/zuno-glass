@@ -1,0 +1,242 @@
+[
+  {
+    "id": "zuno-arven",
+    "name": "ZUNO ARVEN",
+    "price": 189.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Ares Premium  Preto.webp",
+    "description": "Óculos de performance extrema com design aerodinâmico. Proteção UV400 e lentes anti-reflexo para visão cristalina.",
+    "colors": ["Preto"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-infinity-mirror",
+    "name": "ZUNO INFINITY MIRROR",
+    "price": 199.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Infinity  Prata Espelhado Preto.webp",
+    "description": "Lentes espelhadas com tecnologia anti-reflexo. Design moderno e elegante para atletas urbanos.",
+    "colors": ["Prata Espelhado", "Preto"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-noxis",
+    "name": "ZUNO NOXIS",
+    "price": 179.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Jin  Branco Azul Claro.webp",
+    "description": "Modelo versátil com múltiplas opções de cores. Perfeito para treinos e uso casual.",
+    "colors": ["Branco/Azul Claro", "Branco/Rosa", "Preto/Verde"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-axiom",
+    "name": "ZUNO AXIOM",
+    "price": 189.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Diamond  Preto.webp",
+    "description": "Design geométrico com armação resistente. Ideal para esportes de alto impacto.",
+    "colors": ["Preto"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-obsidian",
+    "name": "ZUNO OBSIDIAN",
+    "price": 199.90,
+    "category": "LIFESTYLE",
+    "image": "/images/products/Diamond Premium  Preto Degradê.webp",
+    "description": "Acabamento premium com degradê sofisticado. Elegância e performance em um único modelo.",
+    "colors": ["Preto Degradê"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-venza",
+    "name": "ZUNO VENZA",
+    "price": 179.90,
+    "category": "LIFESTYLE",
+    "image": "/images/products/Lorena  Azul.webp",
+    "description": "Modelo versátil com design clean. Combina com qualquer estilo de vida.",
+    "colors": ["Azul", "Preto/Degradê Branco"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-solaris",
+    "name": "ZUNO SOLARIS",
+    "price": 189.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Dune  Marrom.webp",
+    "description": "Proteção máxima contra raios UV com lentes amareladas. Ideal para dias ensolarados.",
+    "colors": ["Marrom"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-kaizen",
+    "name": "ZUNO KAIZEN",
+    "price": 169.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Madagascar Azul Escuro Preto.webp",
+    "description": "Design minimalista japonês. Leveza extrema e conforto absoluto.",
+    "colors": ["Azul Escuro/Preto", "Verde/Preto"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-mistral",
+    "name": "ZUNO MISTRAL",
+    "price": 179.90,
+    "category": "LIFESTYLE",
+    "image": "/images/products/Aviador Light  Preto.webp",
+    "description": "Inspirado em clássicos atemporais. Estilo que nunca sai de moda.",
+    "colors": ["Preto"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-vortexa",
+    "name": "ZUNO VORTEXA",
+    "price": 199.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Florença 2.0  Preto.webp",
+    "description": "Aerodinâmica extrema para velocidade máxima. Testado em competições.",
+    "colors": ["Preto"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-veyron",
+    "name": "ZUNO VEYRON",
+    "price": 189.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Prime  Preto Fosco.webp",
+    "description": "Inspirado em supercarros. Performance e estilo em harmonia perfeita.",
+    "colors": ["Verde Multicolors", "Azul Multicolors/Preto", "Preto Fosco", "Amarelo Multicolors"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-orvik",
+    "name": "ZUNO ORVIK",
+    "price": 179.90,
+    "category": "LIFESTYLE",
+    "image": "/images/products/Harper  Preto.webp",
+    "description": "Design nórdico minimalista. Sofisticação escandinava.",
+    "colors": ["Preto"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-infinity-x",
+    "name": "ZUNO INFINITY X",
+    "price": 209.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Infinity  Prata Espelhado Preto.webp",
+    "description": "Versão premium da linha Infinity. Tecnologia de ponta em design inovador.",
+    "colors": ["Marrom/Rose", "Preto/Dourado", "Marrom/Preto"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-kaori",
+    "name": "ZUNO KAORI",
+    "price": 169.90,
+    "category": "LIFESTYLE",
+    "image": "/images/products/Mia  Rosa Camuflado.webp",
+    "description": "Delicadeza e força em perfeito equilíbrio. Design feminino sofisticado.",
+    "colors": ["Rosa Camuflado"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-apex",
+    "name": "ZUNO APEX",
+    "price": 189.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Prime  Azul Multicolors Preto.webp",
+    "description": "O topo da pirâmide de performance. Tecnologia de ponta em cada detalhe.",
+    "colors": ["Azul Multicolors"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-strix",
+    "name": "ZUNO STRIX",
+    "price": 179.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Kansas Premium 3.0  Marrom Preto.webp",
+    "description": "Visão de águia com proteção total. Foco absoluto em cada movimento.",
+    "colors": ["Marrom/Verde", "Azul Multicolors", "Preto Fosco"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-neroz",
+    "name": "ZUNO NEROZ",
+    "price": 199.90,
+    "category": "LIFESTYLE",
+    "image": "/images/products/Oregon 2.0  Rosa Escuro Camuflado.webp",
+    "description": "Escuridão sofisticada. Lentes de proteção máxima com estilo urbano.",
+    "colors": ["Preto"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-altis",
+    "name": "ZUNO ALTIS",
+    "price": 189.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Lorena Preto Degradê Branco.webp",
+    "description": "Altitude máxima de performance. Para quem busca o topo.",
+    "colors": ["Preto/Degradê Branco"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-titan",
+    "name": "ZUNO TITAN",
+    "price": 179.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Prime   Verde Multicolors Cinza Azul.webp",
+    "description": "Força titânica em design compacto. Resistência extrema.",
+    "colors": ["Verde Multicolors"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-titan-premium",
+    "name": "ZUNO TITAN PREMIUM",
+    "price": 219.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Devon  Preto Fosco.webp",
+    "description": "Versão premium do Titan com acabamento de luxo. O máximo em qualidade.",
+    "colors": ["Preto Fosco"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-lumea",
+    "name": "ZUNO LUMEA",
+    "price": 169.90,
+    "category": "LIFESTYLE",
+    "image": "/images/products/Hawai   Preto Dourado.webp",
+    "description": "Luz e luminosidade em cada uso. Design que brilha.",
+    "colors": ["Preto Dourado"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-hexagonal",
+    "name": "ZUNO HEXAGONAL B 2.0",
+    "price": 189.90,
+    "category": "LIFESTYLE",
+    "image": "/images/products/Hexagonal B 2.0  Marrom Degradê.webp",
+    "description": "Geometria perfeita em design hexagonal. Sofisticação geométrica.",
+    "colors": ["Marrom Degradê"],
+    "isNew": false
+  },
+  {
+    "id": "zuno-dubai",
+    "name": "ZUNO DUBAI PREMIUM",
+    "price": 229.90,
+    "category": "LIFESTYLE",
+    "image": "/images/products/Dubai Premium Preto Dourado Preto.webp",
+    "description": "Luxo absoluto em design premium. Inspirado na sofisticação de Dubai.",
+    "colors": ["Preto Dourado"],
+    "isNew": true
+  },
+  {
+    "id": "zuno-devon",
+    "name": "ZUNO DEVON",
+    "price": 179.90,
+    "category": "PERFORMANCE",
+    "image": "/images/products/Devon  Marrom Verde.webp",
+    "description": "Design versátil para múltiplas atividades. Confiável em qualquer situação.",
+    "colors": ["Azul Multicolors Transparente Cinza", "Marrom Verde", "Preto Fosco"],
+    "isNew": true
+  }
+]

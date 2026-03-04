@@ -104,3 +104,8 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# Dados de produção (pedidos e waitlist — não versionar)
+data/orders.json
+data/waitlist.json
+nohup.out
