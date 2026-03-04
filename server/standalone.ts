@@ -21,6 +21,8 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
 const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
 const WAITLIST_FILE = path.join(DATA_DIR, "waitlist.json");
+const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
+const STOCK_FILE = path.join(DATA_DIR, "stock.json");
 
 function readJSON(file: string, def: any = []) {
   try { return JSON.parse(fs.readFileSync(file, "utf-8")); } catch { return def; }
@@ -101,48 +103,80 @@ app.put("/api/auth/profile", requireAuth, (req: any, res) => {
   res.json({ success: true, user });
 });
 
-// ─── Catalog ──────────────────────────────────────────────────────────────────
+// // ─── Catalog & Stock (persistent) ────────────────────────────────────────────
 let _catalogCache: any[] | null = null;
 let _stockCache: any | null = null;
 
-async function getCatalog() {
-  if (!_catalogCache) {
+// Gera slug a partir do nome
+function slugify(name: string): string {
+  return name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+// Carrega produtos: primeiro do JSON persistente, depois do catálogo estático
+async function getProducts(): Promise<any[]> {
+  if (_catalogCache) return _catalogCache;
+  // Se já existe products.json, usar ele
+  if (fs.existsSync(PRODUCTS_FILE)) {
+    const saved = readJSON(PRODUCTS_FILE, null);
+    if (Array.isArray(saved) && saved.length > 0) {
+      _catalogCache = saved;
+      return _catalogCache;
+    }
+  }
+  // Primeira vez: inicializar do catálogo estático
+  try {
     const { catalog } = await import("../shared/catalog.js");
     _catalogCache = catalog as any[];
+    writeJSON(PRODUCTS_FILE, _catalogCache);
+  } catch { _catalogCache = []; }
+  return _catalogCache!;
+}
+
+// Carrega estoque: do JSON persistente ou inicializa com 99
+async function getStock(): Promise<any> {
+  if (_stockCache) return _stockCache;
+  if (fs.existsSync(STOCK_FILE)) {
+    const saved = readJSON(STOCK_FILE, null);
+    if (saved && typeof saved === 'object' && Object.keys(saved).length > 0) {
+      _stockCache = saved;
+      return _stockCache;
+    }
   }
-  return _catalogCache;
+  // Inicializar estoque padrão
+  const products = await getProducts();
+  const stock: any = {};
+  for (const p of products) {
+    const variants: any = {};
+    if (p.variants) {
+      for (const v of p.variants) {
+        variants[v.colorName || v.color] = 99;
+      }
+    }
+    stock[p.id] = { total: 99, variants };
+  }
+  _stockCache = stock;
+  writeJSON(STOCK_FILE, _stockCache);
+  return _stockCache;
 }
 
 app.get("/api/catalog", async (_req, res) => {
   try {
-    const catalog = await getCatalog();
-    res.setHeader('Cache-Control', 'public, max-age=300');
-    res.json(catalog);
+    const products = await getProducts();
+    res.setHeader('Cache-Control', 'no-cache');
+    res.json(products);
   } catch (e: any) {
     console.error("[Catalog] Error:", e.message);
     res.json([]);
   }
 });
 
-// ─── Stock ──────────────────────────────────────────────────────────────────
 app.get("/api/stock", async (_req, res) => {
   try {
-    if (!_stockCache) {
-      const catalog = await getCatalog();
-      const stock: any = {};
-      for (const p of catalog) {
-        const variants: any = {};
-        if (p.variants) {
-          for (const v of p.variants) {
-            variants[v.colorName || v.color] = 99;
-          }
-        }
-        stock[p.id] = { total: 99, variants };
-      }
-      _stockCache = stock;
-    }
-    res.setHeader('Cache-Control', 'public, max-age=60');
-    res.json({ stock: _stockCache });
+    const stock = await getStock();
+    res.setHeader('Cache-Control', 'no-cache');
+    res.json({ stock });
   } catch (e: any) { res.json({ stock: {} }); }
 });
 
@@ -349,6 +383,92 @@ app.get("/api/payment/:id/status", async (req, res) => {
     const payment = new Payment(client);
     const result = await payment.get({ id: req.params.id });
     res.json({ status: result.status, statusDetail: result.status_detail });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── Admin: Produtos CRUD ────────────────────────────────────────────────────
+app.get("/api/admin/products", async (_req, res) => {
+  try { res.json(await getProducts()); } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+app.post("/api/admin/products", async (req, res) => {
+  try {
+    const products = await getProducts();
+    const data = req.body;
+    if (!data.name) return res.status(400).json({ error: 'Nome obrigatório' });
+    const id = data.id || slugify(data.name);
+    if (products.find((p: any) => p.id === id)) return res.status(409).json({ error: 'ID já existe. Use um nome diferente.' });
+    const product = { id, ...data };
+    products.push(product);
+    writeJSON(PRODUCTS_FILE, products);
+    _catalogCache = products;
+    // Inicializar estoque para o novo produto
+    const stock = await getStock();
+    const variants: any = {};
+    if (product.variants) { for (const v of product.variants) { variants[v.colorName || v.color] = 99; } }
+    stock[id] = { total: 99, variants };
+    writeJSON(STOCK_FILE, stock);
+    res.status(201).json(product);
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+app.put("/api/admin/products/:id", async (req, res) => {
+  try {
+    const products = await getProducts();
+    const idx = products.findIndex((p: any) => p.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Produto não encontrado' });
+    products[idx] = { ...products[idx], ...req.body, id: req.params.id };
+    writeJSON(PRODUCTS_FILE, products);
+    _catalogCache = products;
+    // Atualizar variantes no estoque se mudaram
+    const stock = await getStock();
+    const p = products[idx];
+    if (p.variants && stock[p.id]) {
+      const existing = stock[p.id].variants || {};
+      const updated: any = {};
+      for (const v of p.variants) {
+        const key = v.colorName || v.color;
+        updated[key] = existing[key] ?? 99;
+      }
+      stock[p.id].variants = updated;
+      stock[p.id].total = Object.values(updated).reduce((a: any, b: any) => a + b, 0);
+      writeJSON(STOCK_FILE, stock);
+    }
+    res.json(products[idx]);
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete("/api/admin/products/:id", async (req, res) => {
+  try {
+    let products = await getProducts();
+    const idx = products.findIndex((p: any) => p.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Produto não encontrado' });
+    products.splice(idx, 1);
+    writeJSON(PRODUCTS_FILE, products);
+    _catalogCache = products;
+    // Remover do estoque
+    const stock = await getStock();
+    delete stock[req.params.id];
+    writeJSON(STOCK_FILE, stock);
+    res.json({ success: true });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── Admin: Estoque ───────────────────────────────────────────────────────────
+app.get("/api/admin/stock", async (_req, res) => {
+  try { res.json(await getStock()); } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+app.put("/api/admin/stock/:productId", async (req, res) => {
+  try {
+    const stock = await getStock();
+    const { variants } = req.body; // { 'Preto Fosco': 10, 'Azul': 5 }
+    if (!stock[req.params.productId]) stock[req.params.productId] = { total: 0, variants: {} };
+    stock[req.params.productId].variants = variants;
+    stock[req.params.productId].total = Object.values(variants as any).reduce((a: any, b: any) => a + Number(b), 0);
+    writeJSON(STOCK_FILE, stock);
+    _stockCache = stock;
+    res.json(stock[req.params.productId]);
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
