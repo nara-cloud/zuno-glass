@@ -4,8 +4,8 @@
     "name": "ZUNO ARVEN",
     "price": 169.9,
     "category": "lifestyle",
-    "image": "/images/products/Ares Premium  Preto.webp",
-    "description": "Óculos de performance extrema com design aerodinâmico. Proteção UV400 e lentes anti-reflexo para visão cristalina.",
+    "image": "/images/products/Harper  Preto.webp",
+    "description": "Óculos de design elegante com proteção UV400. Armação leve e confortável para uso diário.",
     "colors": [
       "Preto"
     ],
@@ -19,8 +19,7 @@
     "image": "/images/products/Infinity  Prata Espelhado Preto.webp",
     "description": "Lentes espelhadas com tecnologia anti-reflexo. Design moderno e elegante para atletas urbanos.",
     "colors": [
-      "Prata Espelhado",
-      "Preto"
+      "Prata Espelhado Preto"
     ],
     "isNew": true
   },
@@ -30,7 +29,7 @@
     "price": 189.9,
     "category": "performance",
     "image": "/images/products/Jin  Branco Azul Claro.webp",
-    "description": "Modelo versátil com múltiplas opções de cores. Perfeito para treinos e uso casual.",
+    "description": "Óculos de alta performance para esportes. Armação resistente com lentes de alto contraste e proteção UV400.",
     "colors": [
       "Branco/Azul Claro",
       "Branco/Rosa",
@@ -43,10 +42,10 @@
     "name": "ZUNO AXIOM",
     "price": 189.9,
     "category": "performance",
-    "image": "/images/products/Diamond  Preto.webp",
-    "description": "Design geométrico com armação resistente. Ideal para esportes de alto impacto.",
+    "image": "/images/products/Hawai   Preto Dourado.webp",
+    "description": "Óculos esportivos com armação robusta e lentes douradas. Ideal para ciclismo e corrida.",
     "colors": [
-      "Preto"
+      "Preto Dourado"
     ],
     "isNew": false
   },
@@ -55,10 +54,10 @@
     "name": "ZUNO OBSIDIAN",
     "price": 169.9,
     "category": "lifestyle",
-    "image": "/images/products/Diamond Premium  Preto Degradê.webp",
-    "description": "Acabamento premium com degradê sofisticado. Elegância e performance em um único modelo.",
+    "image": "/images/products/Kansas Premium 3.0  Marrom Preto.webp",
+    "description": "Óculos premium com armação marrom e lentes escuras. Elegância e sofisticação para o dia a dia.",
     "colors": [
-      "Preto Degradê"
+      "Marrom Preto"
     ],
     "isNew": false
   },
@@ -68,10 +67,10 @@
     "price": 169.9,
     "category": "lifestyle",
     "image": "/images/products/Lorena  Azul.webp",
-    "description": "Modelo versátil com design clean. Combina com qualquer estilo de vida.",
+    "description": "Óculos femininos com design moderno e colorido. Proteção UV400 e leveza extrema.",
     "colors": [
       "Azul",
-      "Preto/Degradê Branco"
+      "Preto Degradê Branco"
     ],
     "isNew": false
   },
@@ -80,10 +79,10 @@
     "name": "ZUNO SOLARIS",
     "price": 169.9,
     "category": "lifestyle",
-    "image": "/images/products/Dune  Marrom.webp",
-    "description": "Proteção máxima contra raios UV com lentes amareladas. Ideal para dias ensolarados.",
+    "image": "/images/products/Dubai Premium Preto Dourado Preto.webp",
+    "description": "Óculos premium dourado com design luxuoso. Proteção UV400 e acabamento de alta qualidade.",
     "colors": [
-      "Marrom"
+      "Preto Dourado"
     ],
     "isNew": true
   },
@@ -93,7 +92,7 @@
     "price": 169.9,
     "category": "lifestyle",
     "image": "/images/products/Madagascar Azul Escuro Preto.webp",
-    "description": "Design minimalista japonês. Leveza extrema e conforto absoluto.",
+    "description": "Óculos esportivos casuais com armação colorida. Proteção UV400 e design moderno.",
     "colors": [
       "Azul Escuro/Preto",
       "Verde/Preto"
@@ -105,10 +104,10 @@
     "name": "ZUNO MISTRAL",
     "price": 189.9,
     "category": "performance",
-    "image": "/images/products/Aviador Light  Preto.webp",
-    "description": "Inspirado em clássicos atemporais. Estilo que nunca sai de moda.",
+    "image": "/images/products/Mia  Rosa Camuflado.webp",
+    "description": "Óculos de performance com armação camuflada rosa. Ideal para treinos intensos com proteção UV400.",
     "colors": [
-      "Preto"
+      "Rosa Camuflado"
     ],
     "isNew": false
   },
@@ -117,10 +116,10 @@
     "name": "ZUNO VORTEXA",
     "price": 189.9,
     "category": "performance",
-    "image": "/images/products/Florença 2.0  Preto.webp",
-    "description": "Aerodinâmica extrema para velocidade máxima. Testado em competições.",
+    "image": "/images/products/Oregon 2.0  Rosa Escuro Camuflado.webp",
+    "description": "Óculos de alta performance com armação camuflada. Projetado para atletas que exigem o máximo.",
     "colors": [
-      "Preto"
+      "Rosa Escuro Camuflado"
     ],
     "isNew": true
   },
@@ -130,12 +129,12 @@
     "price": 189.9,
     "category": "performance",
     "image": "/images/products/Prime  Preto Fosco.webp",
-    "description": "Inspirado em supercarros. Performance e estilo em harmonia perfeita.",
+    "description": "Óculos de alta performance com lentes multicolors. Máxima proteção UV400 para esportes de alta intensidade.",
     "colors": [
-      "Verde Multicolors",
-      "Azul Multicolors/Preto",
+      "Verde Multicolors Cinza Azul",
+      "Azul Multicolors Preto",
       "Preto Fosco",
-      "Amarelo Multicolors"
+      "Amarelo Multicolors Branco Preto"
     ],
     "isNew": true
   },
@@ -144,24 +143,24 @@
     "name": "ZUNO ORVIK",
     "price": 189.9,
     "category": "performance",
-    "image": "/images/products/Harper  Preto.webp",
-    "description": "Design nórdico minimalista. Sofisticação escandinava.",
+    "image": "/images/products/Hexagonal B 2.0  Marrom Degradê.webp",
+    "description": "Óculos hexagonal com lente degradê marrom. Design único com proteção UV400.",
     "colors": [
-      "Preto"
+      "Marrom Degradê"
     ],
     "isNew": false
   },
   {
     "id": "zuno-infinity-x",
     "name": "ZUNO INFINITY X",
-    "price": 189.9,
-    "category": "performance",
-    "image": "/images/products/Infinity  Prata Espelhado Preto.webp",
-    "description": "Versão premium da linha Infinity. Tecnologia de ponta em design inovador.",
+    "price": 169.9,
+    "category": "lifestyle",
+    "image": "/images/products/Samba  Marrom Degradê Rose.webp",
+    "description": "Óculos fashion com armação e lentes degradê. Estilo e proteção UV400 para o dia a dia.",
     "colors": [
-      "Marrom/Rose",
-      "Preto/Dourado",
-      "Marrom/Preto"
+      "Marrom Degradê Rose",
+      "Preto Dourado",
+      "Marrom Degradê Preto"
     ],
     "isNew": true
   },
@@ -170,22 +169,22 @@
     "name": "ZUNO KAORI",
     "price": 169.9,
     "category": "lifestyle",
-    "image": "/images/products/Mia  Rosa Camuflado.webp",
-    "description": "Delicadeza e força em perfeito equilíbrio. Design feminino sofisticado.",
+    "image": "/images/products/Florença 2.0  Preto.webp",
+    "description": "Óculos elegantes com armação preta clássica. Design atemporal com proteção UV400.",
     "colors": [
-      "Rosa Camuflado"
+      "Preto"
     ],
     "isNew": false
   },
   {
     "id": "zuno-apex",
     "name": "ZUNO APEX",
-    "price": 169.9,
-    "category": "lifestyle",
-    "image": "/images/products/Prime  Azul Multicolors Preto.webp",
-    "description": "O topo da pirâmide de performance. Tecnologia de ponta em cada detalhe.",
+    "price": 189.9,
+    "category": "performance",
+    "image": "/images/products/Ares Premium  Preto.webp",
+    "description": "Óculos premium de alta performance com armação preta robusta. Para atletas que buscam o máximo desempenho.",
     "colors": [
-      "Azul Multicolors"
+      "Preto"
     ],
     "isNew": true
   },
@@ -194,11 +193,11 @@
     "name": "ZUNO STRIX",
     "price": 189.9,
     "category": "performance",
-    "image": "/images/products/Kansas Premium 3.0  Marrom Preto.webp",
-    "description": "Visão de águia com proteção total. Foco absoluto em cada movimento.",
+    "image": "/images/products/Devon  Preto Fosco.webp",
+    "description": "Óculos de performance com múltiplas opções de cores. Armação resistente e lentes de alto contraste.",
     "colors": [
-      "Marrom/Verde",
-      "Azul Multicolors",
+      "Marrom Verde",
+      "Azul Multicolors Transparente Cinza",
       "Preto Fosco"
     ],
     "isNew": false
@@ -208,8 +207,8 @@
     "name": "ZUNO NEROZ",
     "price": 169.9,
     "category": "lifestyle",
-    "image": "/images/products/Oregon 2.0  Rosa Escuro Camuflado.webp",
-    "description": "Escuridão sofisticada. Lentes de proteção máxima com estilo urbano.",
+    "image": "/images/products/Verona Preto.webp",
+    "description": "Óculos clássicos com armação preta. Design sofisticado e proteção UV400 para o dia a dia.",
     "colors": [
       "Preto"
     ],
@@ -220,10 +219,10 @@
     "name": "ZUNO ALTIS",
     "price": 189.9,
     "category": "performance",
-    "image": "/images/products/Lorena Preto Degradê Branco.webp",
-    "description": "Altitude máxima de performance. Para quem busca o topo.",
+    "image": "/images/products/Aviador Light  Preto.webp",
+    "description": "Óculos aviador de alta performance com armação leve. Proteção UV400 e design aerodinâmico.",
     "colors": [
-      "Preto/Degradê Branco"
+      "Preto"
     ],
     "isNew": true
   },
@@ -232,10 +231,10 @@
     "name": "ZUNO TITAN",
     "price": 169.9,
     "category": "lifestyle",
-    "image": "/images/products/Prime   Verde Multicolors Cinza Azul.webp",
-    "description": "Força titânica em design compacto. Resistência extrema.",
+    "image": "/images/products/Diamond  Preto.webp",
+    "description": "Óculos com armação diamond preta. Elegância e proteção UV400 para qualquer ocasião.",
     "colors": [
-      "Verde Multicolors"
+      "Preto"
     ],
     "isNew": false
   },
@@ -244,10 +243,10 @@
     "name": "ZUNO TITAN PREMIUM",
     "price": 169.9,
     "category": "lifestyle",
-    "image": "/images/products/Devon  Preto Fosco.webp",
-    "description": "Versão premium do Titan com acabamento de luxo. O máximo em qualidade.",
+    "image": "/images/products/Diamond Premium  Preto Degradê.webp",
+    "description": "Versão premium do Titan com acabamento degradê de luxo. O máximo em qualidade.",
     "colors": [
-      "Preto Fosco"
+      "Preto Degradê"
     ],
     "isNew": true
   },
@@ -256,49 +255,11 @@
     "name": "ZUNO LUMEA",
     "price": 169.9,
     "category": "lifestyle",
-    "image": "/images/products/Hawai   Preto Dourado.webp",
-    "description": "Luz e luminosidade em cada uso. Design que brilha.",
+    "image": "/images/products/Dune  Marrom.webp",
+    "description": "Óculos com armação marrom degradê. Design natural e sofisticado com proteção UV400.",
     "colors": [
-      "Preto Dourado"
+      "Marrom"
     ],
     "isNew": false
-  },
-  {
-    "id": "zuno-hexagonal",
-    "name": "ZUNO HEXAGONAL B 2.0",
-    "price": 169.9,
-    "category": "lifestyle",
-    "image": "/images/products/Hexagonal B 2.0  Marrom Degradê.webp",
-    "description": "Geometria perfeita em design hexagonal. Sofisticação geométrica.",
-    "colors": [
-      "Marrom Degradê"
-    ],
-    "isNew": false
-  },
-  {
-    "id": "zuno-dubai",
-    "name": "ZUNO DUBAI PREMIUM",
-    "price": 169.9,
-    "category": "lifestyle",
-    "image": "/images/products/Dubai Premium Preto Dourado Preto.webp",
-    "description": "Luxo absoluto em design premium. Inspirado na sofisticação de Dubai.",
-    "colors": [
-      "Preto Dourado"
-    ],
-    "isNew": true
-  },
-  {
-    "id": "zuno-devon",
-    "name": "ZUNO DEVON",
-    "price": 169.9,
-    "category": "lifestyle",
-    "image": "/images/products/Devon  Marrom Verde.webp",
-    "description": "Design versátil para múltiplas atividades. Confiável em qualquer situação.",
-    "colors": [
-      "Azul Multicolors Transparente Cinza",
-      "Marrom Verde",
-      "Preto Fosco"
-    ],
-    "isNew": true
   }
 ]

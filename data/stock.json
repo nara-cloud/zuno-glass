@@ -1,104 +1,65 @@
 {
   "zuno-arven": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-infinity-mirror": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-noxis": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-axiom": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-obsidian": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-venza": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-solaris": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-kaizen": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-mistral": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-vortexa": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-veyron": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-orvik": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-infinity-x": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-kaori": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-apex": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-strix": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-neroz": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-altis": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-titan": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-titan-premium": {
-    "total": 99,
-    "variants": {}
+    "default": 99
   },
   "zuno-lumea": {
-    "total": 99,
-    "variants": {}
-  },
-  "zuno-hexagonal": {
-    "total": 99,
-    "variants": {}
-  },
-  "zuno-dubai": {
-    "total": 99,
-    "variants": {}
-  },
-  "zuno-devon": {
-    "total": 99,
-    "variants": {}
-  },
-  "zuno-veyron-preto-fosco": {
-    "total": 15,
-    "variants": {
-      "Preto Fosco": 15
-    }
+    "default": 99
   }
 }
