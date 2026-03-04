@@ -1,0 +1,498 @@
+/**
+ * Catálogo completo de produtos ZUNO GLASS
+ * Usado pelo servidor para servir o endpoint /api/catalog sem banco de dados
+ * Imagens: fotos locais em /images/products/
+ * Formato: cada variante é um produto separado (igual ao zunoglass.com)
+ */
+
+export interface ProductVariant {
+  color: string;
+  colorName: string;
+  image: string;
+}
+
+export interface CatalogProduct {
+  id: string;
+  name: string;
+  tagline: string;
+  price: number;
+  description: string;
+  features: string[];
+  image: string;
+  category: 'performance' | 'lifestyle';
+  variants: ProductVariant[];
+  isNew?: boolean;
+  stock?: number;
+}
+
+// Base path for local product images
+const IMG = '/images/products/';
+
+export const catalog: CatalogProduct[] = [
+  // === LINHA PERFORMANCE === R$ 189,90
+  {
+    id: 'zuno-veyron-preto-fosco',
+    name: 'ZUNO VEYRON PRETO FOSCO',
+    tagline: 'INVISÍVEL. IMPARÁVEL.',
+    price: 189.90,
+    description: 'Armação envolvente de perfil baixo para máxima aerodinâmica. Lentes multicolor com contraste aprimorado para treinos de alta intensidade.',
+    features: ['Lentes Multicolor', 'Armação Envolvente', 'Grip Antiderrapante', 'Ventilação Lateral'],
+    image: `${IMG}Prime  Preto Fosco.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto Fosco', image: `${IMG}Prime  Preto Fosco.webp` },
+    ],
+    isNew: true,
+    stock: 15,
+  },
+  {
+    id: 'zuno-veyron-azul-multicolors-preto',
+    name: 'ZUNO VEYRON AZUL MULTICOLORS PRETO',
+    tagline: 'INVISÍVEL. IMPARÁVEL.',
+    price: 189.90,
+    description: 'Armação envolvente de perfil baixo para máxima aerodinâmica. Lentes azul multicolor com contraste aprimorado.',
+    features: ['Lentes Azul Multicolor', 'Armação Envolvente', 'Grip Antiderrapante', 'Ventilação Lateral'],
+    image: `${IMG}Prime  Azul Multicolors Preto.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#2563eb', colorName: 'Azul Multicolors Preto', image: `${IMG}Prime  Azul Multicolors Preto.webp` },
+    ],
+    isNew: true,
+    stock: 12,
+  },
+  {
+    id: 'zuno-veyron-verde-multicolors',
+    name: 'ZUNO VEYRON VERDE MULTICOLORS',
+    tagline: 'INVISÍVEL. IMPARÁVEL.',
+    price: 189.90,
+    description: 'Armação envolvente de perfil baixo para máxima aerodinâmica. Lentes verde multicolor para máxima visibilidade.',
+    features: ['Lentes Verde Multicolor', 'Armação Envolvente', 'Grip Antiderrapante', 'Ventilação Lateral'],
+    image: `${IMG}Prime   Verde Multicolors Cinza Azul.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#16a34a', colorName: 'Verde Multicolors', image: `${IMG}Prime   Verde Multicolors Cinza Azul.webp` },
+    ],
+    isNew: true,
+    stock: 10,
+  },
+  {
+    id: 'zuno-veyron-amarelo-multicolors',
+    name: 'ZUNO VEYRON AMARELO MULTICOLORS',
+    tagline: 'INVISÍVEL. IMPARÁVEL.',
+    price: 189.90,
+    description: 'Armação envolvente de perfil baixo para máxima aerodinâmica. Lentes amarelo multicolor de alto contraste.',
+    features: ['Lentes Amarelo Multicolor', 'Armação Envolvente', 'Grip Antiderrapante', 'Ventilação Lateral'],
+    image: `${IMG}Prime Amarelo Multicolors Branco Preto.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#eab308', colorName: 'Amarelo Multicolors', image: `${IMG}Prime Amarelo Multicolors Branco Preto.webp` },
+    ],
+    isNew: true,
+    stock: 8,
+  },
+  {
+    id: 'zuno-strix',
+    name: 'ZUNO STRIX',
+    tagline: 'DOMINE O TERRENO.',
+    price: 189.90,
+    description: 'Design agressivo com lentes fotocromáticas que se adaptam à luz ambiente. Para quem não para independente do horário.',
+    features: ['Lentes Fotocromáticas', 'Design Agressivo', 'Proteção UV400', 'Armação Flexível'],
+    image: `${IMG}Diamond  Preto.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto Fosco', image: `${IMG}Diamond  Preto.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-strix-azul-multicolors',
+    name: 'ZUNO STRIX AZUL MULTICOLORS',
+    tagline: 'DOMINE O TERRENO.',
+    price: 189.90,
+    description: 'Design agressivo com lentes azul multicolor. Para quem não para independente do horário.',
+    features: ['Lentes Azul Multicolor', 'Design Agressivo', 'Proteção UV400', 'Armação Flexível'],
+    image: `${IMG}Prime  Azul Multicolors Preto.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#2563eb', colorName: 'Azul Multicolors', image: `${IMG}Prime  Azul Multicolors Preto.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-strix-marrom-verde',
+    name: 'ZUNO STRIX MARROM VERDE',
+    tagline: 'DOMINE O TERRENO.',
+    price: 189.90,
+    description: 'Design agressivo com lentes marrom degradê. Para quem não para independente do horário.',
+    features: ['Lentes Marrom Degradê', 'Design Agressivo', 'Proteção UV400', 'Armação Flexível'],
+    image: `${IMG}Samba  Marrom Degradê Rose.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#92400e', colorName: 'Marrom Verde', image: `${IMG}Samba  Marrom Degradê Rose.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-kaizen-azul-escuro-preto',
+    name: 'ZUNO KAIZEN AZUL ESCURO PRETO',
+    tagline: 'VELOCIDADE SELVAGEM.',
+    price: 189.90,
+    description: 'Inspirado na filosofia japonesa de melhoria contínua. Lentes polarizadas de alta definição para máxima clareza visual.',
+    features: ['Lentes Polarizadas HD', 'Armação TR90', 'Proteção UV400', 'Antirreflexo'],
+    image: `${IMG}Madagascar Azul Escuro Preto.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#1e40af', colorName: 'Azul Escuro Preto', image: `${IMG}Madagascar Azul Escuro Preto.webp` },
+    ],
+    stock: 18,
+  },
+  {
+    id: 'zuno-kaizen-verde-preto',
+    name: 'ZUNO KAIZEN VERDE PRETO',
+    tagline: 'VELOCIDADE SELVAGEM.',
+    price: 189.90,
+    description: 'Inspirado na filosofia japonesa de melhoria contínua. Lentes verde polarizadas de alta definição.',
+    features: ['Lentes Verde Polarizadas', 'Armação TR90', 'Proteção UV400', 'Antirreflexo'],
+    image: `${IMG}Madagascar Verde Preto.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#16a34a', colorName: 'Verde Preto', image: `${IMG}Madagascar Verde Preto.webp` },
+    ],
+    stock: 14,
+  },
+  {
+    id: 'zuno-vortexa',
+    name: 'ZUNO VORTEXA',
+    tagline: 'FOGO NA TRILHA.',
+    price: 189.90,
+    description: 'Lentes espelhadas com efeito degradê para quem quer performance com estilo. Ideal para corridas ao ar livre.',
+    features: ['Lentes Espelhadas Degradê', 'Proteção UV400', 'Armação Leve', 'Design Esportivo'],
+    image: `${IMG}Oregon 2.0  Rosa Escuro Camuflado.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#ea580c', colorName: 'Rosa Escuro Camuflado', image: `${IMG}Oregon 2.0  Rosa Escuro Camuflado.webp` },
+    ],
+    stock: 20,
+  },
+  {
+    id: 'zuno-noxis-preto-verde',
+    name: 'ZUNO NOXIS PRETO VERDE',
+    tagline: 'FLUIDEZ EM MOVIMENTO.',
+    price: 189.90,
+    description: 'Armação ultraleve com sistema de ventilação avançado. Para treinos longos sem desconforto.',
+    features: ['Ultra Leve', 'Ventilação Avançada', 'Lentes Claras', 'Grip Premium'],
+    image: `${IMG}Jin  Preto Verde.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto Verde', image: `${IMG}Jin  Preto Verde.webp` },
+    ],
+    stock: 22,
+  },
+  {
+    id: 'zuno-noxis-branco-rosa',
+    name: 'ZUNO NOXIS BRANCO ROSA',
+    tagline: 'FLUIDEZ EM MOVIMENTO.',
+    price: 189.90,
+    description: 'Armação ultraleve com sistema de ventilação avançado. Versão branco/rosa para quem quer estilo e performance.',
+    features: ['Ultra Leve', 'Ventilação Avançada', 'Lentes Rosê', 'Grip Premium'],
+    image: `${IMG}Jin BrancoRosa.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#f9a8d4', colorName: 'Branco Rosa', image: `${IMG}Jin BrancoRosa.webp` },
+    ],
+    stock: 16,
+  },
+  {
+    id: 'zuno-noxis-branco-azul-claro',
+    name: 'ZUNO NOXIS BRANCO AZUL CLARO',
+    tagline: 'FLUIDEZ EM MOVIMENTO.',
+    price: 189.90,
+    description: 'Armação ultraleve com sistema de ventilação avançado. Versão branco/azul claro para treinos ao ar livre.',
+    features: ['Ultra Leve', 'Ventilação Avançada', 'Lentes Azul Claro', 'Grip Premium'],
+    image: `${IMG}Jin  Branco Azul Claro.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#bfdbfe', colorName: 'Branco Azul Claro', image: `${IMG}Jin  Branco Azul Claro.webp` },
+    ],
+    stock: 14,
+  },
+  {
+    id: 'zuno-apex',
+    name: 'ZUNO APEX',
+    tagline: 'FORÇA DOS DEUSES.',
+    price: 169.90,
+    description: 'Nomeado em honra ao deus da guerra. Armação premium com acabamento metálico e lentes de alta definição.',
+    features: ['Acabamento Metálico', 'Lentes HD', 'Armação Titânio', 'Garantia Estendida'],
+    image: `${IMG}Kansas Premium 3.0  Marrom Preto.webp`,
+    category: 'performance',
+    variants: [
+      { color: '#92400e', colorName: 'Marrom Preto', image: `${IMG}Kansas Premium 3.0  Marrom Preto.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  // === LINHA LIFESTYLE === R$ 169,90
+  {
+    id: 'zuno-arven',
+    name: 'ZUNO ARVEN',
+    tagline: 'CORTE PRECISO.',
+    price: 169.90,
+    description: 'Linhas geométricas e design minimalista. Para quem valoriza estilo sem abrir mão da proteção.',
+    features: ['Design Minimalista', 'Lentes Espelhadas', 'Proteção UV400', 'Armação Metal'],
+    image: `${IMG}Ares Premium  Preto.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto', image: `${IMG}Ares Premium  Preto.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-infinity-mirror',
+    name: 'ZUNO INFINITY MIRROR',
+    tagline: 'REFLEXO INFINITO.',
+    price: 189.90,
+    description: 'Lentes espelhadas que refletem o mundo. Design futurista para quem está sempre à frente.',
+    features: ['Lentes Espelhadas', 'Design Futurista', 'Armação Metal', 'Proteção UV400'],
+    image: `${IMG}Infinity  Prata Espelhado Preto.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#c0c0c0', colorName: 'Prata Espelhado Preto', image: `${IMG}Infinity  Prata Espelhado Preto.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-axiom',
+    name: 'ZUNO AXIOM',
+    tagline: 'BRISA DO PARAÍSO.',
+    price: 169.90,
+    description: 'Lentes degradê azul-verde para quem vive perto do mar. Estilo praiano com proteção total.',
+    features: ['Lentes Degradê Azul', 'Estilo Praiano', 'Proteção UV400', 'Armação Leve'],
+    image: `${IMG}Hawai   Preto Dourado.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#eab308', colorName: 'Preto Dourado', image: `${IMG}Hawai   Preto Dourado.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-venza-preto-fosco',
+    name: 'ZUNO VENZA PRETO DEGRADÊ BRANCO',
+    tagline: 'GOLPE DE ESTILO.',
+    price: 169.90,
+    description: 'Armação oversized com lentes degradê. Presença marcante para qualquer ocasião.',
+    features: ['Formato Oversized', 'Lentes Degradê', 'Proteção UV400', 'Armação Acetato Premium'],
+    image: `${IMG}Devon  Preto Fosco.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto Fosco', image: `${IMG}Devon  Preto Fosco.webp` },
+    ],
+    stock: 20,
+  },
+  {
+    id: 'zuno-venza-azul',
+    name: 'ZUNO VENZA AZUL',
+    tagline: 'GOLPE DE ESTILO.',
+    price: 169.90,
+    description: 'Armação oversized com lentes azul multicolor. Presença marcante para qualquer ocasião.',
+    features: ['Formato Oversized', 'Lentes Azul Multicolor', 'Proteção UV400', 'Armação Acetato Premium'],
+    image: `${IMG}Devon  Azul Multicolors Transparente Cinza.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#bfdbfe', colorName: 'Azul Multicolors', image: `${IMG}Devon  Azul Multicolors Transparente Cinza.webp` },
+    ],
+    stock: 18,
+  },
+  {
+    id: 'zuno-solaris',
+    name: 'ZUNO SOLARIS',
+    tagline: 'LUXO SEM LIMITES.',
+    price: 169.90,
+    description: 'Detalhes dourados e presença imponente. Para quem vive no topo e não aceita menos.',
+    features: ['Detalhes Dourados', 'Lentes Premium', 'Armação Metal/Acetato', 'Acabamento Exclusivo'],
+    image: `${IMG}Dubai Premium Preto Dourado Preto.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#b8860b', colorName: 'Preto Dourado', image: `${IMG}Dubai Premium Preto Dourado Preto.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-mistral',
+    name: 'ZUNO MISTRAL',
+    tagline: 'CAMUFLAGEM URBANA.',
+    price: 169.90,
+    description: 'Estilo militar com lentes verdes. Para quem quer se destacar com atitude.',
+    features: ['Lentes Verdes', 'Estilo Militar', 'Proteção UV400', 'Armação Resistente'],
+    image: `${IMG}Dune  Marrom.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#92400e', colorName: 'Marrom', image: `${IMG}Dune  Marrom.webp` },
+    ],
+    stock: 25,
+  },
+  {
+    id: 'zuno-orvik',
+    name: 'ZUNO ORVIK',
+    tagline: 'GEOMETRIA PERFEITA.',
+    price: 169.90,
+    description: 'Formato hexagonal exclusivo com lentes marrom degradê. Design icônico para personalidades marcantes.',
+    features: ['Formato Hexagonal', 'Lentes Marrom Degradê', 'Armação Metal', 'Design Icônico'],
+    image: `${IMG}Hexagonal B 2.0  Marrom Degradê.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#854d0e', colorName: 'Marrom Degradê', image: `${IMG}Hexagonal B 2.0  Marrom Degradê.webp` },
+    ],
+    stock: 30,
+  },
+  {
+    id: 'zuno-kaori',
+    name: 'ZUNO KAORI',
+    tagline: 'ENERGIA PURA.',
+    price: 169.90,
+    description: 'Cores vibrantes para quem não passa despercebido. Lentes coloridas com proteção UV400.',
+    features: ['Lentes Coloridas', 'Design Vibrante', 'Proteção UV400', 'Armação TR90'],
+    image: `${IMG}Mia  Rosa Camuflado.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#ec4899', colorName: 'Rosa Camuflado', image: `${IMG}Mia  Rosa Camuflado.webp` },
+    ],
+    stock: 22,
+  },
+  {
+    id: 'zuno-lumea',
+    name: 'ZUNO LUMEA',
+    tagline: 'RASTRO NO DESERTO.',
+    price: 169.90,
+    description: 'Tons quentes e design arenoso. Para quem carrega o sol aonde vai.',
+    features: ['Tons Quentes', 'Lentes Âmbar', 'Proteção UV400', 'Armação Leve'],
+    image: `${IMG}Lorena  Azul.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#2563eb', colorName: 'Azul', image: `${IMG}Lorena  Azul.webp` },
+    ],
+    stock: 28,
+  },
+  {
+    id: 'zuno-savik',
+    name: 'ZUNO SAVIK',
+    tagline: 'ACIMA DAS NUVENS.',
+    price: 169.90,
+    description: 'Lentes azuis espelhadas com armação preta. Visão privilegiada em qualquer altitude.',
+    features: ['Lentes Azuis Espelhadas', 'Proteção UV400', 'Armação Preta', 'Design Premium'],
+    image: `${IMG}Aviador Light  Preto.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto', image: `${IMG}Aviador Light  Preto.webp` },
+    ],
+    stock: 35,
+  },
+  {
+    id: 'zuno-neroz',
+    name: 'ZUNO NEROZ',
+    tagline: 'VIDA COM ESTILO.',
+    price: 169.90,
+    description: 'Clássico reinventado. Armação redonda com lentes escuras para o lifestyle urbano.',
+    features: ['Formato Redondo', 'Lentes Escuras', 'Proteção UV400', 'Armação Metal'],
+    image: `${IMG}Harper  Preto.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto', image: `${IMG}Harper  Preto.webp` },
+    ],
+    stock: 40,
+  },
+  {
+    id: 'zuno-altis',
+    name: 'ZUNO ALTIS',
+    tagline: 'SOMBRA URBANA.',
+    price: 169.90,
+    description: 'Design urbano com lentes fumê para o dia a dia. Estilo discreto com proteção total.',
+    features: ['Lentes Fumê', 'Design Urbano', 'Proteção UV400', 'Armação Acetato'],
+    image: `${IMG}Verona Preto.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto Fumê', image: `${IMG}Verona Preto.webp` },
+    ],
+    stock: 45,
+  },
+  {
+    id: 'zuno-titan',
+    name: 'ZUNO TITAN',
+    tagline: 'BRILHO ESCURO.',
+    price: 169.90,
+    description: 'Versão premium com lentes degradê e acabamento sofisticado. Luxo com atitude.',
+    features: ['Lentes Degradê Premium', 'Acabamento Sofisticado', 'Armação Acetato Premium', 'Estojo Rígido'],
+    image: `${IMG}Diamond  Preto.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto', image: `${IMG}Diamond  Preto.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-obsidian',
+    name: 'ZUNO OBSIDIAN',
+    tagline: 'FORJADO PARA DURAR.',
+    price: 169.90,
+    description: 'Construção premium com materiais de alta resistência. O companheiro que aguenta qualquer desafio.',
+    features: ['Alta Resistência', 'Lentes Polarizadas', 'Armação Reforçada', 'Garantia Vitalícia'],
+    image: `${IMG}Florença 2.0  Preto.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#1a1a1a', colorName: 'Preto', image: `${IMG}Florença 2.0  Preto.webp` },
+    ],
+    stock: 30,
+  },
+  {
+    id: 'zuno-infinity-x-preto-dourado',
+    name: 'ZUNO INFINITY X PRETO DOURADO',
+    tagline: 'RITMO DOURADO.',
+    price: 169.90,
+    description: 'O espírito brasileiro em forma de óculos. Acabamento premium com detalhes que brilham.',
+    features: ['Detalhes Dourados', 'Lentes Degradê', 'Armação Acetato Premium', 'Design Brasileiro'],
+    image: `${IMG}Samba  Preto Dourado.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#b8860b', colorName: 'Preto Dourado', image: `${IMG}Samba  Preto Dourado.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-infinity-x-marrom-degradê-preto',
+    name: 'ZUNO INFINITY X MARROM DEGRADÊ PRETO',
+    tagline: 'RITMO DOURADO.',
+    price: 169.90,
+    description: 'O espírito brasileiro em forma de óculos. Acabamento premium com degradê marrom/preto.',
+    features: ['Lentes Marrom Degradê', 'Armação Acetato Premium', 'Proteção UV400', 'Design Exclusivo'],
+    image: `${IMG}Samba Marrom Degradê Preto.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#92400e', colorName: 'Marrom Degradê Preto', image: `${IMG}Samba Marrom Degradê Preto.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+  {
+    id: 'zuno-infinity-x-marrom-degradê-rose',
+    name: 'ZUNO INFINITY X MARROM DEGRADÊ ROSE',
+    tagline: 'RITMO DOURADO.',
+    price: 169.90,
+    description: 'O espírito brasileiro em forma de óculos. Acabamento premium com degradê marrom/rosé.',
+    features: ['Lentes Marrom Degradê Rosé', 'Armação Acetato Premium', 'Proteção UV400', 'Design Exclusivo'],
+    image: `${IMG}Samba  Marrom Degradê Rose.webp`,
+    category: 'lifestyle',
+    variants: [
+      { color: '#f4a6c0', colorName: 'Marrom Degradê Rose', image: `${IMG}Samba  Marrom Degradê Rose.webp` },
+    ],
+    isNew: true,
+    stock: 5,
+  },
+];
