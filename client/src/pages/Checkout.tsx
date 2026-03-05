@@ -68,6 +68,7 @@ function formatPhone(value: string) {
 export default function Checkout() {
   const [, navigate] = useLocation();
   const { items, totalPrice, clearCart } = useCart();
+  const [step, setStep] = useState<'info' | 'payment'>('info'); // ETAPA 1: dados | ETAPA 2: pagamento
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('pix');
   const [isProcessing, setIsProcessing] = useState(false);
   const [pixResult, setPixResult] = useState<PixResult | null>(null);
@@ -443,9 +444,25 @@ export default function Checkout() {
           <span className="font-body text-xs text-gray-600 ml-1">PIX · Boleto</span>
         </div>
 
+        {/* Indicador de etapas */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className={`flex items-center gap-2 ${step === 'info' ? 'text-primary' : 'text-gray-400'}`}>
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 ${step === 'info' ? 'border-primary bg-primary text-black' : 'border-gray-600 bg-gray-600 text-white'}`}>1</div>
+            <span className="font-display font-bold text-sm tracking-wider">IDENTIFICAÇÃO</span>
+          </div>
+          <div className="flex-1 h-px bg-white/10" />
+          <div className={`flex items-center gap-2 ${step === 'payment' ? 'text-primary' : 'text-gray-500'}`}>
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 ${step === 'payment' ? 'border-primary bg-primary text-black' : 'border-gray-700 text-gray-600'}`}>2</div>
+            <span className="font-display font-bold text-sm tracking-wider">PAGAMENTO</span>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left: Payment Form */}
           <div className="lg:col-span-3 space-y-6">
+
+            {/* ETAPA 1: Dados pessoais e endereço */}
+            {step === 'info' && (<>
 
             {/* Payment Method Selector */}
             <div className="bg-white/5 border border-white/10 p-6 space-y-4">
@@ -623,6 +640,40 @@ export default function Checkout() {
                 </div>
             </div>
 
+            {/* Botão CONTINUAR - fim da etapa 1 */}
+            <Button
+              onClick={() => {
+                const cpfClean = payer.cpf.replace(/\D/g, '');
+                if (!payer.firstName || !payer.lastName) { toast.error('Informe seu nome completo.'); return; }
+                if (cpfClean.length !== 11) { toast.error('CPF inválido.'); return; }
+                if (!payer.phone || payer.phone.replace(/\D/g, '').length < 10) { toast.error('Informe seu telefone.'); return; }
+                if (!payer.email || !payer.email.includes('@')) { toast.error('Informe um e-mail válido.'); return; }
+                if (!address.zip_code || !address.street_name || !address.street_number || !address.city || !address.state) { toast.error('Preencha o endereço de entrega completo.'); return; }
+                setStep('payment');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="w-full bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 tracking-wider"
+            >
+              CONTINUAR PARA PAGAMENTO →
+            </Button>
+
+            </>)}
+
+            {/* ETAPA 2: Pagamento */}
+            {step === 'payment' && (<>
+
+            <button onClick={() => setStep('info')} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-body">
+              <ArrowLeft className="w-4 h-4" /> Voltar aos dados
+            </button>
+
+            {/* Resumo dos dados informados */}
+            <div className="bg-white/5 border border-white/10 p-4 space-y-1">
+              <p className="font-display font-bold text-xs text-primary tracking-wider mb-2">DADOS CONFIRMADOS</p>
+              <p className="font-body text-sm text-white">{payer.firstName} {payer.lastName} · {payer.cpf} · {payer.phone}</p>
+              <p className="font-body text-xs text-gray-400">{payer.email}</p>
+              <p className="font-body text-xs text-gray-400">{address.street_name}, {address.street_number} — {address.neighborhood} · {address.city}/{address.state} · {address.zip_code}</p>
+            </div>
+
             {/* Card Fields */}
             {paymentMethod === 'card' && (
               <div className="bg-white/5 border border-white/10 p-6 space-y-4">
@@ -763,6 +814,9 @@ export default function Checkout() {
                 </>
               )}
             </Button>
+
+            </>)}
+
           </div>
 
           {/* Right: Order Summary */}
