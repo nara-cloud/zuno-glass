@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "concurrently \"tsx watch server/standalone.ts\" \"vite --host\"",
-    "build": "vite build --config vite.config.prod.ts && esbuild server/standalone.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "rm -rf node_modules/.cache dist && vite build --config vite.config.prod.ts && esbuild server/standalone.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "NODE_ENV=production node dist/standalone.js",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",
