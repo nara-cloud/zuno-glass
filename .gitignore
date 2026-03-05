@@ -3,9 +3,9 @@
 .pnpm-store/
 
 # Build outputs
-dist/
 build/
 *.dist
+# dist/ incluído intencionalmente para deploy no Railway
 
 # Environment variables
 .env
