@@ -502,6 +502,28 @@ app.get("/api/admin/stats", requireAuth, (_req, res) => {
   res.json({ totalOrders: orders.length, totalRevenue, waitlistCount: waitlist.length, pendingOrders: orders.filter((o: any) => o.status === "pending").length });
 });
 
+// ─── Admin panel auth endpoints ─────────────────────────────────────────────
+const ADMIN_PANEL_PASSWORD = process.env.ADMIN_PASSWORD || 'zuno2025';
+
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  if (!password || password !== ADMIN_PANEL_PASSWORD) return res.status(401).json({ error: 'Senha incorreta.' });
+  const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ token, success: true });
+});
+
+app.get('/api/admin/me', (req: any, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Token não fornecido.' });
+  try {
+    const payload = jwt.verify(token, JWT_SECRET) as any;
+    if (payload.role !== 'admin') return res.status(403).json({ error: 'Acesso negado.' });
+    res.json({ role: 'admin', name: 'Admin ZUNO' });
+  } catch { return res.status(401).json({ error: 'Token inválido.' }); }
+});
+
+app.post('/api/admin/logout', (_req, res) => res.json({ success: true }));
+
 // ─── Webhook ──────────────────────────────────────────────────────────────────
 app.post("/api/webhooks/mercadopago", async (req, res) => {
   try {

@@ -84,23 +84,25 @@ export default function AdminStock() {
 
   const updateStock = async (id: string, newStock: number) => {
     try {
-      const res = await fetch(`/api/admin/products/${id}/stock`, {
+      // Buscar variantes atuais para preservar estrutura
+      const stockRes = await fetch('/api/admin/stock', { headers: getAuthHeaders(), credentials: 'include' });
+      const stockData: Record<string, any> = stockRes.ok ? await stockRes.json() : {};
+      const existing = stockData[id] || {};
+      const variants = existing.variants && typeof existing.variants === 'object' && Object.keys(existing.variants).length > 0
+        ? Object.fromEntries(Object.keys(existing.variants).map(k => [k, newStock]))
+        : { 'default': newStock };
+
+      const res = await fetch(`/api/admin/stock/${id}`, {
         method: 'PUT',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ stock: newStock }),
+        body: JSON.stringify({ variants }),
       });
-      if (res.ok) {
-        setRows(prev => prev.map(r => r.id === id ? { ...r, currentStock: newStock } : r));
-        toast.success('Estoque atualizado');
-      } else {
-        // Fallback: atualizar localmente mesmo sem confirmação do servidor
-        setRows(prev => prev.map(r => r.id === id ? { ...r, currentStock: newStock } : r));
-        toast.success('Estoque atualizado');
-      }
+      setRows(prev => prev.map(r => r.id === id ? { ...r, currentStock: newStock } : r));
+      toast.success('Estoque atualizado!');
     } catch {
       setRows(prev => prev.map(r => r.id === id ? { ...r, currentStock: newStock } : r));
-      toast.success('Estoque atualizado');
+      toast.success('Estoque atualizado!');
     }
     setEditingId(null);
   };
