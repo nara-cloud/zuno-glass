@@ -132,12 +132,13 @@ export default function Navbar() {
                     {isAdmin && (
                       <>
                         <div className="border-t border-white/10 my-1" />
-                        <Link href="/admin" onClick={() => setIsUserMenuOpen(false)}>
-                          <div className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-primary/10 transition-colors cursor-pointer">
-                            <Shield className="w-3.5 h-3.5 text-primary" />
-                            <span className="font-display text-xs tracking-wider text-primary">PAINEL ADMIN</span>
-                          </div>
-                        </Link>
+                        <button
+                          onClick={() => { setIsUserMenuOpen(false); window.location.href = '/admin'; }}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 hover:bg-primary/10 transition-colors cursor-pointer text-left"
+                        >
+                          <Shield className="w-3.5 h-3.5 text-primary" />
+                          <span className="font-display text-xs tracking-wider text-primary">ADMIN</span>
+                        </button>
                       </>
                     )}
                     <div className="border-t border-white/10 my-1" />
