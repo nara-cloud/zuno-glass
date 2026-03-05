@@ -9,7 +9,7 @@ import type { ShippingQuote } from '@shared/shipping';
 
 export default function CartDrawer() {
   const { items, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isCartOpen, closeCart } = useCart();
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
   const [, navigate] = useLocation();
   const [cep, setCep] = useState('');
   const [shippingQuote, setShippingQuote] = useState<ShippingQuote | null>(null);
@@ -75,38 +75,10 @@ export default function CartDrawer() {
   const grandTotalPix = grandTotal * 0.95;
   const installmentGrandTotal = grandTotal > 0 ? (grandTotal / 3) : 0;
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (items.length === 0) return;
-    setIsCheckingOut(true);
-    try {
-      const checkoutItems = items.map(item => ({
-        productId: item.productId,
-        variantColor: item.variantColorName || item.variantColor,
-        quantity: item.quantity,
-      }));
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: checkoutItems,
-          payerEmail: '',
-          shippingCost: shippingQuote?.price || 0,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erro ao criar sessão de pagamento');
-      if (data.url) {
-        toast.info('Redirecionando para o Mercado Pago...');
-        window.open(data.url, '_blank');
-        closeCart();
-      } else {
-        throw new Error('URL de pagamento não retornada');
-      }
-    } catch (err: any) {
-      toast.error('Erro no checkout', { description: err.message });
-    } finally {
-      setIsCheckingOut(false);
-    }
+    closeCart();
+    navigate('/checkout');
   };
 
   return (
@@ -361,19 +333,10 @@ export default function CartDrawer() {
             {/* Checkout Button */}
             <Button
               onClick={handleCheckout}
-              disabled={isCheckingOut}
+              disabled={items.length === 0}
               className="w-full bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider disabled:opacity-70"
             >
-              {isCheckingOut ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  PROCESSANDO...
-                </>
-              ) : (
-                <>
-                  FINALIZAR COMPRA <ArrowRight className="w-5 h-5 ml-2" />
-                </>
-              )}
+              FINALIZAR COMPRA <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
 
             {!shippingQuote && (
