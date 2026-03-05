@@ -394,8 +394,16 @@ app.put("/api/admin/products/bulk", async (req, res) => {
     if (!Array.isArray(products)) return res.status(400).json({ error: 'Array de produtos esperado' });
     writeJSON(PRODUCTS_FILE, products);
     _catalogCache = products;
-    const stock: any = {};
-    for (const p of products) { stock[p.id] = { default: 99 }; }
+    // PRESERVAR estoque existente — apenas inicializar produtos novos
+    const existingStock = fs.existsSync(STOCK_FILE) ? readJSON(STOCK_FILE, {}) : {};
+    const stock: any = { ...existingStock };
+    for (const p of products) {
+      if (!stock[p.id]) {
+        const variants: any = {};
+        if (p.variants) { for (const v of p.variants) { variants[v.colorName || v.color || 'default'] = 99; } }
+        stock[p.id] = { total: 99, variants };
+      }
+    }
     _stockCache = stock;
     writeJSON(STOCK_FILE, stock);
     res.json({ success: true, count: products.length });
