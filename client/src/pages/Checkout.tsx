@@ -21,6 +21,7 @@ interface PayerInfo {
   firstName: string;
   lastName: string;
   cpf: string;
+  phone: string;
 }
 
 interface AddressInfo {
@@ -82,7 +83,7 @@ export default function Checkout() {
   const shippingCost = shippingQuote?.price || 0;
 
   // Payer info
-  const [payer, setPayer] = useState<PayerInfo>({ email: '', firstName: '', lastName: '', cpf: '' });
+  const [payer, setPayer] = useState<PayerInfo>({ email: '', firstName: '', lastName: '', cpf: '', phone: '' });
   const [address, setAddress] = useState<AddressInfo>({
     zip_code: '', street_name: '', street_number: '', neighborhood: '', city: '', state: ''
   });
@@ -153,10 +154,12 @@ export default function Checkout() {
     items.map(i => `${i.productId}|${i.variantColorName || 'default'}|${i.quantity}`).join(';');
 
   const handlePixPayment = async () => {
-    if (!payer.email) {
-      toast.error('Informe seu e-mail para continuar.');
-      return;
-    }
+    const cpfClean = payer.cpf.replace(/\D/g, '');
+    if (!payer.firstName || !payer.lastName) { toast.error('Informe seu nome completo.'); return; }
+    if (cpfClean.length !== 11) { toast.error('CPF inválido.'); return; }
+    if (!payer.phone || payer.phone.replace(/\D/g, '').length < 10) { toast.error('Informe seu telefone.'); return; }
+    if (!payer.email) { toast.error('Informe seu e-mail.'); return; }
+    if (!address.zip_code || !address.street_name || !address.city || !address.state) { toast.error('Preencha o endereço de entrega.'); return; }
     setIsProcessing(true);
     try {
       const res = await fetch('/api/mp/pix', {
@@ -235,10 +238,12 @@ export default function Checkout() {
   };
 
   const handleCardPayment = async () => {
-    if (!payer.email) {
-      toast.error('Informe seu e-mail para continuar.');
-      return;
-    }
+    const cpfClean = payer.cpf.replace(/\D/g, '');
+    if (!payer.firstName || !payer.lastName) { toast.error('Informe seu nome completo.'); return; }
+    if (cpfClean.length !== 11) { toast.error('CPF inválido.'); return; }
+    if (!payer.phone || payer.phone.replace(/\D/g, '').length < 10) { toast.error('Informe seu telefone.'); return; }
+    if (!payer.email) { toast.error('Informe seu e-mail.'); return; }
+    if (!address.zip_code || !address.street_name || !address.city || !address.state) { toast.error('Preencha o endereço de entrega.'); return; }
     setIsProcessing(true);
     try {
       const res = await fetch('/api/checkout', {
@@ -493,11 +498,11 @@ export default function Checkout() {
 
             {/* Payer Info */}
             <div className="bg-white/5 border border-white/10 p-6 space-y-4">
-              <h2 className="font-display font-bold text-lg text-white tracking-wider">SEUS DADOS</h2>
+              <h2 className="font-display font-bold text-lg text-white tracking-wider">DADOS PESSOAIS</h2>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <Label className="font-body text-xs text-gray-400">Nome</Label>
+                  <Label className="font-body text-xs text-gray-400">Nome *</Label>
                   <Input
                     value={payer.firstName}
                     onChange={e => setPayer(p => ({ ...p, firstName: e.target.value }))}
@@ -506,11 +511,32 @@ export default function Checkout() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="font-body text-xs text-gray-400">Sobrenome</Label>
+                  <Label className="font-body text-xs text-gray-400">Sobrenome *</Label>
                   <Input
                     value={payer.lastName}
                     onChange={e => setPayer(p => ({ ...p, lastName: e.target.value }))}
                     placeholder="Silva"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="font-body text-xs text-gray-400">CPF *</Label>
+                  <Input
+                    value={payer.cpf}
+                    onChange={e => setPayer(p => ({ ...p, cpf: formatCPF(e.target.value) }))}
+                    placeholder="000.000.000-00"
+                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="font-body text-xs text-gray-400">Telefone *</Label>
+                  <Input
+                    value={payer.phone}
+                    onChange={e => setPayer(p => ({ ...p, phone: formatPhone(e.target.value) }))}
+                    placeholder="(11) 99999-9999"
                     className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
                   />
                 </div>
@@ -526,23 +552,10 @@ export default function Checkout() {
                   className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
                 />
               </div>
-
-              {(paymentMethod === 'boleto' || paymentMethod === 'card') && (
-                <div className="space-y-1">
-                  <Label className="font-body text-xs text-gray-400">CPF *</Label>
-                  <Input
-                    value={payer.cpf}
-                    onChange={e => setPayer(p => ({ ...p, cpf: formatCPF(e.target.value) }))}
-                    placeholder="000.000.000-00"
-                    className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                  />
-                </div>
-              )}
             </div>
 
-            {/* Address (for boleto) */}
-            {paymentMethod === 'boleto' && (
-              <div className="bg-white/5 border border-white/10 p-6 space-y-4">
+            {/* Address - always shown */}
+            <div className="bg-white/5 border border-white/10 p-6 space-y-4">
                 <h2 className="font-display font-bold text-lg text-white tracking-wider">ENDEREÇO DE ENTREGA</h2>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -608,8 +621,7 @@ export default function Checkout() {
                     className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 w-24"
                   />
                 </div>
-              </div>
-            )}
+            </div>
 
             {/* Card Fields */}
             {paymentMethod === 'card' && (
