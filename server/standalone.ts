@@ -300,6 +300,8 @@ app.post("/api/checkout/preference", async (req, res) => {
     const { MercadoPagoConfig, Preference } = await import("mercadopago");
     const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
     const preference = new Preference(client);
+    const orderId = externalReference || `order-${Date.now()}`;
+    const origin = (req.headers.origin as string) || "https://zuno-glass-production.up.railway.app";
     const result = await preference.create({
       body: {
         items: items.map((item: any) => ({
@@ -311,15 +313,42 @@ app.post("/api/checkout/preference", async (req, res) => {
         })),
         payer: payer || {},
         back_urls: backUrls || {
-          success: `${req.headers.origin || "http://localhost:3000"}/checkout/success`,
-          failure: `${req.headers.origin || "http://localhost:3000"}/checkout`,
-          pending: `${req.headers.origin || "http://localhost:3000"}/checkout`,
+          success: `${origin}/checkout/success`,
+          failure: `${origin}/checkout`,
+          pending: `${origin}/checkout`,
         },
         auto_approve: false,
-        external_reference: externalReference || `order-${Date.now()}`,
+        external_reference: orderId,
         payment_methods: { installments: 3 },
+        notification_url: `https://zuno-glass-production.up.railway.app/api/webhooks/mercadopago`,
       },
     });
+    // Salvar pedido no banco com dados do cliente
+    const orders = readJSON(ORDERS_FILE);
+    const fullName = payer ? `${payer.first_name || ''} ${payer.last_name || ''}`.trim() : '';
+    const newOrder: any = {
+      id: orderId,
+      items: items.map((item: any) => ({
+        productId: item.id,
+        name: item.title,
+        quantity: item.quantity,
+        price: item.unit_price,
+        variantColor: item.variantColor || 'Padrão',
+      })),
+      customerName: fullName,
+      customerEmail: payer?.email || '',
+      customerPhone: payer?.phone ? `${payer.phone.area_code}${payer.phone.number}` : '',
+      customerCpf: payer?.identification?.number || '',
+      shippingCost: 0,
+      total: items.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0),
+      status: 'pending',
+      preferenceId: result.id,
+      createdAt: new Date().toISOString(),
+    };
+    orders.push(newOrder);
+    writeJSON(ORDERS_FILE, orders);
+    // Notificação WhatsApp - novo pedido
+    sendWhatsAppNotification(formatOrderNotification(newOrder, "NOVO PEDIDO")).catch(() => {});
     res.json({ preferenceId: result.id, initPoint: result.init_point, sandboxInitPoint: result.sandbox_init_point });
   } catch (e: any) {
     console.error("[MP Preference] Error:", e.message);
@@ -704,12 +733,36 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
       const result = await payment.get({ id: data.id });
       if (result.status === "approved") {
         const orders = readJSON(ORDERS_FILE);
-        const order = orders.find((o: any) => o.paymentId === data.id || o.paymentId === String(data.id));
+        const extRef = result.external_reference;
+        const order = orders.find((o: any) =>
+          o.paymentId === data.id ||
+          o.paymentId === String(data.id) ||
+          (extRef && (o.id === extRef || o.preferenceId === extRef))
+        );
         if (order) {
           order.status = "paid";
+          order.paymentId = String(data.id);
+          order.paidAt = new Date().toISOString();
           writeJSON(ORDERS_FILE, orders);
           // Notificação WhatsApp - pagamento aprovado
           sendWhatsAppNotification(formatOrderNotification(order, "PAGAMENTO APROVADO")).catch(() => {});
+        } else {
+          // Pedido não encontrado - criar registro com dados do pagamento
+          const fallbackOrder: any = {
+            id: extRef || `order-mp-${data.id}`,
+            items: [],
+            customerName: result.payer?.first_name ? `${result.payer.first_name} ${result.payer.last_name || ''}`.trim() : 'Cliente',
+            customerEmail: result.payer?.email || '',
+            total: result.transaction_amount || 0,
+            status: 'paid',
+            paymentId: String(data.id),
+            preferenceId: extRef || '',
+            paidAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+          };
+          orders.push(fallbackOrder);
+          writeJSON(ORDERS_FILE, orders);
+          sendWhatsAppNotification(formatOrderNotification(fallbackOrder, "PAGAMENTO APROVADO")).catch(() => {});
         }
       }
     }
