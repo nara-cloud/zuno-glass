@@ -34,6 +34,15 @@ const emptyForm: Omit<Product, 'id'> = {
   isNew: false,
 };
 
+// Retorna o nome de exibição: "NOME — Cor" para modelos com múltiplas cores, só "NOME" para únicos
+function getDisplayName(product: Product, allProducts: Product[]): { title: string; subtitle: string | null } {
+  const sameNameCount = allProducts.filter(p => p.name === product.name).length;
+  if (sameNameCount > 1 && product.color) {
+    return { title: product.name, subtitle: product.color };
+  }
+  return { title: product.name, subtitle: null };
+}
+
 export default function AdminProducts() {
   const { getAuthHeaders } = useAdminAuth();
   const [products, setProducts] = useState<Product[]>([]);
@@ -249,8 +258,17 @@ export default function AdminProducts() {
                     </div>
                   </div>
                   <div className="p-3">
-                    <p className="font-display font-bold text-xs text-white tracking-wide leading-tight">{p.name}</p>
-                    <p className="font-body text-[10px] text-gray-500 mt-0.5">{p.color}</p>
+                    {(() => {
+                      const dn = getDisplayName(p, products);
+                      return (
+                        <>
+                          <p className="font-display font-bold text-xs text-white tracking-wide leading-tight">{dn.title}</p>
+                          {dn.subtitle && (
+                            <p className="font-body text-[10px] text-primary/80 mt-0.5 tracking-wide">{dn.subtitle}</p>
+                          )}
+                        </>
+                      );
+                    })()}
                     <p className="font-display font-bold text-sm text-primary mt-2">{fmt(p.price)}</p>
                     <div className="flex gap-2 mt-3">
                       <button

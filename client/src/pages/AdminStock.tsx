@@ -248,8 +248,7 @@ export default function AdminStock() {
         ) : (
           <div className="bg-[#111111] border border-white/10 overflow-hidden">
             <div className="grid grid-cols-12 gap-2 px-4 py-3 border-b border-white/10 bg-black/30">
-              <div className="col-span-5 font-display font-bold text-[10px] text-gray-600 tracking-widest">PRODUTO</div>
-              <div className="col-span-3 font-display font-bold text-[10px] text-gray-600 tracking-widest">COR</div>
+              <div className="col-span-8 font-display font-bold text-[10px] text-gray-600 tracking-widest">PRODUTO</div>
               <div className="col-span-2 font-display font-bold text-[10px] text-gray-600 tracking-widest text-center">LINHA</div>
               <div className="col-span-2 font-display font-bold text-[10px] text-gray-600 tracking-widest text-center">ESTOQUE</div>
             </div>
@@ -265,11 +264,19 @@ export default function AdminStock() {
                     key={row.id}
                     className={`grid grid-cols-12 gap-2 px-4 py-3 items-center hover:bg-white/[0.03] transition-colors ${row.currentStock === 0 ? 'bg-red-400/[0.03]' : ''}`}
                   >
-                    <div className="col-span-5">
-                      <p className="font-display font-bold text-xs text-white tracking-wider truncate">{row.productName}</p>
-                    </div>
-                    <div className="col-span-3">
-                      <p className="font-body text-xs text-gray-400 truncate">{row.color}</p>
+                    <div className="col-span-8">
+                      {(() => {
+                        const sameCount = rows.filter(r => r.productName === row.productName).length;
+                        if (sameCount > 1 && row.color) {
+                          return (
+                            <>
+                              <p className="font-display font-bold text-xs text-white tracking-wider">{row.productName}</p>
+                              <p className="font-body text-[10px] text-primary/80 mt-0.5">{row.color}</p>
+                            </>
+                          );
+                        }
+                        return <p className="font-display font-bold text-xs text-white tracking-wider">{row.productName}</p>;
+                      })()}
                     </div>
                     <div className="col-span-2 text-center">
                       <span className={`font-display font-bold text-[9px] px-1.5 py-0.5 border tracking-wider ${
