@@ -28,6 +28,7 @@ import Warranty from "./pages/Warranty";
 import SizeGuide from "./pages/SizeGuide";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
+import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import AdminSales from "./pages/AdminSales";
 import AdminOrders from "./pages/AdminOrders";
 import AdminOrderDetail from "./pages/AdminOrderDetail";
@@ -126,6 +127,7 @@ function App() {
         defaultTheme="dark"
         // switchable
       >
+        <AdminAuthProvider>
         <AuthProvider>
           <CartProvider>
             <TooltipProvider>
@@ -135,6 +137,7 @@ function App() {
             </TooltipProvider>
           </CartProvider>
         </AuthProvider>
+        </AdminAuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
