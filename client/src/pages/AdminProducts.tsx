@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Search, Edit2, Trash2, X, Check, Plus, ImageIcon } from 'lucide-react';
+import { Search, Edit2, Trash2, X, Check, Plus, ImageIcon, Upload, Camera } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { toast } from 'sonner';
 
@@ -34,7 +34,6 @@ const emptyForm: Omit<Product, 'id'> = {
   isNew: false,
 };
 
-// Retorna o nome de exibição: "NOME — Cor" para modelos com múltiplas cores, só "NOME" para únicos
 function getDisplayName(product: Product, allProducts: Product[]): { title: string; subtitle: string | null } {
   const sameNameCount = allProducts.filter(p => p.name === product.name).length;
   if (sameNameCount > 1 && product.color) {
@@ -54,6 +53,10 @@ export default function AdminProducts() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [addForm, setAddForm] = useState<Omit<Product, 'id'>>({ ...emptyForm });
   const [saving, setSaving] = useState(false);
+  const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const addFileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   const load = () => {
     setLoading(true);
@@ -142,6 +145,65 @@ export default function AdminProducts() {
     load();
   };
 
+  // Upload de imagem para o servidor
+  const uploadImage = async (file: File): Promise<string | null> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const imageData = e.target?.result as string;
+          const res = await fetch('/api/admin/catalog/upload-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            credentials: 'include',
+            body: JSON.stringify({ imageData, mimeType: file.type }),
+          });
+          if (!res.ok) throw new Error('Erro no upload');
+          const data = await res.json();
+          resolve(data.url || null);
+        } catch {
+          toast.error('Erro ao fazer upload da imagem');
+          resolve(null);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Upload direto no card (modo visualização)
+  const handleCardImageUpload = async (productId: string, file: File) => {
+    setUploadingFor(productId);
+    try {
+      const url = await uploadImage(file);
+      if (!url) return;
+      const res = await fetch(`/api/admin/products/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify({ image: url }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success('Foto atualizada!');
+      load();
+    } catch { toast.error('Erro ao atualizar foto'); } finally { setUploadingFor(null); }
+  };
+
+  // Upload no modal de edição
+  const handleEditImageUpload = async (file: File) => {
+    setUploadingFor('edit');
+    const url = await uploadImage(file);
+    if (url) setEditForm(f => ({ ...f, image: url }));
+    setUploadingFor(null);
+  };
+
+  // Upload no modal de adicionar
+  const handleAddImageUpload = async (file: File) => {
+    setUploadingFor('add');
+    const url = await uploadImage(file);
+    if (url) setAddForm(f => ({ ...f, image: url }));
+    setUploadingFor(null);
+  };
+
   return (
     <AdminLayout title="PRODUTOS" subtitle="Gerenciamento do catálogo de produtos">
       {/* Header */}
@@ -219,9 +281,34 @@ export default function AdminProducts() {
                       </select>
                     </div>
                   </div>
+                  {/* Foto com upload no modo edição */}
                   <div>
-                    <label className="font-body text-[10px] text-gray-500 mb-1 block">Imagem (caminho)</label>
-                    <input type="text" value={editForm.image || ''} onChange={e => setEditForm(f => ({ ...f, image: e.target.value }))} className="w-full bg-[#111] border border-white/10 text-white text-xs px-2 py-1.5 font-body focus:outline-none focus:border-primary" placeholder="/images/products/..." />
+                    <label className="font-body text-[10px] text-gray-500 mb-1 block">Foto do Produto</label>
+                    {editForm.image && (
+                      <div className="mb-2 border border-white/10 p-1">
+                        <img src={editForm.image} alt="preview" className="h-24 object-contain mx-auto" onError={e => { (e.target as HTMLImageElement).style.opacity = '0.3'; }} />
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={editForm.image || ''}
+                        onChange={e => setEditForm(f => ({ ...f, image: e.target.value }))}
+                        className="flex-1 bg-[#111] border border-white/10 text-white text-xs px-2 py-1.5 font-body focus:outline-none focus:border-primary"
+                        placeholder="URL da imagem..."
+                      />
+                      <label className={`flex items-center gap-1 px-2 py-1.5 border border-primary/50 text-primary text-[10px] font-display cursor-pointer hover:bg-primary/10 transition-colors ${uploadingFor === 'edit' ? 'opacity-50 pointer-events-none' : ''}`}>
+                        {uploadingFor === 'edit' ? <div className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" /> : <Upload className="w-3 h-3" />}
+                        {uploadingFor === 'edit' ? '' : 'UPLOAD'}
+                        <input
+                          ref={editFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => { const f = e.target.files?.[0]; if (f) handleEditImageUpload(f); e.target.value = ''; }}
+                        />
+                      </label>
+                    </div>
                   </div>
                   <div>
                     <label className="font-body text-[10px] text-gray-500 mb-1 block">Descrição</label>
@@ -237,7 +324,7 @@ export default function AdminProducts() {
               ) : (
                 /* View Mode */
                 <>
-                  <div className="relative aspect-square bg-[#111] overflow-hidden">
+                  <div className="relative aspect-square bg-[#111] overflow-hidden group">
                     {p.image ? (
                       <img
                         src={p.image}
@@ -250,6 +337,26 @@ export default function AdminProducts() {
                         <ImageIcon className="w-12 h-12 text-gray-700" />
                       </div>
                     )}
+                    {/* Botão de upload sobreposto na foto */}
+                    <label className={`absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer ${uploadingFor === p.id ? 'opacity-100' : ''}`}>
+                      {uploadingFor === p.id ? (
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                          <span className="text-[10px] font-display text-white">ENVIANDO...</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2">
+                          <Camera className="w-8 h-8 text-white" />
+                          <span className="text-[10px] font-display text-white tracking-wider">TROCAR FOTO</span>
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleCardImageUpload(p.id, f); e.target.value = ''; }}
+                      />
+                    </label>
                     <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
                       <Badge className={`text-[9px] border font-display ${p.category === 'performance' ? 'bg-primary/20 text-primary border-primary/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'}`}>
                         {(p.category || '').toUpperCase()}
@@ -279,15 +386,17 @@ export default function AdminProducts() {
                       </button>
                       <button
                         onClick={() => startEdit(p)}
-                        className="px-3 py-1.5 border border-white/10 text-gray-400 hover:text-white hover:border-white/30 transition-colors"
+                        className="p-1.5 border border-white/10 text-gray-500 hover:text-white hover:border-white/30 transition-colors"
+                        title="Editar produto"
                       >
-                        <Edit2 className="w-3 h-3" />
+                        <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDelete(p.id, p.name)}
-                        className="px-3 py-1.5 border border-white/10 text-gray-600 hover:text-red-400 hover:border-red-500/30 transition-colors"
+                        className="p-1.5 border border-white/10 text-gray-500 hover:text-red-400 hover:border-red-500/30 transition-colors"
+                        title="Remover produto"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
@@ -298,9 +407,9 @@ export default function AdminProducts() {
         </div>
       )}
 
-      {/* Add Product Modal */}
+      {/* Add Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-[#1a1a1a] border border-white/10 w-full max-w-lg my-4">
             <div className="flex items-center justify-between p-4 border-b border-white/10">
               <h2 className="font-display font-bold text-sm text-white tracking-wider">NOVO PRODUTO</h2>
@@ -333,22 +442,45 @@ export default function AdminProducts() {
                     <option value="nao">Não</option>
                   </select>
                 </div>
+                {/* Foto com upload no modal de adicionar */}
                 <div className="col-span-2">
-                  <label className="font-body text-xs text-gray-500 mb-1 block">Caminho da Imagem</label>
-                  <input type="text" value={addForm.image} onChange={e => setAddForm(f => ({ ...f, image: e.target.value }))} className="w-full bg-[#111] border border-white/10 text-white text-sm px-3 py-2 font-body focus:outline-none focus:border-primary" placeholder="/images/products/NomeDaImagem.webp" />
-                  <p className="font-body text-[10px] text-gray-600 mt-1">Use o nome exato do arquivo na pasta /images/products/</p>
+                  <label className="font-body text-xs text-gray-500 mb-1 block">Foto do Produto</label>
+                  {addForm.image && (
+                    <div className="mb-2 border border-white/10 p-2">
+                      <img src={addForm.image} alt="preview" className="h-32 object-contain mx-auto" onError={e => { (e.target as HTMLImageElement).style.opacity = '0.3'; }} />
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={addForm.image}
+                      onChange={e => setAddForm(f => ({ ...f, image: e.target.value }))}
+                      className="flex-1 bg-[#111] border border-white/10 text-white text-sm px-3 py-2 font-body focus:outline-none focus:border-primary"
+                      placeholder="URL ou faça upload →"
+                    />
+                    <label className={`flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/50 text-primary text-xs font-display font-bold cursor-pointer hover:bg-primary/20 transition-colors whitespace-nowrap ${uploadingFor === 'add' ? 'opacity-50 pointer-events-none' : ''}`}>
+                      {uploadingFor === 'add' ? (
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4" />
+                      )}
+                      {uploadingFor === 'add' ? 'ENVIANDO...' : 'UPLOAD FOTO'}
+                      <input
+                        ref={addFileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleAddImageUpload(f); e.target.value = ''; }}
+                      />
+                    </label>
+                  </div>
+                  <p className="font-body text-[10px] text-gray-600 mt-1">Faça upload de uma foto ou cole a URL diretamente</p>
                 </div>
                 <div className="col-span-2">
                   <label className="font-body text-xs text-gray-500 mb-1 block">Descrição</label>
                   <textarea value={addForm.description} onChange={e => setAddForm(f => ({ ...f, description: e.target.value }))} rows={3} className="w-full bg-[#111] border border-white/10 text-white text-sm px-3 py-2 font-body focus:outline-none focus:border-primary resize-none" placeholder="Descrição do produto..." />
                 </div>
               </div>
-              {addForm.image && (
-                <div className="border border-white/10 p-2">
-                  <p className="font-body text-[10px] text-gray-500 mb-2">Pré-visualização:</p>
-                  <img src={addForm.image} alt="preview" className="h-32 object-contain mx-auto" onError={e => { (e.target as HTMLImageElement).style.opacity = '0.3'; }} />
-                </div>
-              )}
               <div className="flex gap-3 pt-2">
                 <Button type="button" variant="outline" onClick={() => setShowAddModal(false)} className="flex-1 border-white/10 text-gray-400 font-display text-xs">CANCELAR</Button>
                 <Button type="submit" disabled={saving} className="flex-1 bg-primary text-black font-display font-bold text-xs">{saving ? 'CRIANDO...' : 'CRIAR PRODUTO'}</Button>
