@@ -113,7 +113,7 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
-      <div className="pt-12 pb-20 container">
+      <div className="pt-20 pb-20 container">
         <Link href="/products">
           <span className="inline-flex items-center gap-2 text-gray-500 hover:text-primary mb-8 font-display tracking-wider transition-colors cursor-pointer">
             <ArrowLeft className="w-4 h-4" /> VOLTAR PARA A LOJA

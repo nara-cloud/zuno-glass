@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useAuthContext } from '@/contexts/AuthContext';
 
-const LOGO_URL = '/images/logo-zuno-white.png';
+const LOGO_URL = '/images/logo-zuno-trim.png';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -75,7 +75,7 @@ export default function Navbar() {
           <img
             src={LOGO_URL}
             alt="ZUNO GLASS"
-            className="w-[48vw] md:w-[220px] h-auto object-contain"
+            className="w-[36vw] md:w-[160px] h-auto object-contain"
           />
         </Link>
 

@@ -94,7 +94,7 @@ export default function FAQ() {
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden animate-in fade-in duration-700">
       <Navbar />
 
-      <section className="pt-32 pb-20 container max-w-3xl">
+      <section className="pt-24 pb-20 container max-w-3xl">
         <div className="text-center mb-16">
           <h1 className="font-display font-bold text-5xl text-white mb-4">
             PERGUNTAS <span className="text-primary">FREQUENTES</span>

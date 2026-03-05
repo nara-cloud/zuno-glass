@@ -64,7 +64,7 @@ export default function Products() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
-      <div className="pb-20 container pt-12">
+      <div className="pb-20 container pt-20">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
           <div>

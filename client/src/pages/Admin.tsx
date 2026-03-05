@@ -230,7 +230,7 @@ export default function Admin() {
     .filter(o => o.status === 'approved' || o.status === 'paid')
     .reduce((sum, o) => sum + o.items.reduce((s, item) => s + (item.price || 0) * (item.quantity || 1), 0) + (o.shippingCost || 0), 0);
   const approvedOrders = orders.filter(o => o.status === 'approved' || o.status === 'paid').length;
-  const totalStock = Object.values(stock).reduce((sum, s) => sum + (s.total || 0), 0);
+  const totalStock = Object.values(stock).reduce((sum, s: any) => sum + (s.total ?? s.default ?? 0), 0);
 
   // LOGIN SCREEN
   if (!isAuthenticated) {
@@ -481,7 +481,11 @@ export default function Admin() {
             ) : (
               <div className="space-y-3">
                 {products.map(product => {
-                  const productStock = stock[product.id] || { total: 0, variants: {} };
+                  const rawStock = stock[product.id] || {};
+                  const productStock = {
+                    total: rawStock.total ?? rawStock.default ?? 0,
+                    variants: rawStock.variants && typeof rawStock.variants === 'object' ? rawStock.variants : {},
+                  };
                   const isEditing = editingStock === product.id;
 
                   return (

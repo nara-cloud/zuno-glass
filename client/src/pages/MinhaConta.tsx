@@ -211,7 +211,7 @@ export default function MinhaConta() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <div className="container max-w-5xl pt-24 pb-16">
+      <div className="container max-w-5xl pt-20 pb-16">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

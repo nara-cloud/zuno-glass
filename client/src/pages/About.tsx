@@ -10,7 +10,7 @@ export default function About() {
       <Navbar />
       
       {/* Hero */}
-      <section className="pt-32 pb-20 container">
+      <section className="pt-24 pb-20 container">
         <div className="max-w-4xl">
           <div className="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-4 py-2 rounded-full mb-8">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
