@@ -2,10 +2,13 @@
 nixPkgs = ["nodejs_22"]
 
 [phases.install]
-cmds = ["npm install -g pnpm@10 && pnpm install"]
+cmds = ["npm install -g pnpm@10 && pnpm install --frozen-lockfile"]
 
 [phases.build]
-cmds = ["rm -rf node_modules/.cache dist && pnpm run build"]
+cmds = ["VITE_CACHE_DIR=/tmp/vite-cache pnpm run build"]
 
 [start]
 cmd = "node dist/standalone.js"
+
+[options]
+no-cache = true
