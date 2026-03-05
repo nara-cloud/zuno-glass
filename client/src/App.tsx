@@ -46,6 +46,11 @@ import AdminCashflow from "./pages/AdminCashflow";
 import AdminPermissions from "./pages/AdminPermissions";
 import AdminCatalog from "./pages/AdminCatalog";
 import AdminIntegrations from "./pages/AdminIntegrations";
+import AdminScenarios from "./pages/AdminScenarios";
+import AdminProfitability from "./pages/AdminProfitability";
+import AdminSettings from "./pages/AdminSettings";
+import AdminPayments from "./pages/AdminPayments";
+import AdminBot from "./pages/AdminBot";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MinhaConta from "./pages/MinhaConta";
@@ -107,6 +112,11 @@ function Router() {
       <Route path={"/admin/permissions"} component={AdminPermissions} />
       <Route path={"/admin/catalog"} component={AdminCatalog} />
       <Route path={"/admin/integrations"} component={AdminIntegrations} />
+      <Route path={"/admin/scenarios"} component={AdminScenarios} />
+      <Route path={"/admin/profitability"} component={AdminProfitability} />
+      <Route path={"/admin/settings"} component={AdminSettings} />
+      <Route path={"/admin/payments"} component={AdminPayments} />
+      <Route path={"/admin/bot"} component={AdminBot} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

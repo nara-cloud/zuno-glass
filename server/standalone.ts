@@ -524,6 +524,128 @@ app.get('/api/admin/me', (req: any, res) => {
 
 app.post('/api/admin/logout', (_req, res) => res.json({ success: true }));
 
+// ─── Gestão endpoints (JSON file-based) ───────────────────────────────────────
+const INVESTMENTS_FILE = path.join(DATA_DIR, 'investments.json');
+const AFFILIATES_FILE = path.join(DATA_DIR, 'affiliates.json');
+const PAYMENTS_FILE = path.join(DATA_DIR, 'payments.json');
+const FINANCIAL_FILE = path.join(DATA_DIR, 'financial.json');
+const SALES_FILE = path.join(DATA_DIR, 'sales.json');
+const SCENARIOS_FILE = path.join(DATA_DIR, 'scenarios.json');
+const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
+
+// Investments
+app.get('/api/admin/gestao/investments', requireAuth, (_req, res) => {
+  res.json(readJSON(INVESTMENTS_FILE, []));
+});
+app.post('/api/admin/gestao/investments', requireAuth, (req, res) => {
+  const items = readJSON(INVESTMENTS_FILE, []);
+  const item = { id: Date.now(), created_at: new Date().toISOString(), ...req.body };
+  items.push(item);
+  writeJSON(INVESTMENTS_FILE, items);
+  res.json(item);
+});
+app.delete('/api/admin/gestao/investments/:id', requireAuth, (req, res) => {
+  const items = readJSON(INVESTMENTS_FILE, []);
+  const filtered = items.filter((i: any) => String(i.id) !== req.params.id);
+  writeJSON(INVESTMENTS_FILE, filtered);
+  res.json({ success: true });
+});
+
+// Affiliates
+app.get('/api/admin/gestao/affiliates', requireAuth, (_req, res) => {
+  res.json(readJSON(AFFILIATES_FILE, []));
+});
+app.post('/api/admin/gestao/affiliates', requireAuth, (req, res) => {
+  const items = readJSON(AFFILIATES_FILE, []);
+  const item = { id: Date.now(), created_at: new Date().toISOString(), active: true, sales: 0, commission: 0, ...req.body };
+  items.push(item);
+  writeJSON(AFFILIATES_FILE, items);
+  res.json(item);
+});
+app.put('/api/admin/gestao/affiliates/:id', requireAuth, (req, res) => {
+  const items = readJSON(AFFILIATES_FILE, []);
+  const idx = items.findIndex((i: any) => String(i.id) === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  items[idx] = { ...items[idx], ...req.body };
+  writeJSON(AFFILIATES_FILE, items);
+  res.json(items[idx]);
+});
+app.delete('/api/admin/gestao/affiliates/:id', requireAuth, (req, res) => {
+  const items = readJSON(AFFILIATES_FILE, []);
+  writeJSON(AFFILIATES_FILE, items.filter((i: any) => String(i.id) !== req.params.id));
+  res.json({ success: true });
+});
+
+// Payments
+app.get('/api/admin/gestao/payments', requireAuth, (_req, res) => {
+  // Derive from orders
+  const orders = readJSON(ORDERS_FILE, []);
+  const payments = orders.map((o: any) => ({
+    id: o.id,
+    date: o.createdAt,
+    amount: o.items?.reduce((s: number, i: any) => s + (i.price || 0) * (i.quantity || 1), 0) + (o.shippingCost || 0),
+    method: o.paymentMethod || 'credit_card',
+    status: o.status,
+    customer: o.customerName || o.customer?.name || 'Cliente',
+    orderId: o.id,
+  }));
+  res.json(payments);
+});
+
+// Financial
+app.get('/api/admin/gestao/financial', requireAuth, (_req, res) => {
+  res.json(readJSON(FINANCIAL_FILE, { revenue: 0, expenses: 0, profit: 0, records: [] }));
+});
+
+// Sales (aggregate from orders)
+app.get('/api/admin/gestao/sales', requireAuth, (_req, res) => {
+  const orders = readJSON(ORDERS_FILE, []);
+  const approved = orders.filter((o: any) => o.status === 'approved' || o.status === 'paid');
+  const total = approved.reduce((s: number, o: any) => {
+    return s + (o.items?.reduce((ss: number, i: any) => ss + (i.price || 0) * (i.quantity || 1), 0) || 0) + (o.shippingCost || 0);
+  }, 0);
+  res.json({ total, count: approved.length, orders: approved });
+});
+
+// Scenarios
+app.get('/api/admin/gestao/scenarios', requireAuth, (_req, res) => {
+  res.json(readJSON(SCENARIOS_FILE, []));
+});
+app.post('/api/admin/gestao/scenarios', requireAuth, (req, res) => {
+  const items = readJSON(SCENARIOS_FILE, []);
+  const item = { id: Date.now(), created_at: new Date().toISOString(), ...req.body };
+  items.push(item);
+  writeJSON(SCENARIOS_FILE, items);
+  res.json(item);
+});
+
+// Settings
+app.get('/api/admin/settings', requireAuth, (_req, res) => {
+  res.json(readJSON(SETTINGS_FILE, { storeName: 'ZUNO GLASS', adminPassword: 'zuno2025', freeShippingThreshold: 299, shippingCost: 19.90 }));
+});
+app.put('/api/admin/settings', requireAuth, (req, res) => {
+  const current = readJSON(SETTINGS_FILE, {});
+  const updated = { ...current, ...req.body };
+  writeJSON(SETTINGS_FILE, updated);
+  // Update admin password if changed
+  if (req.body.adminPassword) {
+    process.env.ADMIN_PASSWORD = req.body.adminPassword;
+  }
+  res.json(updated);
+});
+
+// Partners
+app.get('/api/admin/gestao/partners', requireAuth, (_req, res) => {
+  res.json(readJSON(path.join(DATA_DIR, 'partners.json'), []));
+});
+app.post('/api/admin/gestao/partners', requireAuth, (req, res) => {
+  const items = readJSON(path.join(DATA_DIR, 'partners.json'), []);
+  const item = { id: Date.now(), created_at: new Date().toISOString(), ...req.body };
+  items.push(item);
+  writeJSON(path.join(DATA_DIR, 'partners.json'), items);
+  res.json(item);
+});
+
 // ─── Webhook ──────────────────────────────────────────────────────────────────
 app.post("/api/webhooks/mercadopago", async (req, res) => {
   try {

@@ -97,7 +97,7 @@ async function uploadImage(file: File, authHeaders: HeadersInit = {}): Promise<s
     reader.onload = async () => {
       try {
         const base64 = reader.result as string;
-        const res = await fetch('/api/admin/catalog/upload-image', {
+        const res = await fetch('/api/admin/products/upload-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...authHeaders },
           credentials: 'include',
@@ -134,7 +134,7 @@ export default function AdminCatalog() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/catalog/products', { headers: getAuthHeaders(), credentials: 'include' });
+      const res = await fetch('/api/admin/products', { headers: getAuthHeaders(), credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         setProducts(data.products || data);
@@ -236,7 +236,7 @@ export default function AdminCatalog() {
     setSaving(true);
     try {
       const isEdit = !!editingProduct.id;
-      const url = isEdit ? `/api/admin/catalog/products/${editingProduct.id}` : '/api/admin/catalog/products';
+      const url = isEdit ? `/api/admin/products/${editingProduct.id}` : '/api/admin/products';
       const res = await fetch(url, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
@@ -261,7 +261,7 @@ export default function AdminCatalog() {
   const handleDelete = async () => {
     if (!deletingId) return;
     try {
-      const res = await fetch(`/api/admin/catalog/products/${deletingId}`, { method: 'DELETE', headers: getAuthHeaders(), credentials: 'include' });
+      const res = await fetch(`/api/admin/products/${deletingId}`, { method: 'DELETE', headers: getAuthHeaders(), credentials: 'include' });
       if (res.ok) {
         toast.success('Produto removido');
         setDeleteDialogOpen(false);
@@ -272,7 +272,7 @@ export default function AdminCatalog() {
 
   const toggleActive = async (product: Product) => {
     try {
-      await fetch(`/api/admin/catalog/products/${product.id}`, {
+      await fetch(`/api/admin/products/${product.id}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, credentials: 'include',
         body: JSON.stringify({ ...product, isActive: !product.isActive }),
       });
@@ -283,7 +283,7 @@ export default function AdminCatalog() {
 
   const toggleFeatured = async (product: Product) => {
     try {
-      await fetch(`/api/admin/catalog/products/${product.id}`, {
+      await fetch(`/api/admin/products/${product.id}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json', ...getAuthHeaders() }, credentials: 'include',
         body: JSON.stringify({ ...product, isFeatured: !product.isFeatured }),
       });
