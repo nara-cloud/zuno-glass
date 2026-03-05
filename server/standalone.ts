@@ -15,6 +15,40 @@ const JWT_SECRET = process.env.JWT_SECRET || "zuno-glass-secret-2025";
 const MP_ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN || "APP_USR-7342182629407170-030307-d26fb83cc501bea0f26eb7bd84dfded2-253817435";
 const MP_PUBLIC_KEY = process.env.MERCADO_PAGO_PUBLIC_KEY || "APP_USR-f4856d8d-0b95-4520-bdc3-b6a12f5ed7ff";
 
+// ─── Z-API WhatsApp Notifications ────────────────────────────────────────────
+const ZAPI_INSTANCE_ID = process.env.ZAPI_INSTANCE_ID || "3EFAF4F0A833A199333B5ED3E77AF5CE";
+const ZAPI_TOKEN = process.env.ZAPI_TOKEN || "414F185DAF8C4667856CEF43";
+const ZAPI_NOTIFY_PHONE = process.env.ZAPI_NOTIFY_PHONE || "5574981343604";
+
+async function sendWhatsAppNotification(message: string): Promise<void> {
+  try {
+    const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}/send-text`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Client-Token": ZAPI_TOKEN },
+      body: JSON.stringify({ phone: ZAPI_NOTIFY_PHONE, message }),
+    });
+    if (!response.ok) {
+      const err = await response.text();
+      console.error("[Z-API] Erro ao enviar notificação:", err);
+    } else {
+      console.log("[Z-API] Notificação WhatsApp enviada com sucesso");
+    }
+  } catch (e: any) {
+    console.error("[Z-API] Falha na notificação:", e.message);
+  }
+}
+
+function formatOrderNotification(order: any, status: string): string {
+  const items = (order.items || []).map((i: any) => `  - ${i.title || i.name} x${i.quantity} = R$${((i.unit_price || i.price || 0) * i.quantity).toFixed(2)}`).join("\n");
+  const payer = order.payer || {};
+  const name = payer.first_name ? `${payer.first_name} ${payer.last_name || ""}`.trim() : "Cliente";
+  const phone = payer.phone || payer.whatsapp || "";
+  const total = order.total ? `R$${Number(order.total).toFixed(2)}` : "";
+  const method = order.paymentMethod === "pix" ? "PIX" : order.paymentMethod === "card" ? "Cartao" : "";
+  return `*ZUNO GLASS - ${status}*\n\nPedido: ${order.orderNumber || order.id}\nCliente: ${name}\n${phone ? `Telefone: ${phone}\n` : ""}${payer.email ? `Email: ${payer.email}\n` : ""}\nItens:\n${items}\n\nTotal: ${total}\n${method ? `Pagamento: ${method}` : ""}`;
+}
+
 // ─── Data files ───────────────────────────────────────────────────────────────
 const DATA_DIR = path.join(__dirname, "../data");
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -323,6 +357,8 @@ app.post("/api/checkout/pix", async (req, res) => {
     };
     orders.push(order);
     writeJSON(ORDERS_FILE, orders);
+    // Notificação WhatsApp
+    sendWhatsAppNotification(formatOrderNotification(order, "NOVO PEDIDO PIX")).catch(() => {});
     res.json({
       paymentId: result.id,
       status: result.status,
@@ -369,6 +405,8 @@ app.post("/api/checkout/card", async (req, res) => {
     };
     orders.push(order);
     writeJSON(ORDERS_FILE, orders);
+    // Notificação WhatsApp
+    sendWhatsAppNotification(formatOrderNotification(order, "NOVO PEDIDO CARTAO")).catch(() => {});
     res.json({ paymentId: result.id, status: result.status, statusDetail: result.status_detail, orderNumber: order.orderNumber });
   } catch (e: any) {
     console.error("[MP Card] Error:", e.message);
@@ -665,8 +703,13 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
       const result = await payment.get({ id: data.id });
       if (result.status === "approved") {
         const orders = readJSON(ORDERS_FILE);
-        const order = orders.find((o: any) => o.paymentId === data.id);
-        if (order) { order.status = "paid"; writeJSON(ORDERS_FILE, orders); }
+        const order = orders.find((o: any) => o.paymentId === data.id || o.paymentId === String(data.id));
+        if (order) {
+          order.status = "paid";
+          writeJSON(ORDERS_FILE, orders);
+          // Notificação WhatsApp - pagamento aprovado
+          sendWhatsAppNotification(formatOrderNotification(order, "PAGAMENTO APROVADO")).catch(() => {});
+        }
       }
     }
     res.sendStatus(200);
