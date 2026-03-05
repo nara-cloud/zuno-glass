@@ -109,3 +109,16 @@ temp/
 data/orders.json
 data/waitlist.json
 nohup.out
+data/stock.json
+data/products.json
+data/orders.json
+data/investments.json
+data/affiliates.json
+data/payments.json
+data/financial.json
+data/sales.json
+data/scenarios.json
+data/settings.json
+data/partners.json
+data/waitlist.json
+dist/
