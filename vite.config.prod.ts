@@ -4,7 +4,10 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig({
-  cacheDir: '/tmp/vite-cache-checkout-v3',
+  cacheDir: '/tmp/vite-cache-checkout-v4',
+  define: {
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
