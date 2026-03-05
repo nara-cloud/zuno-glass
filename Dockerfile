@@ -11,8 +11,8 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-# Compilar APENAS o servidor - o dist/public já está pré-compilado no repo
-RUN npx esbuild server/standalone.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+# Limpar cache e compilar tudo do zero (frontend + servidor)
+RUN rm -rf node_modules/.cache dist && pnpm run build
 
 EXPOSE 8080
 ENV NODE_ENV=production
