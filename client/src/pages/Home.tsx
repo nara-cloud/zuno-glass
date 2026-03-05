@@ -344,8 +344,8 @@ export default function Home() {
               <span className="font-display font-bold text-primary text-sm tracking-widest">VAGAS LIMITADAS</span>
             </div>
             <h2 className="font-display font-bold text-4xl md:text-6xl text-white mb-4">
-              ENTRE PARA O<br />
-              <span className="text-primary">LANÇAMENTO OFICIAL</span>
+              FAÇA PARTE DO<br />
+              <span className="text-primary">ZUNO SQUAD</span>
             </h2>
             <p className="font-body text-gray-400 text-lg mb-4">
               Acesso antecipado + condição exclusiva para os primeiros da lista.
