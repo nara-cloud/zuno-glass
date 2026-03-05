@@ -18,6 +18,7 @@ const MP_PUBLIC_KEY = process.env.MERCADO_PAGO_PUBLIC_KEY || "APP_USR-f4856d8d-0
 // ─── Z-API WhatsApp Notifications ────────────────────────────────────────────
 const ZAPI_INSTANCE_ID = process.env.ZAPI_INSTANCE_ID || "3EFAF4F0A833A199333B5ED3E77AF5CE";
 const ZAPI_TOKEN = process.env.ZAPI_TOKEN || "414F185DAF8C4667856CEF43";
+const ZAPI_CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN || "F294e30290d0c4612af8396eab6449577S";
 const ZAPI_NOTIFY_PHONE = process.env.ZAPI_NOTIFY_PHONE || "5574981343604";
 
 async function sendWhatsAppNotification(message: string): Promise<void> {
@@ -25,7 +26,7 @@ async function sendWhatsAppNotification(message: string): Promise<void> {
     const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}/send-text`;
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Client-Token": ZAPI_TOKEN },
+      headers: { "Content-Type": "application/json", "Client-Token": ZAPI_CLIENT_TOKEN },
       body: JSON.stringify({ phone: ZAPI_NOTIFY_PHONE, message }),
     });
     if (!response.ok) {
