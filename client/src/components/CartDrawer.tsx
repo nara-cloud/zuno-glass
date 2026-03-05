@@ -7,6 +7,7 @@ import { Link } from 'wouter';
 import { calculateShipping, isValidCep, formatCep } from '@shared/shipping';
 import type { ShippingQuote } from '@shared/shipping';
 
+// checkout-v4-2etapas-20260305
 type Step = 'cart' | 'form';
 
 interface CustomerForm {
