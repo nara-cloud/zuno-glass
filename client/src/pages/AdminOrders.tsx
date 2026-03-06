@@ -18,20 +18,24 @@ import { toast } from 'sonner';
 const STATUS_LABELS: Record<string, string> = {
   all: 'Todos',
   pending: 'Pendente',
+  em_separacao: 'Aprovado e em Separação',
   confirmed: 'Confirmado',
   processing: 'Em Preparo',
   shipped: 'Enviado',
   delivered: 'Entregue',
   cancelled: 'Cancelado',
+  paid: 'Pago',
 };
 
 const STATUS_VARIANTS: Record<string, string> = {
   pending: 'bg-yellow-400/10 text-yellow-400 border-yellow-400/30',
+  em_separacao: 'bg-green-400/10 text-green-400 border-green-400/30',
   confirmed: 'bg-blue-400/10 text-blue-400 border-blue-400/30',
   processing: 'bg-orange-400/10 text-orange-400 border-orange-400/30',
   shipped: 'bg-purple-400/10 text-purple-400 border-purple-400/30',
   delivered: 'bg-green-400/10 text-green-400 border-green-400/30',
   cancelled: 'bg-red-400/10 text-red-400 border-red-400/30',
+  paid: 'bg-green-400/10 text-green-400 border-green-400/30',
 };
 
 const PAYMENT_STATUS_VARIANTS: Record<string, string> = {
@@ -171,29 +175,29 @@ export default function AdminOrders() {
                         onClick={() => navigate(`/admin/orders/${order.id}`)}
                       >
                         <td className="px-4 py-3">
-                          <p className="font-display font-bold text-xs text-white">{order.order_number}</p>
-                          <p className="font-body text-[10px] text-gray-500 md:hidden">{order.customer_email}</p>
+                          <p className="font-display font-bold text-xs text-white">{order.orderNumber || order.id}</p>
+                          <p className="font-body text-[10px] text-gray-500 md:hidden">{order.customerEmail || order.payer?.email || '—'}</p>
                         </td>
                         <td className="px-4 py-3 hidden md:table-cell">
-                          <p className="font-body text-xs text-white">{order.customer_name || '—'}</p>
-                          <p className="font-body text-[10px] text-gray-500">{order.customer_email}</p>
+                          <p className="font-body text-xs text-white">{order.customerName || (order.payer ? `${order.payer.first_name || ''} ${order.payer.last_name || ''}`.trim() : '') || '—'}</p>
+                          <p className="font-body text-[10px] text-gray-500">{order.customerEmail || order.payer?.email || '—'}</p>
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <p className="font-body text-xs text-gray-400">
-                            {new Date(order.created_at).toLocaleDateString('pt-BR')}
+                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString('pt-BR') : '—'}
                           </p>
                           <p className="font-body text-[10px] text-gray-600">
-                            {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            {order.createdAt ? new Date(order.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''}
                           </p>
                         </td>
                         <td className="px-4 py-3 text-right">
                           <p className="font-display font-bold text-sm text-primary">
-                            R$ {parseFloat(order.total).toFixed(2).replace('.', ',')}
+                            R$ {parseFloat(order.total || order.amount || 0).toFixed(2).replace('.', ',')}
                           </p>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`inline-block px-2 py-0.5 text-[10px] font-body rounded-sm ${PAYMENT_STATUS_VARIANTS[order.payment_status] || 'text-gray-400'}`}>
-                            {PAYMENT_STATUS_LABELS[order.payment_status] || order.payment_status}
+                          <span className={`inline-block px-2 py-0.5 text-[10px] font-body rounded-sm ${PAYMENT_STATUS_VARIANTS[order.paymentStatus || order.payment_status] || 'text-gray-400'}`}>
+                            {PAYMENT_STATUS_LABELS[order.paymentStatus || order.payment_status] || order.paymentStatus || order.payment_status || '—'}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">

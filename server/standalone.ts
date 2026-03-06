@@ -666,8 +666,34 @@ app.put("/api/admin/stock/:productId", async (req, res) => {
 });
 
 // ─── Admin routes ─────────────────────────────────────────────────────────────
-app.get("/api/admin/orders", requireAuth, (_req, res) => {
-  res.json(readJSON(ORDERS_FILE));
+app.get("/api/admin/orders", requireAuth, (req: any, res) => {
+  try {
+    const { page = '1', limit = '50', search = '', status = '' } = req.query;
+    let orders: any[] = readJSON(ORDERS_FILE, []);
+    // Ordenar do mais recente para o mais antigo
+    orders = orders.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    // Filtrar por status
+    if (status && status !== 'all') {
+      orders = orders.filter((o: any) => o.status === status);
+    }
+    // Filtrar por busca (email, nome, id)
+    if (search) {
+      const s = String(search).toLowerCase();
+      orders = orders.filter((o: any) =>
+        (o.id && String(o.id).toLowerCase().includes(s)) ||
+        (o.customerEmail && o.customerEmail.toLowerCase().includes(s)) ||
+        (o.customerName && o.customerName.toLowerCase().includes(s)) ||
+        (o.email && o.email.toLowerCase().includes(s)) ||
+        (o.payer && o.payer.email && o.payer.email.toLowerCase().includes(s)) ||
+        (o.payer && o.payer.first_name && (o.payer.first_name + ' ' + (o.payer.last_name || '')).toLowerCase().includes(s))
+      );
+    }
+    const total = orders.length;
+    const pageNum = parseInt(String(page), 10) || 1;
+    const limitNum = parseInt(String(limit), 10) || 50;
+    const paginated = orders.slice((pageNum - 1) * limitNum, pageNum * limitNum);
+    res.json({ orders: paginated, total });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 // Atualizar status de um pedido
