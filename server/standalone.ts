@@ -113,12 +113,13 @@ function requireAuth(req: any, res: any, next: any) {
 // ─── Auth routes ──────────────────────────────────────────────────────────────
 app.post("/api/auth/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, address } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: "Nome, e-mail e senha são obrigatórios." });
     if (users.find((u: any) => u.email === email.toLowerCase())) return res.status(409).json({ error: "E-mail já cadastrado." });
     const passwordHash = await bcrypt.hash(password, 10);
     const newId = users.length > 0 ? Math.max(...users.map((u: any) => u.id || 0)) + 1 : 1;
-    const user = { id: newId, email: email.toLowerCase(), passwordHash, name, roles: ["customer"], isActive: true, createdAt: new Date().toISOString() };
+    const user: any = { id: newId, email: email.toLowerCase(), passwordHash, name, roles: ["customer"], isActive: true, createdAt: new Date().toISOString() };
+    if (address) user.address = address;
     users.push(user);
     saveUsers(users);
     const accessToken = jwt.sign({ userId: user.id, email: user.email, roles: user.roles }, JWT_SECRET, { expiresIn: "7d" });
@@ -399,7 +400,7 @@ app.post("/api/checkout", async (req, res) => {
 // ─── Checkout / Mercado Pago (advanced) ──────────────────────────────────────────────────
 app.post("/api/checkout/preference", async (req, res) => {
   try {
-    const { items, payer, backUrls, externalReference } = req.body;
+    const { items, payer, backUrls, externalReference, shippingAddress } = req.body;
     const { MercadoPagoConfig, Preference } = await import("mercadopago");
     const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
     const preference = new Preference(client);
@@ -442,6 +443,7 @@ app.post("/api/checkout/preference", async (req, res) => {
       customerEmail: payer?.email || '',
       customerPhone: payer?.phone ? `${payer.phone.area_code}${payer.phone.number}` : '',
       customerCpf: payer?.identification?.number || '',
+      shippingAddress: shippingAddress || null,
       shippingCost: 0,
       total: items.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0),
       status: 'pending',

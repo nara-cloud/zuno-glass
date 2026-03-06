@@ -1,13 +1,13 @@
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
-import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2, CreditCard, Truck, MapPin, User, ChevronLeft, Eye, EyeOff } from 'lucide-react';
+import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2, CreditCard, Truck, MapPin, User, ChevronLeft, Eye, EyeOff, Home } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
 import { calculateShipping, isValidCep, formatCep } from '@shared/shipping';
 import type { ShippingQuote } from '@shared/shipping';
 
-// checkout-v5-senha-conta-20260306
+// checkout-v6-endereco-20260306
 type Step = 'cart' | 'form';
 
 interface CustomerForm {
@@ -16,6 +16,14 @@ interface CustomerForm {
   phone: string;
   cpf: string;
   password: string;
+  // Endereço
+  cepForm: string;
+  logradouro: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
 }
 
 export default function CartDrawer() {
@@ -28,6 +36,7 @@ export default function CartDrawer() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isFetchingCep, setIsFetchingCep] = useState(false);
 
   const [form, setForm] = useState<CustomerForm>({
     name: '',
@@ -35,8 +44,15 @@ export default function CartDrawer() {
     phone: '',
     cpf: '',
     password: '',
+    cepForm: '',
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    estado: '',
   });
-  const [formErrors, setFormErrors] = useState<Partial<CustomerForm>>({});
+  const [formErrors, setFormErrors] = useState<Partial<Record<keyof CustomerForm, string>>>({});
 
   // Carregar CEP salvo do localStorage
   useEffect(() => {
@@ -62,6 +78,15 @@ export default function CartDrawer() {
       setTimeout(() => setStep('cart'), 300);
     }
   }, [isCartOpen]);
+
+  // Preencher CEP do formulário com o CEP de frete já calculado
+  useEffect(() => {
+    if (step === 'form' && cep && !form.cepForm) {
+      const cleanCep = cep.replace(/\D/g, '');
+      setForm(f => ({ ...f, cepForm: formatCep(cleanCep) }));
+      fetchAddressByCep(cleanCep);
+    }
+  }, [step]);
 
   const handleCepChange = (value: string) => {
     const formatted = formatCep(value);
@@ -93,6 +118,34 @@ export default function CartDrawer() {
     }, 600);
   };
 
+  const fetchAddressByCep = async (cleanCep: string) => {
+    if (cleanCep.length !== 8) return;
+    setIsFetchingCep(true);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+      const data = await res.json();
+      if (!data.erro) {
+        setForm(f => ({
+          ...f,
+          logradouro: data.logradouro || f.logradouro,
+          bairro: data.bairro || f.bairro,
+          cidade: data.localidade || f.cidade,
+          estado: data.uf || f.estado,
+        }));
+      }
+    } catch (_) {}
+    setIsFetchingCep(false);
+  };
+
+  const handleCepFormChange = (value: string) => {
+    const formatted = formatCep(value);
+    setForm(f => ({ ...f, cepForm: formatted }));
+    const clean = formatted.replace(/\D/g, '');
+    if (clean.length === 8) {
+      fetchAddressByCep(clean);
+    }
+  };
+
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, '').slice(0, 11);
     if (digits.length <= 2) return digits;
@@ -110,7 +163,7 @@ export default function CartDrawer() {
   };
 
   const validateForm = (): boolean => {
-    const errors: Partial<CustomerForm> = {};
+    const errors: Partial<Record<keyof CustomerForm, string>> = {};
     if (!form.name.trim() || form.name.trim().split(' ').length < 2) {
       errors.name = 'Informe nome e sobrenome';
     }
@@ -128,6 +181,26 @@ export default function CartDrawer() {
     if (!form.password || form.password.length < 6) {
       errors.password = 'Senha deve ter no mínimo 6 caracteres';
     }
+    // Endereço
+    const cepDigits = form.cepForm.replace(/\D/g, '');
+    if (cepDigits.length !== 8) {
+      errors.cepForm = 'CEP inválido';
+    }
+    if (!form.logradouro.trim()) {
+      errors.logradouro = 'Informe o logradouro';
+    }
+    if (!form.numero.trim()) {
+      errors.numero = 'Informe o número';
+    }
+    if (!form.bairro.trim()) {
+      errors.bairro = 'Informe o bairro';
+    }
+    if (!form.cidade.trim()) {
+      errors.cidade = 'Informe a cidade';
+    }
+    if (!form.estado.trim()) {
+      errors.estado = 'Informe o estado';
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -141,17 +214,32 @@ export default function CartDrawer() {
       const lastName = nameParts.slice(1).join(' ');
       const phoneDigits = form.phone.replace(/\D/g, '');
       const cpfDigits = form.cpf.replace(/\D/g, '');
+      const cepDigits = form.cepForm.replace(/\D/g, '');
       const shippingCost = shippingQuote ? shippingQuote.price : 0;
       const orderId = `order-${Date.now()}`;
+
+      const shippingAddress = {
+        cep: cepDigits,
+        logradouro: form.logradouro,
+        numero: form.numero,
+        complemento: form.complemento,
+        bairro: form.bairro,
+        cidade: form.cidade,
+        estado: form.estado,
+      };
 
       // 1. Cadastrar ou logar o cliente automaticamente
       let accessToken: string | null = null;
       try {
-        // Tentar cadastrar
         const regRes = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: form.name.trim(), email: form.email.trim().toLowerCase(), password: form.password }),
+          body: JSON.stringify({
+            name: form.name.trim(),
+            email: form.email.trim().toLowerCase(),
+            password: form.password,
+            address: shippingAddress,
+          }),
         });
         const regData = await regRes.json();
         if (regRes.ok) {
@@ -197,7 +285,13 @@ export default function CartDrawer() {
             type: 'CPF',
             number: cpfDigits,
           },
+          address: {
+            zip_code: cepDigits,
+            street_name: form.logradouro,
+            street_number: form.numero,
+          },
         },
+        shippingAddress,
         externalReference: orderId,
         backUrls: {
           success: `${window.location.origin}/minha-conta?tab=pedidos&order=${orderId}`,
@@ -233,6 +327,9 @@ export default function CartDrawer() {
   const grandTotal = totalPrice + shippingCost;
   const grandTotalPix = grandTotal * 0.95;
   const installmentGrandTotal = grandTotal > 0 ? (grandTotal / 3) : 0;
+
+  const inputClass = (field: keyof CustomerForm) =>
+    `w-full bg-black/50 border px-3 py-2.5 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none transition-colors ${formErrors[field] ? 'border-red-500' : 'border-white/10 focus:border-primary/50'}`;
 
   return (
     <>
@@ -288,82 +385,63 @@ export default function CartDrawer() {
           <>
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {items.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
+                <div className="flex flex-col items-center justify-center h-full text-center py-16">
                   <ShoppingBag className="w-16 h-16 text-gray-700 mb-4" />
-                  <h3 className="font-display font-bold text-lg text-gray-500 mb-2">
-                    CARRINHO VAZIO
-                  </h3>
-                  <p className="font-body text-sm text-gray-600 mb-6">
-                    Adicione produtos para começar suas compras.
-                  </p>
-                  <Link href="/products" onClick={closeCart}>
-                    <Button className="bg-primary text-black hover:bg-white font-display font-bold tracking-wider clip-corner">
-                      VER COLEÇÃO
+                  <p className="font-display font-bold text-xl text-gray-500 tracking-wider">CARRINHO VAZIO</p>
+                  <p className="font-body text-sm text-gray-600 mt-2">Adicione produtos para continuar</p>
+                  <Link href="/produtos" onClick={closeCart}>
+                    <Button className="mt-6 bg-primary text-black hover:bg-white font-display font-bold tracking-wider">
+                      VER PRODUTOS
                     </Button>
                   </Link>
                 </div>
               ) : (
                 <>
                   {items.map((item) => (
-                    <div
-                      key={`${item.productId}-${item.variantColor}`}
-                      className="flex gap-4 bg-white/5 border border-white/10 p-4 group"
-                    >
-                      <div className="w-20 h-20 bg-white/5 flex-shrink-0 flex items-center justify-center p-2">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-contain"
-                        />
+                    <div key={`${item.productId}-${item.variantColor}`} className="flex gap-4 py-3 border-b border-white/5">
+                      <div className="w-16 h-16 bg-white/5 flex-shrink-0 overflow-hidden">
+                        {item.image && (
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h4 className="font-display font-bold text-sm text-white leading-tight">
-                              {item.name}
-                            </h4>
-                            <p className="font-body text-xs text-gray-500 mt-0.5">
-                              {item.variantColorName} · {item.category.toUpperCase()}
-                            </p>
-                          </div>
+                        <p className="font-display font-bold text-sm text-white tracking-wide truncate">{item.name}</p>
+                        {item.variantColor && (
+                          <p className="font-body text-xs text-gray-500 mt-0.5">{item.variantColor}</p>
+                        )}
+                        <p className="font-body text-sm text-primary font-bold mt-1">
+                          R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
                           <button
-                            onClick={() => removeItem(item.productId, item.variantColor)}
-                            className="text-gray-600 hover:text-red-400 transition-colors flex-shrink-0"
+                            onClick={() => updateQuantity(item.productId, item.variantColor || '', item.quantity - 1)}
+                            className="w-6 h-6 flex items-center justify-center border border-white/20 text-gray-400 hover:text-white hover:border-white/40 transition-colors"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="font-body text-sm text-white w-6 text-center">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.productId, item.variantColor || '', item.quantity + 1)}
+                            className="w-6 h-6 flex items-center justify-center border border-white/20 text-gray-400 hover:text-white hover:border-white/40 transition-colors"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                          <button
+                            onClick={() => removeItem(item.productId, item.variantColor || '')}
+                            className="ml-auto text-gray-600 hover:text-red-400 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
-                        </div>
-                        <div className="flex items-center justify-between mt-3">
-                          <div className="flex items-center gap-1 border border-white/10">
-                            <button
-                              onClick={() => updateQuantity(item.productId, item.variantColor, item.quantity - 1)}
-                              className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                            >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="font-display font-bold text-sm text-white w-8 text-center">
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() => updateQuantity(item.productId, item.variantColor, item.quantity + 1)}
-                              className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </button>
-                          </div>
-                          <span className="font-display font-bold text-sm text-primary">
-                            R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
-                          </span>
                         </div>
                       </div>
                     </div>
                   ))}
 
-                  {/* Shipping Calculator */}
-                  <div className="border border-white/10 bg-white/5 p-4 space-y-3">
+                  {/* Frete */}
+                  <div className="bg-white/5 border border-white/10 p-4 space-y-3">
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-primary" />
-                      <span className="font-display font-bold text-sm text-white tracking-wider">CALCULAR FRETE</span>
+                      <Truck className="w-4 h-4 text-primary" />
+                      <span className="font-display text-xs text-gray-400 tracking-wider">CALCULAR FRETE</span>
                     </div>
                     <div className="flex gap-2">
                       <input
@@ -373,37 +451,27 @@ export default function CartDrawer() {
                         onKeyDown={(e) => e.key === 'Enter' && handleCalculateShipping()}
                         placeholder="00000-000"
                         maxLength={9}
-                        className="flex-1 bg-black/50 border border-white/10 px-3 py-2.5 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors"
+                        className="flex-1 bg-black/50 border border-white/10 px-3 py-2 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors"
                       />
-                      <Button
+                      <button
                         onClick={handleCalculateShipping}
                         disabled={isCalculating}
-                        className="bg-primary text-black hover:bg-white font-display font-bold text-xs px-4 tracking-wider"
+                        className="bg-primary text-black px-4 py-2 font-display font-bold text-xs tracking-wider hover:bg-white transition-colors disabled:opacity-70"
                       >
-                        {isCalculating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'CALCULAR'}
-                      </Button>
+                        {isCalculating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'OK'}
+                      </button>
                     </div>
                     {cepError && <p className="font-body text-xs text-red-400">{cepError}</p>}
                     {shippingQuote && (
-                      <div className="bg-black/30 border border-white/5 p-3 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Truck className="w-4 h-4 text-primary" />
-                            <span className="font-body text-xs text-gray-300">{shippingQuote.region}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="font-body text-xs text-gray-400">Prazo estimado</span>
-                          <span className="font-body text-xs text-white font-bold">{shippingQuote.estimateText}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="font-body text-xs text-gray-400">Valor do frete</span>
-                          <span className={`font-display font-bold text-sm ${shippingQuote.freeShipping ? 'text-primary' : 'text-white'}`}>
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center">
+                          <span className="font-body text-xs text-gray-400">{shippingQuote.carrier} — {shippingQuote.days} dias úteis</span>
+                          <span className={`font-body text-xs font-bold ${shippingQuote.freeShipping ? 'text-primary' : 'text-white'}`}>
                             {shippingQuote.formattedPrice}
                           </span>
                         </div>
                         {shippingQuote.freeShipping && (
-                          <p className="font-body text-[10px] text-primary/70">Frete grátis para sua região!</p>
+                          <p className="font-body text-xs text-primary">🎉 Frete grátis aplicado!</p>
                         )}
                       </div>
                     )}
@@ -411,7 +479,7 @@ export default function CartDrawer() {
                       href="https://buscacepinter.correios.com.br/app/endereco/index.php"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-body text-[10px] text-gray-600 hover:text-primary transition-colors underline"
+                      className="font-body text-[10px] text-gray-600 hover:text-gray-400 transition-colors block"
                     >
                       Não sei meu CEP
                     </a>
@@ -422,82 +490,59 @@ export default function CartDrawer() {
 
             {items.length > 0 && (
               <div className="border-t border-white/10 p-6 space-y-4">
-                <button
-                  onClick={clearCart}
-                  className="font-body text-xs text-gray-600 hover:text-red-400 transition-colors underline"
-                >
-                  Limpar carrinho
-                </button>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-display text-sm text-gray-400 tracking-wider">SUBTOTAL</span>
-                    <span className="font-display font-bold text-sm text-white">
-                      R$ {totalPrice.toFixed(2).replace('.', ',')}
-                    </span>
+                {/* Resumo */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between">
+                    <span className="font-body text-sm text-gray-400">Subtotal</span>
+                    <span className="font-body text-sm text-white">R$ {totalPrice.toFixed(2).replace('.', ',')}</span>
                   </div>
                   {shippingQuote && (
-                    <div className="flex items-center justify-between">
-                      <span className="font-display text-sm text-gray-400 tracking-wider">FRETE</span>
-                      <span className={`font-display font-bold text-sm ${shippingQuote.freeShipping ? 'text-primary' : 'text-white'}`}>
+                    <div className="flex justify-between">
+                      <span className="font-body text-sm text-gray-400">Frete</span>
+                      <span className={`font-body text-sm font-bold ${shippingQuote.freeShipping ? 'text-primary' : 'text-white'}`}>
                         {shippingQuote.formattedPrice}
                       </span>
                     </div>
                   )}
-                  <div className="border-t border-white/10 pt-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-display text-sm text-gray-300 tracking-wider">TOTAL</span>
-                      <span className="font-display font-bold text-lg text-white">
-                        R$ {grandTotal.toFixed(2).replace('.', ',')}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-xs text-gray-500">Parcelamento</span>
-                    <span className="font-body text-xs text-gray-400">
-                      ou <span className="text-white font-bold">3x de R$ {installmentGrandTotal.toFixed(2).replace('.', ',')}</span> sem juros
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-xs text-gray-500">PIX (5% desc.)</span>
-                    <span className="font-body text-xs text-primary font-bold">
-                      R$ {grandTotalPix.toFixed(2).replace('.', ',')}
-                    </span>
+                  <div className="flex justify-between pt-2 border-t border-white/10">
+                    <span className="font-display font-bold text-sm text-white tracking-wider">TOTAL</span>
+                    <span className="font-display font-bold text-sm text-primary">R$ {grandTotal.toFixed(2).replace('.', ',')}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-white/5 p-3 border border-white/10">
-                  <CreditCard className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                  <span className="font-body text-xs text-gray-500">
-                    Pagamento seguro via Mercado Pago. Visa, Mastercard, Elo e PIX.
-                  </span>
+                {/* Info pagamento */}
+                <div className="bg-white/5 border border-white/10 p-3 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-3.5 h-3.5 text-primary" />
+                    <span className="font-body text-xs text-gray-400">3x de R$ {installmentGrandTotal.toFixed(2).replace('.', ',')} sem juros</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-body text-xs text-primary font-bold">PIX</span>
+                    <span className="font-body text-xs text-gray-400">R$ {grandTotalPix.toFixed(2).replace('.', ',')} (5% OFF)</span>
+                  </div>
                 </div>
+
+                {!shippingQuote && (
+                  <p className="font-body text-xs text-gray-600 text-center">Informe seu CEP acima para calcular o frete.</p>
+                )}
 
                 <Button
                   onClick={() => setStep('form')}
-                  disabled={items.length === 0}
-                  className="w-full bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider disabled:opacity-70"
+                  className="w-full bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider"
                 >
                   FINALIZAR COMPRA <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
-
-                {!shippingQuote && (
-                  <p className="font-body text-[10px] text-gray-600 text-center">
-                    Informe seu CEP acima para calcular o frete.
-                  </p>
-                )}
               </div>
             )}
           </>
         )}
 
-        {/* ── ETAPA 2: FORMULÁRIO DE CADASTRO ── */}
+        {/* ── ETAPA 2: FORMULÁRIO ── */}
         {step === 'form' && (
           <>
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {/* Resumo do pedido */}
-              <div className="bg-white/5 border border-white/10 p-4 space-y-1">
-                <p className="font-display font-bold text-xs text-gray-400 tracking-wider mb-2">RESUMO DO PEDIDO</p>
+              <div className="bg-white/5 border border-white/10 p-4 space-y-1.5 text-sm">
                 {items.map((item) => (
                   <div key={`${item.productId}-${item.variantColor}`} className="flex justify-between">
                     <span className="font-body text-xs text-gray-300">{item.name} x{item.quantity}</span>
@@ -518,8 +563,13 @@ export default function CartDrawer() {
                 </div>
               </div>
 
-              {/* Campos do formulário */}
+              {/* ── Dados pessoais ── */}
               <div className="space-y-3">
+                <div className="flex items-center gap-2 pb-1 border-b border-white/10">
+                  <User className="w-4 h-4 text-primary" />
+                  <span className="font-display text-xs text-gray-400 tracking-wider">DADOS PESSOAIS</span>
+                </div>
+
                 <div>
                   <label className="font-display text-xs text-gray-400 tracking-wider block mb-1">NOME COMPLETO *</label>
                   <input
@@ -527,7 +577,7 @@ export default function CartDrawer() {
                     value={form.name}
                     onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
                     placeholder="Seu nome completo"
-                    className={`w-full bg-black/50 border px-3 py-2.5 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none transition-colors ${formErrors.name ? 'border-red-500' : 'border-white/10 focus:border-primary/50'}`}
+                    className={inputClass('name')}
                   />
                   {formErrors.name && <p className="font-body text-xs text-red-400 mt-1">{formErrors.name}</p>}
                 </div>
@@ -539,7 +589,7 @@ export default function CartDrawer() {
                     value={form.email}
                     onChange={(e) => setForm(f => ({ ...f, email: e.target.value }))}
                     placeholder="seu@email.com"
-                    className={`w-full bg-black/50 border px-3 py-2.5 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none transition-colors ${formErrors.email ? 'border-red-500' : 'border-white/10 focus:border-primary/50'}`}
+                    className={inputClass('email')}
                   />
                   {formErrors.email && <p className="font-body text-xs text-red-400 mt-1">{formErrors.email}</p>}
                 </div>
@@ -551,7 +601,7 @@ export default function CartDrawer() {
                     value={form.phone}
                     onChange={(e) => setForm(f => ({ ...f, phone: formatPhone(e.target.value) }))}
                     placeholder="(00) 00000-0000"
-                    className={`w-full bg-black/50 border px-3 py-2.5 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none transition-colors ${formErrors.phone ? 'border-red-500' : 'border-white/10 focus:border-primary/50'}`}
+                    className={inputClass('phone')}
                   />
                   {formErrors.phone && <p className="font-body text-xs text-red-400 mt-1">{formErrors.phone}</p>}
                 </div>
@@ -563,7 +613,7 @@ export default function CartDrawer() {
                     value={form.cpf}
                     onChange={(e) => setForm(f => ({ ...f, cpf: formatCpf(e.target.value) }))}
                     placeholder="000.000.000-00"
-                    className={`w-full bg-black/50 border px-3 py-2.5 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none transition-colors ${formErrors.cpf ? 'border-red-500' : 'border-white/10 focus:border-primary/50'}`}
+                    className={inputClass('cpf')}
                   />
                   {formErrors.cpf && <p className="font-body text-xs text-red-400 mt-1">{formErrors.cpf}</p>}
                 </div>
@@ -588,6 +638,106 @@ export default function CartDrawer() {
                   </div>
                   {formErrors.password && <p className="font-body text-xs text-red-400 mt-1">{formErrors.password}</p>}
                   <p className="font-body text-[10px] text-gray-600 mt-1">Use essa senha para acessar sua conta e acompanhar seus pedidos.</p>
+                </div>
+              </div>
+
+              {/* ── Endereço de entrega ── */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 pb-1 border-b border-white/10">
+                  <Home className="w-4 h-4 text-primary" />
+                  <span className="font-display text-xs text-gray-400 tracking-wider">ENDEREÇO DE ENTREGA</span>
+                </div>
+
+                <div>
+                  <label className="font-display text-xs text-gray-400 tracking-wider block mb-1">CEP *</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={form.cepForm}
+                      onChange={(e) => handleCepFormChange(e.target.value)}
+                      placeholder="00000-000"
+                      maxLength={9}
+                      className={inputClass('cepForm')}
+                    />
+                    {isFetchingCep && (
+                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-gray-500" />
+                    )}
+                  </div>
+                  {formErrors.cepForm && <p className="font-body text-xs text-red-400 mt-1">{formErrors.cepForm}</p>}
+                </div>
+
+                <div>
+                  <label className="font-display text-xs text-gray-400 tracking-wider block mb-1">LOGRADOURO *</label>
+                  <input
+                    type="text"
+                    value={form.logradouro}
+                    onChange={(e) => setForm(f => ({ ...f, logradouro: e.target.value }))}
+                    placeholder="Rua, Avenida, etc."
+                    className={inputClass('logradouro')}
+                  />
+                  {formErrors.logradouro && <p className="font-body text-xs text-red-400 mt-1">{formErrors.logradouro}</p>}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-display text-xs text-gray-400 tracking-wider block mb-1">NÚMERO *</label>
+                    <input
+                      type="text"
+                      value={form.numero}
+                      onChange={(e) => setForm(f => ({ ...f, numero: e.target.value }))}
+                      placeholder="123"
+                      className={inputClass('numero')}
+                    />
+                    {formErrors.numero && <p className="font-body text-xs text-red-400 mt-1">{formErrors.numero}</p>}
+                  </div>
+                  <div>
+                    <label className="font-display text-xs text-gray-400 tracking-wider block mb-1">COMPLEMENTO</label>
+                    <input
+                      type="text"
+                      value={form.complemento}
+                      onChange={(e) => setForm(f => ({ ...f, complemento: e.target.value }))}
+                      placeholder="Apto, Bloco..."
+                      className="w-full bg-black/50 border border-white/10 px-3 py-2.5 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-display text-xs text-gray-400 tracking-wider block mb-1">BAIRRO *</label>
+                  <input
+                    type="text"
+                    value={form.bairro}
+                    onChange={(e) => setForm(f => ({ ...f, bairro: e.target.value }))}
+                    placeholder="Seu bairro"
+                    className={inputClass('bairro')}
+                  />
+                  {formErrors.bairro && <p className="font-body text-xs text-red-400 mt-1">{formErrors.bairro}</p>}
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2">
+                    <label className="font-display text-xs text-gray-400 tracking-wider block mb-1">CIDADE *</label>
+                    <input
+                      type="text"
+                      value={form.cidade}
+                      onChange={(e) => setForm(f => ({ ...f, cidade: e.target.value }))}
+                      placeholder="Sua cidade"
+                      className={inputClass('cidade')}
+                    />
+                    {formErrors.cidade && <p className="font-body text-xs text-red-400 mt-1">{formErrors.cidade}</p>}
+                  </div>
+                  <div>
+                    <label className="font-display text-xs text-gray-400 tracking-wider block mb-1">ESTADO *</label>
+                    <input
+                      type="text"
+                      value={form.estado}
+                      onChange={(e) => setForm(f => ({ ...f, estado: e.target.value.toUpperCase().slice(0, 2) }))}
+                      placeholder="SP"
+                      maxLength={2}
+                      className={inputClass('estado')}
+                    />
+                    {formErrors.estado && <p className="font-body text-xs text-red-400 mt-1">{formErrors.estado}</p>}
+                  </div>
                 </div>
               </div>
             </div>
