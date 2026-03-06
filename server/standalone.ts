@@ -753,7 +753,43 @@ app.post('/api/admin/gestao/partners', requireAuth, (req, res) => {
   res.json(item);
 });
 
-// ─── Webhook ──────────────────────────────────────────────────────────────────
+// ─── Baixa de estoque ────────────────────────────────────────────────────────
+function deductStock(orderItems: any[]): void {
+  try {
+    const stock = readJSON(STOCK_FILE, {});
+    let changed = false;
+    for (const item of orderItems) {
+      const productId = item.productId || item.id;
+      const variantColor = item.variantColor || 'default';
+      const qty = Number(item.quantity) || 1;
+      if (!productId || !stock[productId]) continue;
+      const productStock = stock[productId];
+      // Decrementar variante específica
+      if (productStock.variants && productStock.variants[variantColor] !== undefined) {
+        productStock.variants[variantColor] = Math.max(0, (productStock.variants[variantColor] || 0) - qty);
+      } else if (productStock.variants && productStock.variants['default'] !== undefined) {
+        productStock.variants['default'] = Math.max(0, (productStock.variants['default'] || 0) - qty);
+      }
+      // Recalcular total do produto
+      if (productStock.variants) {
+        productStock.total = Object.values(productStock.variants as Record<string, number>)
+          .reduce((sum: number, v: any) => sum + Number(v), 0);
+      } else {
+        productStock.total = Math.max(0, (productStock.total || 0) - qty);
+      }
+      changed = true;
+    }
+    if (changed) {
+      writeJSON(STOCK_FILE, stock);
+      _stockCache = stock; // Atualizar cache em memória
+      console.log('[Stock] Estoque atualizado após pagamento aprovado');
+    }
+  } catch (e: any) {
+    console.error('[Stock] Erro ao dar baixa no estoque:', e.message);
+  }
+}
+
+// ─── Webhook ──────────────────────────────────────────────────────────────────────────────────
 app.post("/api/webhooks/mercadopago", async (req, res) => {
   try {
     const { type, data } = req.body;
@@ -776,6 +812,8 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
           order.paymentId = String(data.id);
           order.paidAt = new Date().toISOString();
           writeJSON(ORDERS_FILE, orders);
+          // Dar baixa no estoque
+          deductStock(order.items || []);
           // Notificação WhatsApp - pagamento aprovado
           sendWhatsAppNotification(formatOrderNotification(order, "PAGAMENTO APROVADO - EM SEPARAÇÃO")).catch(() => {});
         } else {

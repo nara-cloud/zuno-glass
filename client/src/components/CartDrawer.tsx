@@ -183,6 +183,7 @@ export default function CartDrawer() {
           quantity: item.quantity,
           unit_price: item.price,
           currency_id: 'BRL',
+          variantColor: item.variantColor || 'default',
         })),
         payer: {
           first_name: firstName,
