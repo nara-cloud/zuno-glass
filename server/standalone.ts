@@ -58,6 +58,7 @@ const ORDERS_FILE = path.join(DATA_DIR, "orders.json");
 const WAITLIST_FILE = path.join(DATA_DIR, "waitlist.json");
 const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
 const STOCK_FILE = path.join(DATA_DIR, "stock.json");
+const CUSTOMERS_FILE = path.join(DATA_DIR, "customers.json");
 
 function readJSON(file: string, def: any = []) {
   try { return JSON.parse(fs.readFileSync(file, "utf-8")); } catch { return def; }
@@ -66,11 +67,25 @@ function writeJSON(file: string, data: any) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
 
-// ─── In-memory users ─────────────────────────────────────────────────────────
-const users: any[] = [];
+// ─── Persistent users ────────────────────────────────────────────────────────
+function loadUsers(): any[] {
+  try {
+    const saved = readJSON(CUSTOMERS_FILE, null);
+    if (Array.isArray(saved) && saved.length > 0) return saved;
+  } catch {}
+  return [];
+}
+function saveUsers(userList: any[]) {
+  writeJSON(CUSTOMERS_FILE, userList);
+}
+const users: any[] = loadUsers();
+// Garantir que o admin sempre existe
 (async () => {
-  const hash = await bcrypt.hash("admin123", 10);
-  users.push({ id: 1, email: "admin@zunoglass.com", passwordHash: hash, name: "Admin ZUNO", roles: ["admin", "ops"], isActive: true });
+  if (!users.find((u: any) => u.email === 'admin@zunoglass.com')) {
+    const hash = await bcrypt.hash('admin123', 10);
+    users.push({ id: 1, email: 'admin@zunoglass.com', passwordHash: hash, name: 'Admin ZUNO', roles: ['admin', 'ops'], isActive: true });
+    saveUsers(users);
+  }
 })();
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
@@ -100,10 +115,12 @@ app.post("/api/auth/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: "Nome, e-mail e senha são obrigatórios." });
-    if (users.find(u => u.email === email.toLowerCase())) return res.status(409).json({ error: "E-mail já cadastrado." });
+    if (users.find((u: any) => u.email === email.toLowerCase())) return res.status(409).json({ error: "E-mail já cadastrado." });
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = { id: users.length + 1, email: email.toLowerCase(), passwordHash, name, roles: ["customer"], isActive: true };
+    const newId = users.length > 0 ? Math.max(...users.map((u: any) => u.id || 0)) + 1 : 1;
+    const user = { id: newId, email: email.toLowerCase(), passwordHash, name, roles: ["customer"], isActive: true, createdAt: new Date().toISOString() };
     users.push(user);
+    saveUsers(users);
     const accessToken = jwt.sign({ userId: user.id, email: user.email, roles: user.roles }, JWT_SECRET, { expiresIn: "7d" });
     res.status(201).json({ accessToken, user: { id: user.id, name: user.name, email: user.email, roles: user.roles } });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -126,16 +143,30 @@ app.post("/api/auth/refresh", (_req, res) => res.status(401).json({ error: "Not 
 app.post("/api/auth/forgot-password", (_req, res) => res.json({ success: true, message: "Se o e-mail existir, você receberá as instruções." }));
 
 app.get("/api/auth/me", requireAuth, (req: any, res) => {
-  const user = users.find(u => u.id === req.authUser.userId);
+  const user = users.find((u: any) => u.id === req.authUser.userId) ||
+               users.find((u: any) => u.email === req.authUser.email);
   if (!user) return res.status(404).json({ error: "Usuário não encontrado." });
-  res.json({ user: { id: user.id, name: user.name, email: user.email, roles: user.roles, address: {} } });
+  res.json({ user: { id: user.id, name: user.name, email: user.email, roles: user.roles, phone: user.phone, cpf: user.cpf, address: user.address || {} } });
 });
 
 app.put("/api/auth/profile", requireAuth, (req: any, res) => {
-  const user = users.find(u => u.id === req.authUser.userId);
+  const user = users.find((u: any) => u.id === req.authUser.userId);
   if (!user) return res.status(404).json({ error: "Usuário não encontrado." });
   Object.assign(user, req.body);
+  saveUsers(users);
   res.json({ success: true, user });
+});
+
+// ─── GET /api/auth/my-orders ──────────────────────────────────────────────────
+app.get("/api/auth/my-orders", requireAuth, (req: any, res) => {
+  try {
+    const email = req.authUser.email;
+    const orders = readJSON(ORDERS_FILE, []);
+    const myOrders = orders.filter((o: any) =>
+      o.customerEmail && o.customerEmail.toLowerCase() === email.toLowerCase()
+    );
+    res.json({ orders: myOrders });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 // // ─── Catalog & Stock (persistent) ────────────────────────────────────────────
@@ -313,9 +344,9 @@ app.post("/api/checkout/preference", async (req, res) => {
         })),
         payer: payer || {},
         back_urls: backUrls || {
-          success: `${origin}/checkout/success`,
+          success: `${origin}/minha-conta?tab=pedidos`,
           failure: `${origin}/checkout`,
-          pending: `${origin}/checkout`,
+          pending: `${origin}/minha-conta?tab=pedidos`,
         },
         auto_approve: false,
         external_reference: orderId,
@@ -740,12 +771,13 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
           (extRef && (o.id === extRef || o.preferenceId === extRef))
         );
         if (order) {
-          order.status = "paid";
+          order.status = "em_separacao";
+          order.paymentStatus = "paid";
           order.paymentId = String(data.id);
           order.paidAt = new Date().toISOString();
           writeJSON(ORDERS_FILE, orders);
           // Notificação WhatsApp - pagamento aprovado
-          sendWhatsAppNotification(formatOrderNotification(order, "PAGAMENTO APROVADO")).catch(() => {});
+          sendWhatsAppNotification(formatOrderNotification(order, "PAGAMENTO APROVADO - EM SEPARAÇÃO")).catch(() => {});
         } else {
           // Pedido não encontrado - criar registro com dados do pagamento
           const fallbackOrder: any = {
@@ -754,7 +786,8 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
             customerName: result.payer?.first_name ? `${result.payer.first_name} ${result.payer.last_name || ''}`.trim() : 'Cliente',
             customerEmail: result.payer?.email || '',
             total: result.transaction_amount || 0,
-            status: 'paid',
+            status: 'em_separacao',
+            paymentStatus: 'paid',
             paymentId: String(data.id),
             preferenceId: extRef || '',
             paidAt: new Date().toISOString(),
@@ -762,7 +795,7 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
           };
           orders.push(fallbackOrder);
           writeJSON(ORDERS_FILE, orders);
-          sendWhatsAppNotification(formatOrderNotification(fallbackOrder, "PAGAMENTO APROVADO")).catch(() => {});
+          sendWhatsAppNotification(formatOrderNotification(fallbackOrder, "PAGAMENTO APROVADO - EM SEPARAÇÃO")).catch(() => {});
         }
       }
     }

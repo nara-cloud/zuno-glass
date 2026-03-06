@@ -341,9 +341,9 @@ async function startServer() {
       const preference = await createPreference({
         items: mpItems,
         externalReference: externalRef.join(';'),
-        successUrl: `${origin}/checkout/success`,
+        successUrl: `${origin}/minha-conta?tab=pedidos`,
         failureUrl: `${origin}/checkout?error=payment_failed`,
-        pendingUrl: `${origin}/checkout/success?pending=true`,
+        pendingUrl: `${origin}/minha-conta?tab=pedidos`,
         payerEmail: payerEmail || undefined,
         shippingCost: shippingCost || 0,
         notificationUrl: `${origin}/api/mp/webhook`,

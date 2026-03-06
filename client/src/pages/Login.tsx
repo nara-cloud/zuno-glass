@@ -15,6 +15,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const returnTo = urlParams.get('returnTo') || '/minha-conta';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
@@ -26,7 +29,7 @@ export default function Login() {
     setLoading(false);
     if (result.success) {
       toast.success('Bem-vindo de volta!');
-      setLocation('/minha-conta');
+      setLocation(returnTo);
     } else {
       toast.error(result.error || 'Erro ao fazer login.');
     }

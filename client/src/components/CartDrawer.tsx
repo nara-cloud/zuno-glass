@@ -1,13 +1,13 @@
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
-import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2, CreditCard, Truck, MapPin, User, ChevronLeft } from 'lucide-react';
+import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2, CreditCard, Truck, MapPin, User, ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
 import { calculateShipping, isValidCep, formatCep } from '@shared/shipping';
 import type { ShippingQuote } from '@shared/shipping';
 
-// checkout-v4-2etapas-20260305
+// checkout-v5-senha-conta-20260306
 type Step = 'cart' | 'form';
 
 interface CustomerForm {
@@ -15,6 +15,7 @@ interface CustomerForm {
   email: string;
   phone: string;
   cpf: string;
+  password: string;
 }
 
 export default function CartDrawer() {
@@ -26,12 +27,14 @@ export default function CartDrawer() {
   const [cepError, setCepError] = useState('');
   const [isCalculating, setIsCalculating] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState<CustomerForm>({
     name: '',
     email: '',
     phone: '',
     cpf: '',
+    password: '',
   });
   const [formErrors, setFormErrors] = useState<Partial<CustomerForm>>({});
 
@@ -122,6 +125,9 @@ export default function CartDrawer() {
     if (cpfDigits.length !== 11) {
       errors.cpf = 'CPF inválido';
     }
+    if (!form.password || form.password.length < 6) {
+      errors.password = 'Senha deve ter no mínimo 6 caracteres';
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -136,7 +142,40 @@ export default function CartDrawer() {
       const phoneDigits = form.phone.replace(/\D/g, '');
       const cpfDigits = form.cpf.replace(/\D/g, '');
       const shippingCost = shippingQuote ? shippingQuote.price : 0;
+      const orderId = `order-${Date.now()}`;
 
+      // 1. Cadastrar ou logar o cliente automaticamente
+      let accessToken: string | null = null;
+      try {
+        // Tentar cadastrar
+        const regRes = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: form.name.trim(), email: form.email.trim().toLowerCase(), password: form.password }),
+        });
+        const regData = await regRes.json();
+        if (regRes.ok) {
+          accessToken = regData.accessToken;
+        } else if (regRes.status === 409) {
+          // E-mail já cadastrado — tentar login
+          const loginRes = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: form.email.trim().toLowerCase(), password: form.password }),
+          });
+          const loginData = await loginRes.json();
+          if (loginRes.ok) {
+            accessToken = loginData.accessToken;
+          }
+        }
+      } catch (_) {}
+
+      // Salvar token no localStorage para manter sessão
+      if (accessToken) {
+        localStorage.setItem('zuno_access_token', accessToken);
+      }
+
+      // 2. Criar preferência no Mercado Pago
       const prefPayload = {
         items: items.map(item => ({
           id: item.productId,
@@ -158,7 +197,12 @@ export default function CartDrawer() {
             number: cpfDigits,
           },
         },
-        externalReference: `order-${Date.now()}`,
+        externalReference: orderId,
+        backUrls: {
+          success: `${window.location.origin}/minha-conta?tab=pedidos&order=${orderId}`,
+          failure: `${window.location.origin}/checkout`,
+          pending: `${window.location.origin}/minha-conta?tab=pedidos&order=${orderId}`,
+        },
       };
 
       const response = await fetch('/api/checkout/preference', {
@@ -522,11 +566,29 @@ export default function CartDrawer() {
                   />
                   {formErrors.cpf && <p className="font-body text-xs text-red-400 mt-1">{formErrors.cpf}</p>}
                 </div>
-              </div>
 
-              <p className="font-body text-[10px] text-gray-600">
-                Seus dados sao usados apenas para processar o pedido e entrega.
-              </p>
+                <div>
+                  <label className="font-display text-xs text-gray-400 tracking-wider block mb-1">CRIE SUA SENHA *</label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={form.password}
+                      onChange={(e) => setForm(f => ({ ...f, password: e.target.value }))}
+                      placeholder="Mínimo 6 caracteres"
+                      className={`w-full bg-black/50 border px-3 py-2.5 pr-10 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none transition-colors ${formErrors.password ? 'border-red-500' : 'border-white/10 focus:border-primary/50'}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(v => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {formErrors.password && <p className="font-body text-xs text-red-400 mt-1">{formErrors.password}</p>}
+                  <p className="font-body text-[10px] text-gray-600 mt-1">Use essa senha para acessar sua conta e acompanhar seus pedidos.</p>
+                </div>
+              </div>
             </div>
 
             <div className="border-t border-white/10 p-6">

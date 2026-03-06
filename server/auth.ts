@@ -352,6 +352,60 @@ router.put('/profile', requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// ─── GET /api/auth/my-orders ─────────────────────────────────────────────────
+router.get('/my-orders', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const authUser = (req as any).authUser;
+    const email = authUser.email;
+    const mysql2 = await import('mysql2/promise');
+    const pool = mysql2.createPool(process.env.DATABASE_URL || '');
+    // Buscar pedidos do cliente pelo email
+    const [orderRows] = await pool.execute<any[]>(
+      `SELECT o.id, o.order_number, o.status, o.payment_status, o.total,
+              o.shipping_cost, o.subtotal, o.tracking_code, o.created_at
+       FROM orders o
+       WHERE o.customer_email = ?
+       ORDER BY o.created_at DESC
+       LIMIT 50`,
+      [email]
+    );
+    const orders = orderRows as any[];
+    // Para cada pedido, buscar os itens
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order: any) => {
+        const [itemRows] = await pool.execute<any[]>(
+          `SELECT product_name, variant_color_name, quantity, unit_price, image_url
+           FROM order_items WHERE order_id = ?`,
+          [order.id]
+        );
+        return {
+          id: order.id,
+          orderNumber: order.order_number,
+          status: order.status,
+          paymentStatus: order.payment_status,
+          total: parseFloat(order.total),
+          shippingCost: parseFloat(order.shipping_cost || 0),
+          subtotal: parseFloat(order.subtotal || 0),
+          trackingCode: order.tracking_code,
+          createdAt: order.created_at,
+          items: (itemRows as any[]).map((item: any) => ({
+            productName: item.product_name,
+            variantColorName: item.variant_color_name,
+            quantity: item.quantity,
+            unitPrice: parseFloat(item.unit_price),
+            imageUrl: item.image_url,
+          })),
+        };
+      })
+    );
+    await pool.end();
+    return res.json({ orders: ordersWithItems });
+  } catch (err: any) {
+    console.error('[Auth] My orders error:', err.message);
+    return res.status(500).json({ error: 'Erro ao buscar pedidos.' });
+  }
+});
+
 // ─── Middleware: requireAuth ──────────────────────────────────────────────────
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;

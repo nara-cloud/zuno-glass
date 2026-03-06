@@ -16,25 +16,29 @@ import Navbar from '@/components/Navbar';
 type Tab = 'dashboard' | 'pedidos' | 'perfil' | 'endereco';
 
 interface Order {
-  id: number;
-  orderNumber: string;
+  id: string | number;
+  orderNumber?: string;
   status: string;
-  paymentStatus: string;
+  paymentStatus?: string;
   total: number;
   createdAt: string;
   items: Array<{
-    productName: string;
+    productName?: string;
+    name?: string;
     variantColorName?: string;
     quantity: number;
-    unitPrice: number;
+    unitPrice?: number;
+    price?: number;
   }>;
   trackingCode?: string;
 }
 
 const statusLabel: Record<string, string> = {
-  pending: 'Aguardando',
+  pending: 'Aguardando Pagamento',
   confirmed: 'Confirmado',
   processing: 'Processando',
+  em_separacao: 'Aprovado e em Separação',
+  paid: 'Pago',
   shipped: 'Enviado',
   delivered: 'Entregue',
   cancelled: 'Cancelado',
@@ -44,6 +48,8 @@ const statusIcon: Record<string, React.ReactNode> = {
   pending: <Clock className="w-4 h-4 text-yellow-500" />,
   confirmed: <CheckCircle className="w-4 h-4 text-blue-500" />,
   processing: <Clock className="w-4 h-4 text-blue-500" />,
+  em_separacao: <CheckCircle className="w-4 h-4 text-green-500" />,
+  paid: <CheckCircle className="w-4 h-4 text-green-500" />,
   shipped: <Truck className="w-4 h-4 text-primary" />,
   delivered: <CheckCircle className="w-4 h-4 text-green-500" />,
   cancelled: <XCircle className="w-4 h-4 text-red-500" />,
@@ -52,7 +58,9 @@ const statusIcon: Record<string, React.ReactNode> = {
 export default function MinhaConta() {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated, loading, logout, accessToken, updateUser } = useAuthContext();
-  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const initialTab = (urlParams.get('tab') as Tab) || 'dashboard';
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
@@ -65,7 +73,8 @@ export default function MinhaConta() {
   // Redirect if not authenticated
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      setLocation('/entrar');
+      const returnTo = window.location.pathname + window.location.search;
+      setLocation(`/entrar?returnTo=${encodeURIComponent(returnTo)}`);
     }
   }, [loading, isAuthenticated, setLocation]);
 
@@ -89,12 +98,19 @@ export default function MinhaConta() {
     }
   }, [user]);
 
-  // Fetch orders when tab changes
+  // Fetch orders when tab changes or on mount if tab=pedidos
   useEffect(() => {
     if (activeTab === 'pedidos' && accessToken) {
       fetchOrders();
     }
   }, [activeTab, accessToken]);
+
+  // Auto-fetch orders on mount if redirected from payment
+  useEffect(() => {
+    if (initialTab === 'pedidos' && accessToken && orders.length === 0) {
+      fetchOrders();
+    }
+  }, [accessToken]);
 
   const fetchOrders = async () => {
     setOrdersLoading(true);
@@ -329,6 +345,16 @@ export default function MinhaConta() {
             {activeTab === 'pedidos' && (
               <div>
                 <h2 className="font-display font-bold text-lg tracking-tight mb-6">MEUS PEDIDOS</h2>
+                {/* Banner de sucesso quando redirecionado do pagamento */}
+                {urlParams.get('tab') === 'pedidos' && (
+                  <div className="border border-green-500/30 bg-green-500/10 p-4 mb-6 flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-display font-bold text-sm text-green-400 tracking-wider">PAGAMENTO CONFIRMADO!</p>
+                      <p className="font-body text-xs text-green-300/80 mt-1">Seu pedido foi aprovado e está sendo separado. Você receberá atualizações por aqui.</p>
+                    </div>
+                  </div>
+                )}
                 {ordersLoading ? (
                   <div className="flex items-center justify-center py-16">
                     <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -350,15 +376,25 @@ export default function MinhaConta() {
                       <div key={order.id} className="border border-border/50 bg-card/30 p-5">
                         <div className="flex items-start justify-between mb-4">
                           <div>
-                            <p className="font-display font-bold text-sm tracking-wider">#{order.orderNumber}</p>
+                            <p className="font-display font-bold text-sm tracking-wider">#{order.orderNumber || order.id}</p>
                             <p className="text-xs text-muted-foreground mt-1">
                               {new Date(order.createdAt).toLocaleDateString('pt-BR', {
                                 day: '2-digit', month: 'long', year: 'numeric'
                               })}
                             </p>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {statusIcon[order.status] || <Clock className="w-4 h-4" />}
+                          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-sm border ${
+                            order.status === 'em_separacao' || order.status === 'paid'
+                              ? 'border-green-500/30 bg-green-500/10'
+                              : order.status === 'shipped'
+                              ? 'border-primary/30 bg-primary/10'
+                              : order.status === 'delivered'
+                              ? 'border-green-500/30 bg-green-500/10'
+                              : order.status === 'cancelled'
+                              ? 'border-red-500/30 bg-red-500/10'
+                              : 'border-yellow-500/30 bg-yellow-500/10'
+                          }`}>
+                            {statusIcon[order.status] || <Clock className="w-4 h-4 text-yellow-500" />}
                             <span className="text-xs font-display tracking-wider">
                               {statusLabel[order.status] || order.status}
                             </span>
@@ -369,10 +405,10 @@ export default function MinhaConta() {
                           {order.items?.map((item, i) => (
                             <div key={i} className="flex justify-between text-sm">
                               <span className="text-muted-foreground">
-                                {item.quantity}x {item.productName}
+                                {item.quantity}x {item.productName || item.name || 'Produto'}
                                 {item.variantColorName && ` — ${item.variantColorName}`}
                               </span>
-                              <span>R$ {(item.unitPrice * item.quantity).toFixed(2).replace('.', ',')}</span>
+                              <span>R$ {((item.unitPrice ?? item.price ?? 0) * item.quantity).toFixed(2).replace('.', ',')}</span>
                             </div>
                           ))}
                         </div>
