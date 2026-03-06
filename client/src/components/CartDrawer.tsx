@@ -72,11 +72,15 @@ export default function CartDrawer() {
     }
   }, [totalPrice]);
 
-  // Resetar para etapa do carrinho ao fechar
+  // Resetar para etapa do carrinho ao fechar + bloquear scroll da página
   useEffect(() => {
-    if (!isCartOpen) {
+    if (isCartOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
       setTimeout(() => setStep('cart'), 300);
     }
+    return () => { document.body.style.overflow = ''; };
   }, [isCartOpen]);
 
   // Preencher CEP do formulário com o CEP de frete já calculado
