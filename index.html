@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Zuno Community</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --primary: #CCFF00;
+      --bg: #111111;
+      --surface: #1A1A1A;
+      --surface2: #222222;
+      --border: #2A2A2A;
+      --text: #F0F0F0;
+      --muted: #888888;
+      --boost: #FF6B00;
+      --boost-light: #FF8C33;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    #app {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+    /* SPLASH */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: #111111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+    }
+    #splash img { width: 120px; height: 120px; object-fit: contain; animation: pulse 1.5s ease-in-out infinite; }
+    #splash .tagline { color: var(--primary); font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.08);opacity:0.85} }
+
+    /* SCREENS */
+    .screen { display: none; flex-direction: column; min-height: calc(100vh - 72px); overflow-y: auto; padding-bottom: 80px; }
+    .screen.active { display: flex; }
+
+    /* BOTTOM NAV */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      background: #161616;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      height: 72px;
+      z-index: 100;
+      padding: 0 8px;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      padding: 8px 4px;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    .nav-item .nav-icon { font-size: 22px; line-height: 1; }
+    .nav-item .nav-label { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; }
+    .nav-item.active .nav-label { color: var(--primary); }
+    .nav-item.active .nav-icon { filter: drop-shadow(0 0 6px var(--primary)); }
+
+    /* HEADER */
+    .screen-header {
+      padding: 52px 20px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .screen-title { font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; }
+    .screen-title span { color: var(--primary); }
+
+    /* CARDS */
+    .card { background: var(--surface); border-radius: 16px; overflow: hidden; }
+    .card-border { border: 1px solid var(--border); }
+
+    /* BUTTONS */
+    .btn-primary {
+      background: var(--primary);
+      color: #111;
+      font-weight: 800;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 1.5px solid var(--primary);
+      border-radius: 10px;
+      padding: 10px 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    /* BADGE */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge-primary { background: var(--primary); color: #111; }
+    .badge-boost { background: var(--boost); color: #fff; }
+    .badge-muted { background: var(--surface2); color: var(--muted); }
+    .badge-green { background: rgba(204,255,0,0.15); color: var(--primary); border: 1px solid rgba(204,255,0,0.3); }
+
+    /* PROGRESS BAR */
+    .progress-bar { background: var(--border); border-radius: 99px; height: 6px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; background: var(--primary); transition: width 0.5s ease; }
+    .progress-fill.boost { background: var(--boost); }
+
+    /* SECTION TITLE */
+    .section-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* HORIZONTAL SCROLL */
+    .h-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .h-scroll::-webkit-scrollbar { display: none; }
+
+    /* TABS */
+    .tab-bar { display: flex; gap: 4px; background: var(--surface); border-radius: 12px; padding: 4px; margin: 0 20px 20px; }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tab-btn.active { background: var(--primary); color: #111; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 500;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-sheet {
+      background: var(--surface);
+      border-radius: 24px 24px 0 0;
+      width: 100%;
+      max-width: 430px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px 20px 40px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    .modal-overlay.open .modal-sheet { transform: translateY(0); }
+    .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 99px; margin: 0 auto 20px; }
+
+    /* ===== HOME SCREEN ===== */
+    .hero-banner {
+      position: relative;
+      height: 260px;
+      overflow: hidden;
+      margin: 0 0 20px;
+    }
+    .hero-banner img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(17,17,17,0.95) 0%, rgba(17,17,17,0.3) 60%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px;
+    }
+    .hero-logo { height: 36px; object-fit: contain; margin-bottom: 8px; filter: brightness(0) invert(1); }
+    .hero-title { font-size: 22px; font-weight: 900; text-transform: uppercase; line-height: 1.1; }
+    .hero-title span { color: var(--primary); }
+    .hero-sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+    .quick-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; margin-bottom: 20px; }
+    .stat-card { background: var(--surface); border-radius: 14px; padding: 14px; border: 1px solid var(--border); }
+    .stat-card .stat-icon { font-size: 20px; margin-bottom: 6px; }
+    .stat-card .stat-value { font-size: 22px; font-weight: 900; color: var(--primary); }
+    .stat-card .stat-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .zp-card {
+      margin: 0 20px 20px;
+      background: linear-gradient(135deg, #1A2200 0%, #1A1A1A 100%);
+      border: 1px solid rgba(204,255,0,0.25);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+    }
+    .zp-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .zp-icon { width: 44px; height: 44px; background: rgba(204,255,0,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .zp-info .zp-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .zp-info .zp-balance { font-size: 28px; font-weight: 900; color: var(--primary); line-height: 1; }
+    .zp-meta { display: flex; align-items: center; gap: 12px; }
+    .zp-level { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .zp-streak { font-size: 12px; color: var(--text); font-weight: 600; }
+    .zp-btn { background: var(--primary); color: #111; font-size: 12px; font-weight: 800; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+
+    .boost-banner {
+      margin: 0 20px 20px;
+      background: linear-gradient(135deg, #2A1200 0%, #1A1A1A 100%);
+      border: 1px solid rgba(255,107,0,0.3);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      height: 120px;
+    }
+    .boost-banner img { position: absolute; right: 0; top: 0; height: 100%; width: 50%; object-fit: cover; object-position: left; }
+    .boost-banner-content { position: absolute; left: 0; top: 0; bottom: 0; width: 55%; padding: 16px; display: flex; flex-direction: column; justify-content: center; }
+    .boost-banner-tag { font-size: 9px; font-weight: 800; color: var(--boost); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+    .boost-banner-title { font-size: 15px; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
+    .boost-banner-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    .section-block { padding: 0 20px; margin-bottom: 24px; }
+
+    .challenge-mini { background: var(--surface); border-radius: 14px; padding: 14px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; margin-bottom: 10px; cursor: pointer; }
+    .challenge-mini-icon { font-size: 28px; width: 48px; height: 48px; background: var(--surface2); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .challenge-mini-info { flex: 1; min-width: 0; }
+    .challenge-mini-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .challenge-mini-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .challenge-mini-progress { margin-top: 8px; }
+
+    /* ===== DISCOVER SCREEN ===== */
+    .discover-hero { position: relative; height: 220px; margin-bottom: 20px; overflow: hidden; }
+    .discover-hero img { width: 100%; height: 100%; object-fit: cover; }
+    .discover-hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(17,17,17,1) 0%, rgba(17,17,17,0.4) 50%, transparent 100%);
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 20px;
+    }
+    .discover-hero-tag { font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .discover-hero-title { font-size: 20px; font-weight: 900; text-transform: uppercase; line-height: 1.1; }
+    .discover-hero-meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .discover-hero-actions { display: flex; gap: 10px; margin-top: 12px; }
+    .btn-play { background: var(--primary); color: #111; font-weight: 800; font-size: 13px; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .btn-info { background: rgba(255,255,255,0.15); color: #fff; font-weight: 700; font-size: 13px; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; }
+
+    .filter-bar { display: flex; gap: 8px; padding: 0 20px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .filter-chip.active { background: var(--primary); color: #111; border-color: var(--primary); }
+
+    .content-row { padding: 0 20px; margin-bottom: 24px; }
+    .content-row-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .content-row-title h3 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    .content-row-title span { font-size: 12px; color: var(--primary); font-weight: 600; cursor: pointer; }
+
+    .content-card { flex-shrink: 0; width: 160px; cursor: pointer; }
+    .content-card-thumb { width: 160px; height: 100px; border-radius: 12px; overflow: hidden; background: var(--surface2); position: relative; }
+    .content-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .content-card-type { position: absolute; top: 8px; left: 8px; }
+    .content-card-duration { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 6px; }
+    .content-card-title { font-size: 13px; font-weight: 700; margin-top: 8px; line-height: 1.3; }
+    .content-card-author { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    .boost-content-card { flex-shrink: 0; width: 160px; cursor: pointer; }
+    .boost-content-card .content-card-thumb { border: 1px solid rgba(255,107,0,0.3); }
+
+    /* ===== CHALLENGES SCREEN ===== */
+    .challenge-card { background: var(--surface); border-radius: 16px; padding: 16px; border: 1px solid var(--border); margin-bottom: 12px; cursor: pointer; }
+    .challenge-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .challenge-card-icon { font-size: 32px; width: 56px; height: 56px; background: var(--surface2); border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+    .challenge-card-title { font-size: 16px; font-weight: 800; }
+    .challenge-card-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .challenge-card-desc { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 12px; }
+    .challenge-progress-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .challenge-progress-label { font-size: 13px; font-weight: 700; }
+    .challenge-progress-pct { font-size: 13px; font-weight: 800; color: var(--primary); }
+
+    /* MEDALS */
+    .medals-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 20px; }
+    .medal-card { background: var(--surface); border-radius: 14px; padding: 14px 10px; text-align: center; border: 1px solid var(--border); }
+    .medal-card.locked { opacity: 0.4; }
+    .medal-icon { font-size: 32px; margin-bottom: 8px; }
+    .medal-name { font-size: 11px; font-weight: 700; line-height: 1.3; }
+    .medal-desc { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+    /* RANKING */
+    .ranking-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+    .ranking-pos { font-size: 16px; font-weight: 900; width: 28px; text-align: center; }
+    .ranking-pos.gold { color: #FFD700; }
+    .ranking-pos.silver { color: #C0C0C0; }
+    .ranking-pos.bronze { color: #CD7F32; }
+    .ranking-avatar { width: 44px; height: 44px; border-radius: 22px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .ranking-info { flex: 1; }
+    .ranking-name { font-size: 14px; font-weight: 700; }
+    .ranking-pts { font-size: 12px; color: var(--muted); }
+    .ranking-badge { font-size: 12px; font-weight: 800; color: var(--primary); }
+
+    /* ===== SHOP SCREEN ===== */
+    .shop-boost-banner {
+      margin: 0 20px 20px;
+      background: linear-gradient(135deg, #FF6B00 0%, #FF8C33 100%);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .shop-boost-banner img { height: 80px; object-fit: contain; }
+    .shop-boost-banner-text .title { font-size: 16px; font-weight: 900; color: #fff; text-transform: uppercase; }
+    .shop-boost-banner-text .sub { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 3px; }
+    .shop-boost-banner-text .discount { font-size: 20px; font-weight: 900; color: #fff; margin-top: 6px; }
+
+    .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; }
+    .product-card { background: var(--surface); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; }
+    .product-card-img { width: 100%; height: 140px; object-fit: cover; background: #222; }
+    .product-card-info { padding: 10px; }
+    .product-card-name { font-size: 13px; font-weight: 700; line-height: 1.3; }
+    .product-card-price { font-size: 15px; font-weight: 900; color: var(--primary); margin-top: 4px; }
+    .product-card-zp { font-size: 10px; color: var(--muted); }
+
+    /* ===== COMMUNITY SCREEN ===== */
+    .boost-hero-card {
+      margin: 0 20px 20px;
+      background: linear-gradient(135deg, #2A1200 0%, #1A0A00 100%);
+      border: 1.5px solid var(--boost);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .boost-hero-img { width: 100%; height: 180px; object-fit: cover; object-position: top; }
+    .boost-hero-body { padding: 16px; }
+    .boost-hero-tag { font-size: 10px; font-weight: 800; color: var(--boost); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .boost-hero-title { font-size: 22px; font-weight: 900; text-transform: uppercase; }
+    .boost-hero-sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 6px; line-height: 1.5; }
+    .boost-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0; }
+    .boost-stat { background: rgba(255,107,0,0.1); border-radius: 10px; padding: 10px 6px; text-align: center; border: 1px solid rgba(255,107,0,0.2); }
+    .boost-stat-value { font-size: 16px; font-weight: 900; color: var(--boost); }
+    .boost-stat-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .boost-flavors { display: flex; gap: 10px; margin: 14px 0; }
+    .boost-flavor { flex: 1; border-radius: 12px; overflow: hidden; position: relative; height: 100px; }
+    .boost-flavor img { width: 100%; height: 100%; object-fit: cover; }
+    .boost-flavor-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); padding: 6px; text-align: center; font-size: 11px; font-weight: 700; }
+
+    .partner-card { background: var(--surface); border-radius: 14px; padding: 14px; border: 1px solid var(--border); margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .partner-avatar { width: 52px; height: 52px; border-radius: 14px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; overflow: hidden; }
+    .partner-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .partner-info { flex: 1; }
+    .partner-name { font-size: 14px; font-weight: 800; }
+    .partner-cat { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .partner-desc { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+
+    .pro-card { background: var(--surface); border-radius: 16px; padding: 16px; border: 1px solid var(--border); margin-bottom: 12px; }
+    .pro-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .pro-avatar { width: 56px; height: 56px; border-radius: 28px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; border: 2px solid var(--primary); }
+    .pro-name { font-size: 15px; font-weight: 800; }
+    .pro-specialty { font-size: 12px; color: var(--primary); font-weight: 600; }
+    .pro-city { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .pro-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .pro-tag { background: var(--surface2); color: var(--muted); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+
+    /* ===== PROFILE SCREEN ===== */
+    .profile-header {
+      background: linear-gradient(180deg, #1A2200 0%, var(--bg) 100%);
+      padding: 52px 20px 24px;
+      text-align: center;
+    }
+    .profile-avatar { width: 80px; height: 80px; border-radius: 40px; background: var(--surface2); border: 3px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 12px; }
+    .profile-name { font-size: 22px; font-weight: 900; }
+    .profile-handle { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .profile-stats { display: flex; justify-content: center; gap: 32px; margin-top: 16px; }
+    .profile-stat-value { font-size: 20px; font-weight: 900; color: var(--primary); text-align: center; }
+    .profile-stat-label { font-size: 11px; color: var(--muted); text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .menu-item { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .menu-item-icon { font-size: 22px; width: 36px; text-align: center; }
+    .menu-item-label { font-size: 15px; font-weight: 600; flex: 1; }
+    .menu-item-arrow { color: var(--muted); font-size: 18px; }
+
+    /* ZUNO POINTS SCREEN */
+    .zp-screen-header {
+      background: linear-gradient(135deg, #1A2200 0%, #111 100%);
+      padding: 52px 20px 24px;
+    }
+    .zp-screen-balance { font-size: 48px; font-weight: 900; color: var(--primary); }
+    .zp-screen-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+    .zp-level-bar { margin-top: 16px; }
+    .zp-level-info { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .zp-level-name { font-size: 13px; font-weight: 700; color: var(--primary); }
+    .zp-level-next { font-size: 12px; color: var(--muted); }
+
+    .reward-card { background: var(--surface); border-radius: 14px; padding: 14px; border: 1px solid var(--border); margin-bottom: 10px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .reward-icon { font-size: 28px; width: 52px; height: 52px; background: var(--surface2); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .reward-info { flex: 1; }
+    .reward-name { font-size: 14px; font-weight: 700; }
+    .reward-desc { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .reward-pts { font-size: 14px; font-weight: 900; color: var(--primary); }
+
+    /* LOG WORKOUT */
+    .workout-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; margin-bottom: 20px; }
+    .workout-type-card { background: var(--surface); border-radius: 14px; padding: 16px; border: 2px solid var(--border); cursor: pointer; text-align: center; transition: all 0.2s; }
+    .workout-type-card.selected { border-color: var(--primary); background: rgba(204,255,0,0.08); }
+    .workout-type-icon { font-size: 32px; margin-bottom: 8px; }
+    .workout-type-name { font-size: 13px; font-weight: 700; }
+    .workout-type-pts { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    .input-field {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus { border-color: var(--primary); }
+    .input-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+    .points-preview {
+      background: linear-gradient(135deg, #1A2200 0%, #1A1A1A 100%);
+      border: 1px solid rgba(204,255,0,0.3);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      margin: 0 20px 20px;
+    }
+    .points-preview-value { font-size: 36px; font-weight: 900; color: var(--primary); }
+    .points-preview-label { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Animations */
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .screen.active { animation: fadeIn 0.25s ease; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--primary);
+      color: #111;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 12px 24px;
+      border-radius: 99px;
+      z-index: 999;
+      opacity: 0;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SPLASH -->
+  <div id="splash">
+    <img src="assets/images/icon.png" alt="Zuno" />
+    <div class="tagline">No Limite da Luz</div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+      <img src="assets/images/zuno-atletas-correndo.png" alt="Atletas Zuno" onerror="this.src='assets/images/zuno-hero-banner.png'" />
+      <div class="hero-overlay">
+        <img class="hero-logo" src="assets/images/zuno-logo-official.png" alt="Zuno" onerror="this.style.display='none'" />
+        <div class="hero-title">PARA QUEM VIVE NO<br><span>LIMITE DA LUZ</span></div>
+        <div class="hero-sub">Óculos de alta performance · UV400 · TR-90</div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="stat-card">
+        <div class="stat-icon">🏃</div>
+        <div class="stat-value">12</div>
+        <div class="stat-label">Treinos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-value">3</div>
+        <div class="stat-label">Desafios</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📍</div>
+        <div class="stat-value">47km</div>
+        <div class="stat-label">Distância</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-value">5</div>
+        <div class="stat-label">Dias seguidos</div>
+      </div>
+    </div>
+
+    <!-- Zuno Points Card -->
+    <div class="zp-card" onclick="navigate('zuno-points')">
+      <div class="zp-card-top">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="zp-icon">⚡</div>
+          <div class="zp-info">
+            <div class="zp-label">Zuno Points</div>
+            <div class="zp-balance">1.3k ZP</div>
+          </div>
+        </div>
+        <button class="zp-btn" onclick="event.stopPropagation();navigate('log-workout')">+ TREINO</button>
+      </div>
+      <div class="zp-meta">
+        <span class="zp-level">Nível: Atleta</span>
+        <span class="zp-streak">🔥 5 dias seguidos</span>
+      </div>
+      <div class="progress-bar" style="margin-top:10px">
+        <div class="progress-fill" style="width:52%"></div>
+      </div>
+    </div>
+
+    <!-- Boost Up Banner -->
+    <div class="boost-banner" onclick="showTab('community');showCommunityTab('marcas')">
+      <img src="assets/images/boost-lata-original.png" alt="Boost Up" onerror="this.src='assets/images/boostup-can-original.png'" />
+      <div class="boost-banner-content">
+        <div class="boost-banner-tag">⚡ Parceiro Oficial</div>
+        <div class="boost-banner-title">BOOST UP × ZUNO</div>
+        <div class="boost-banner-sub">Energy drink para quem supera limites</div>
+      </div>
+    </div>
+
+    <!-- Desafios em andamento -->
+    <div class="section-block">
+      <div class="section-title">Desafios em Andamento</div>
+      <div class="challenge-mini" onclick="showTab('challenges')">
+        <div class="challenge-mini-icon">🏅</div>
+        <div class="challenge-mini-info">
+          <div class="challenge-mini-title">Desafio 5K</div>
+          <div class="challenge-mini-sub">3.2km / 5km</div>
+          <div class="challenge-mini-progress">
+            <div class="progress-bar"><div class="progress-fill" style="width:64%"></div></div>
+          </div>
+        </div>
+        <span class="badge badge-primary">64%</span>
+      </div>
+      <div class="challenge-mini" onclick="showTab('challenges')">
+        <div class="challenge-mini-icon">🏆</div>
+        <div class="challenge-mini-info">
+          <div class="challenge-mini-title">100km em 30 Dias</div>
+          <div class="challenge-mini-sub">67.5km / 100km</div>
+          <div class="challenge-mini-progress">
+            <div class="progress-bar"><div class="progress-fill" style="width:68%"></div></div>
+          </div>
+        </div>
+        <span class="badge badge-primary">68%</span>
+      </div>
+    </div>
+
+    <!-- Parceiros -->
+    <div class="section-block">
+      <div class="section-title">Parceiros em Destaque</div>
+      <div class="h-scroll">
+        <div style="flex-shrink:0;width:140px;background:var(--surface);border-radius:14px;padding:12px;border:1px solid var(--border);cursor:pointer;text-align:center" onclick="showTab('community');showCommunityTab('marcas')">
+          <div style="font-size:28px;margin-bottom:6px">⚡</div>
+          <div style="font-size:12px;font-weight:800;color:var(--boost)">BOOST UP</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px">Energy Drink</div>
+          <div class="badge badge-boost" style="margin-top:8px;font-size:9px">10% OFF</div>
+        </div>
+        <div style="flex-shrink:0;width:140px;background:var(--surface);border-radius:14px;padding:12px;border:1px solid var(--border);cursor:pointer;text-align:center">
+          <div style="font-size:28px;margin-bottom:6px">💪</div>
+          <div style="font-size:12px;font-weight:800">SMART FIT</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px">Academia</div>
+          <div class="badge badge-green" style="margin-top:8px;font-size:9px">EM BREVE</div>
+        </div>
+        <div style="flex-shrink:0;width:140px;background:var(--surface);border-radius:14px;padding:12px;border:1px solid var(--border);cursor:pointer;text-align:center">
+          <div style="font-size:28px;margin-bottom:6px">🏃</div>
+          <div style="font-size:12px;font-weight:800">ASICS</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px">Calçados</div>
+          <div class="badge badge-green" style="margin-top:8px;font-size:9px">EM BREVE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCOVER -->
+  <div class="screen" id="screen-discover">
+    <div class="discover-hero">
+      <img src="assets/images/zuno-hero-banner.png" alt="Zuno" onerror="this.src='assets/images/zuno-atletas-correndo.png'" />
+      <div class="discover-hero-overlay">
+        <div class="discover-hero-tag">⚡ Destaque Zuno</div>
+        <div class="discover-hero-title">PARA QUEM VIVE NO LIMITE DA LUZ</div>
+        <div class="discover-hero-meta">Zuno Glass · Vídeo · 4 min</div>
+        <div class="discover-hero-actions">
+          <button class="btn-play" onclick="showToast('▶ Reproduzindo...')">▶ Assistir</button>
+          <button class="btn-info" onclick="showToast('ℹ Mais informações em breve')">+ Info</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-bar">
+      <button class="filter-chip active" onclick="setFilter(this,'todos')">Todos</button>
+      <button class="filter-chip" onclick="setFilter(this,'treino')">Treino</button>
+      <button class="filter-chip" onclick="setFilter(this,'nutricao')">Nutrição</button>
+      <button class="filter-chip" onclick="setFilter(this,'produto')">Produto</button>
+      <button class="filter-chip" onclick="setFilter(this,'comunidade')">Comunidade</button>
+      <button class="filter-chip" onclick="setFilter(this,'wellness')">Wellness</button>
+    </div>
+
+    <!-- Zuno Row -->
+    <div class="content-row">
+      <div class="content-row-title">
+        <h3>⚡ Zuno Glass</h3>
+        <span>Ver tudo</span>
+      </div>
+      <div class="h-scroll">
+        <div class="content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb">
+            <img src="assets/images/zuno-atletas-correndo.png" alt="" />
+            <div class="content-card-type"><span class="badge badge-primary" style="font-size:9px">VÍDEO</span></div>
+            <div class="content-card-duration">4:32</div>
+          </div>
+          <div class="content-card-title">Performance UV400 em Ação</div>
+          <div class="content-card-author">Zuno Glass · 2.1k views</div>
+        </div>
+        <div class="content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb">
+            <img src="assets/images/zuno-features.png" alt="" />
+            <div class="content-card-type"><span class="badge badge-muted" style="font-size:9px">ARTIGO</span></div>
+          </div>
+          <div class="content-card-title">Clareza Óptica: O que é TR-90?</div>
+          <div class="content-card-author">Zuno Glass · 890 views</div>
+        </div>
+        <div class="content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb">
+            <img src="assets/images/zuno-atleta-solo.png" alt="" />
+            <div class="content-card-type"><span class="badge badge-primary" style="font-size:9px">VÍDEO</span></div>
+            <div class="content-card-duration">2:15</div>
+          </div>
+          <div class="content-card-title">Review: Óculos Prime em Corrida</div>
+          <div class="content-card-author">Zuno Glass · 1.4k views</div>
+        </div>
+        <div class="content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb">
+            <img src="assets/images/zuno-embalagem.png" alt="" />
+            <div class="content-card-type"><span class="badge badge-muted" style="font-size:9px">GUIA</span></div>
+          </div>
+          <div class="content-card-title">Unboxing: Limite da Luz</div>
+          <div class="content-card-author">Zuno Glass · 3.2k views</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Boost Up Row -->
+    <div class="content-row">
+      <div class="content-row-title">
+        <h3 style="color:var(--boost)">⚡ Boost Up × Zuno</h3>
+        <span onclick="showTab('community');showCommunityTab('marcas')">Ver parceiro</span>
+      </div>
+      <div class="h-scroll">
+        <div class="boost-content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb" style="border:1px solid rgba(255,107,0,0.3)">
+            <img src="assets/images/boost-lata-original.png" alt="" />
+            <div class="content-card-type"><span class="badge badge-boost" style="font-size:9px">VÍDEO</span></div>
+            <div class="content-card-duration">3:20</div>
+          </div>
+          <div class="content-card-title">Super Zero: 0 açúcar, máx. energia</div>
+          <div class="content-card-author">Boost Up · 5.8k views</div>
+        </div>
+        <div class="boost-content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb" style="border:1px solid rgba(255,107,0,0.3)">
+            <img src="assets/images/boost-mix-perfeito.png" alt="" />
+            <div class="content-card-type"><span class="badge badge-muted" style="font-size:9px">ARTIGO</span></div>
+          </div>
+          <div class="content-card-title">O Mix Perfeito: Cafeína + Taurina</div>
+          <div class="content-card-author">Boost Up · 2.3k views</div>
+        </div>
+        <div class="boost-content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb" style="border:1px solid rgba(255,107,0,0.3)">
+            <img src="assets/images/boost-atleta-latas.png" alt="" onerror="this.src='assets/images/boostup-can-original.png'" />
+            <div class="content-card-type"><span class="badge badge-boost" style="font-size:9px">REVIEW</span></div>
+          </div>
+          <div class="content-card-title">Atletas testam Yellow Fruits</div>
+          <div class="content-card-author">Boost Up · 1.9k views</div>
+        </div>
+        <div class="boost-content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb" style="border:1px solid rgba(255,107,0,0.3)">
+            <img src="assets/images/boost-yellow-fruits-banner.png" alt="" />
+            <div class="content-card-type"><span class="badge badge-muted" style="font-size:9px">GUIA</span></div>
+          </div>
+          <div class="content-card-title">Quando tomar energia antes do treino</div>
+          <div class="content-card-author">Boost Up · 4.1k views</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profissionais Row -->
+    <div class="content-row">
+      <div class="content-row-title">
+        <h3>👤 Profissionais</h3>
+        <span onclick="showTab('community');showCommunityTab('profissionais')">Ver todos</span>
+      </div>
+      <div class="h-scroll">
+        <div class="content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb" style="background:linear-gradient(135deg,#1A2200,#222)">
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px">🏃</div>
+            <div class="content-card-type"><span class="badge badge-primary" style="font-size:9px">DICA</span></div>
+          </div>
+          <div class="content-card-title">5 erros na corrida com óculos</div>
+          <div class="content-card-author">Carlos Mendes · 1.2k views</div>
+        </div>
+        <div class="content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb" style="background:linear-gradient(135deg,#1A2200,#222)">
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px">🥗</div>
+            <div class="content-card-type"><span class="badge badge-muted" style="font-size:9px">ARTIGO</span></div>
+          </div>
+          <div class="content-card-title">Nutrição pré-treino: o guia completo</div>
+          <div class="content-card-author">Ana Beatriz · 3.4k views</div>
+        </div>
+        <div class="content-card" onclick="showToast('▶ Abrindo conteúdo...')">
+          <div class="content-card-thumb" style="background:linear-gradient(135deg,#1A2200,#222)">
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px">🎾</div>
+            <div class="content-card-type"><span class="badge badge-primary" style="font-size:9px">VÍDEO</span></div>
+            <div class="content-card-duration">6:45</div>
+          </div>
+          <div class="content-card-title">Beach Tennis: técnica e visão</div>
+          <div class="content-card-author">Rafael Souza · 2.7k views</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHALLENGES -->
+  <div class="screen" id="screen-challenges">
+    <div class="screen-header">
+      <div class="screen-title">Desafios</div>
+      <div class="badge badge-primary" style="cursor:pointer" onclick="navigate('zuno-points')">⚡ 1.3k ZP</div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="setChallengeTab(this,'desafios')">Desafios</button>
+      <button class="tab-btn" onclick="setChallengeTab(this,'ranking')">Ranking</button>
+      <button class="tab-btn" onclick="setChallengeTab(this,'medalhas')">Medalhas</button>
+    </div>
+
+    <!-- Desafios Tab -->
+    <div id="challenges-desafios" style="padding:0 20px">
+      <div class="challenge-card">
+        <div class="challenge-card-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="challenge-card-icon">🏅</div>
+            <div>
+              <div class="challenge-card-title">Desafio 5K</div>
+              <div class="challenge-card-meta">Corrida · 1.847 participantes</div>
+            </div>
+          </div>
+          <span class="badge badge-primary">ATIVO</span>
+        </div>
+        <div class="challenge-card-desc">Complete 5km em qualquer modalidade durante o mês. Corrida, caminhada ou ciclismo.</div>
+        <div class="challenge-progress-row">
+          <span class="challenge-progress-label">3.2km / 5km</span>
+          <span class="challenge-progress-pct">64%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:64%"></div></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px">Termina em 30 de mar. · 🏆 500 ZP</div>
+      </div>
+
+      <div class="challenge-card">
+        <div class="challenge-card-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="challenge-card-icon">🔥</div>
+            <div>
+              <div class="challenge-card-title">Consistência 21</div>
+              <div class="challenge-card-meta">Qualquer · 2.341 participantes</div>
+            </div>
+          </div>
+        </div>
+        <div class="challenge-card-desc">Treine 21 dias seguidos. Qualquer atividade conta. A consistência é o que separa.</div>
+        <button class="btn-primary" onclick="showToast('✅ Participando do desafio!')">Participar</button>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px">🏆 750 ZP ao completar</div>
+      </div>
+
+      <div class="challenge-card">
+        <div class="challenge-card-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="challenge-card-icon">🤝</div>
+            <div>
+              <div class="challenge-card-title">Squad Run</div>
+              <div class="challenge-card-meta">Corrida · 956 participantes</div>
+            </div>
+          </div>
+        </div>
+        <div class="challenge-card-desc">Participe de uma corrida coletiva organizada pela comunidade ZUNO na sua cidade.</div>
+        <button class="btn-primary" onclick="showToast('✅ Inscrito no Squad Run!')">Participar</button>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px">🏆 1.000 ZP ao completar</div>
+      </div>
+
+      <div class="challenge-card">
+        <div class="challenge-card-header">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="challenge-card-icon">🏆</div>
+            <div>
+              <div class="challenge-card-title">100km em 30 Dias</div>
+              <div class="challenge-card-meta">Corrida · 1.203 participantes</div>
+            </div>
+          </div>
+          <span class="badge badge-primary">ATIVO</span>
+        </div>
+        <div class="challenge-card-desc">Corra 100km durante o mês. Qualquer modalidade de corrida conta!</div>
+        <div class="challenge-progress-row">
+          <span class="challenge-progress-label">67.5km / 100km</span>
+          <span class="challenge-progress-pct">68%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:68%"></div></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px">Termina em 30 de mar. · 🏆 500 ZP</div>
+      </div>
+    </div>
+
+    <!-- Ranking Tab -->
+    <div id="challenges-ranking" style="display:none">
+      <div class="ranking-item">
+        <div class="ranking-pos gold">🥇</div>
+        <div class="ranking-avatar">🏃</div>
+        <div class="ranking-info">
+          <div class="ranking-name">Pedro Alves</div>
+          <div class="ranking-pts">8.450 ZP · Lenda Zuno</div>
+        </div>
+        <div class="ranking-badge">1°</div>
+      </div>
+      <div class="ranking-item">
+        <div class="ranking-pos silver">🥈</div>
+        <div class="ranking-avatar">🚴</div>
+        <div class="ranking-info">
+          <div class="ranking-name">Marina Costa</div>
+          <div class="ranking-pts">7.200 ZP · Elite</div>
+        </div>
+        <div class="ranking-badge">2°</div>
+      </div>
+      <div class="ranking-item">
+        <div class="ranking-pos bronze">🥉</div>
+        <div class="ranking-avatar">🎾</div>
+        <div class="ranking-info">
+          <div class="ranking-name">Lucas Ferreira</div>
+          <div class="ranking-pts">6.800 ZP · Elite</div>
+        </div>
+        <div class="ranking-badge">3°</div>
+      </div>
+      <div class="ranking-item" style="background:rgba(204,255,0,0.05)">
+        <div class="ranking-pos" style="color:var(--primary)">⚡</div>
+        <div class="ranking-avatar" style="border:2px solid var(--primary)">😊</div>
+        <div class="ranking-info">
+          <div class="ranking-name">Você</div>
+          <div class="ranking-pts">1.300 ZP · Atleta</div>
+        </div>
+        <div class="ranking-badge">#47°</div>
+      </div>
+      <div class="ranking-item">
+        <div class="ranking-pos" style="color:var(--muted)">5</div>
+        <div class="ranking-avatar">💪</div>
+        <div class="ranking-info">
+          <div class="ranking-name">Juliana Santos</div>
+          <div class="ranking-pts">5.100 ZP · Elite</div>
+        </div>
+        <div class="ranking-badge">5°</div>
+      </div>
+    </div>
+
+    <!-- Medalhas Tab -->
+    <div id="challenges-medalhas" style="display:none">
+      <div style="padding:0 20px 12px;font-size:12px;color:var(--muted)">Suas conquistas desbloqueadas</div>
+      <div class="medals-grid">
+        <div class="medal-card">
+          <div class="medal-icon">🏃</div>
+          <div class="medal-name">Primeira Corrida</div>
+          <div class="medal-desc">Registrou 1 corrida</div>
+        </div>
+        <div class="medal-card">
+          <div class="medal-icon">🏆</div>
+          <div class="medal-name">100km Club</div>
+          <div class="medal-desc">100km acumulados</div>
+        </div>
+        <div class="medal-card">
+          <div class="medal-icon">🔥</div>
+          <div class="medal-name">Desafiador</div>
+          <div class="medal-desc">Completou 3 desafios</div>
+        </div>
+        <div class="medal-card">
+          <div class="medal-icon">🌅</div>
+          <div class="medal-name">Madrugador</div>
+          <div class="medal-desc">Treino antes das 7h</div>
+        </div>
+        <div class="medal-card locked">
+          <div class="medal-icon">📅</div>
+          <div class="medal-name">Consistente</div>
+          <div class="medal-desc">21 dias seguidos</div>
+        </div>
+        <div class="medal-card locked">
+          <div class="medal-icon">⚡</div>
+          <div class="medal-name">500km Club</div>
+          <div class="medal-desc">500km acumulados</div>
+        </div>
+        <div class="medal-card locked">
+          <div class="medal-icon">⭐</div>
+          <div class="medal-name">Squad Member</div>
+          <div class="medal-desc">Participou do Squad Run</div>
+        </div>
+        <div class="medal-card locked">
+          <div class="medal-icon">👑</div>
+          <div class="medal-name">Embaixador</div>
+          <div class="medal-desc">Indicou 5 amigos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="screen" id="screen-shop">
+    <div class="screen-header">
+      <div class="screen-title">Loja <span>Zuno</span></div>
+      <div class="badge badge-primary" style="cursor:pointer" onclick="navigate('zuno-points')">⚡ 1.3k ZP</div>
+    </div>
+
+    <!-- Boost Banner -->
+    <div class="shop-boost-banner" onclick="window.open('https://www.drinkboostup.com.br','_blank')">
+      <img src="assets/images/boost-lata-original.png" alt="Boost Up" onerror="this.src='assets/images/boostup-can-original.png'" />
+      <div class="shop-boost-banner-text">
+        <div class="title">Boost Up × Zuno</div>
+        <div class="sub">Parceiro oficial · Energy drink Super Zero</div>
+        <div class="discount">10% OFF exclusivo</div>
+      </div>
+    </div>
+
+    <!-- Produtos -->
+    <div style="padding:0 20px;margin-bottom:12px">
+      <div class="section-title">Óculos de Performance</div>
+    </div>
+    <div class="products-grid">
+      <div class="product-card" onclick="showToast('🛒 Adicionado ao carrinho!')">
+        <img class="product-card-img" src="assets/images/products/Prime  Preto Fosco.webp" alt="Prime" onerror="this.style.background='#222'" />
+        <div class="product-card-info">
+          <div class="product-card-name">Prime Preto Fosco</div>
+          <div class="product-card-price">R$ 189</div>
+          <div class="product-card-zp">ou 2.500 ZP</div>
+        </div>
+      </div>
+      <div class="product-card" onclick="showToast('🛒 Adicionado ao carrinho!')">
+        <img class="product-card-img" src="assets/images/products/Diamond  Preto.webp" alt="Diamond" onerror="this.style.background='#222'" />
+        <div class="product-card-info">
+          <div class="product-card-name">Diamond Preto</div>
+          <div class="product-card-price">R$ 219</div>
+          <div class="product-card-zp">ou 2.800 ZP</div>
+        </div>
+      </div>
+      <div class="product-card" onclick="showToast('🛒 Adicionado ao carrinho!')">
+        <img class="product-card-img" src="assets/images/products/Ares Premium  Preto.webp" alt="Ares" onerror="this.style.background='#222'" />
+        <div class="product-card-info">
+          <div class="product-card-name">Ares Premium Preto</div>
+          <div class="product-card-price">R$ 249</div>
+          <div class="product-card-zp">ou 3.200 ZP</div>
+        </div>
+      </div>
+      <div class="product-card" onclick="showToast('🛒 Adicionado ao carrinho!')">
+        <img class="product-card-img" src="assets/images/products/Jin  Preto Verde.webp" alt="Jin" onerror="this.style.background='#222'" />
+        <div class="product-card-info">
+          <div class="product-card-name">Jin Preto Verde</div>
+          <div class="product-card-price">R$ 179</div>
+          <div class="product-card-zp">ou 2.200 ZP</div>
+        </div>
+      </div>
+      <div class="product-card" onclick="showToast('🛒 Adicionado ao carrinho!')">
+        <img class="product-card-img" src="assets/images/products/Devon  Preto Fosco.webp" alt="Devon" onerror="this.style.background='#222'" />
+        <div class="product-card-info">
+          <div class="product-card-name">Devon Preto Fosco</div>
+          <div class="product-card-price">R$ 159</div>
+          <div class="product-card-zp">ou 2.000 ZP</div>
+        </div>
+      </div>
+      <div class="product-card" onclick="showToast('🛒 Adicionado ao carrinho!')">
+        <img class="product-card-img" src="assets/images/products/Dubai Premium Preto Dourado Preto.webp" alt="Dubai" onerror="this.style.background='#222'" />
+        <div class="product-card-info">
+          <div class="product-card-name">Dubai Premium</div>
+          <div class="product-card-price">R$ 279</div>
+          <div class="product-card-zp">ou 3.500 ZP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY -->
+  <div class="screen" id="screen-community">
+    <div class="screen-header">
+      <div class="screen-title">Comunidade</div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-marcas" onclick="showCommunityTab('marcas')">Marcas</button>
+      <button class="tab-btn" id="tab-profissionais" onclick="showCommunityTab('profissionais')">Profissionais</button>
+    </div>
+
+    <!-- Marcas Tab -->
+    <div id="community-marcas" style="padding:0 20px">
+      <!-- Boost Up Hero -->
+      <div class="boost-hero-card">
+        <img class="boost-hero-img" src="assets/images/boost-atleta-latas.png" alt="Boost Up" onerror="this.src='assets/images/boostup-can-original.png'" />
+        <div class="boost-hero-body">
+          <div class="boost-hero-tag">⚡ Parceiro Oficial Zuno</div>
+          <div class="boost-hero-title">BOOST UP</div>
+          <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+            <span class="badge badge-boost">Energy Drink</span>
+            <span class="badge badge-boost">Super Zero</span>
+            <span class="badge badge-boost">10% OFF</span>
+          </div>
+          <div class="boost-hero-sub">Um energético para quem quer superar limites. 0 açúcar, 90mg de cafeína, 8 vitaminas e minerais.</div>
+          <div class="boost-stats">
+            <div class="boost-stat"><div class="boost-stat-value">90mg</div><div class="boost-stat-label">Cafeína</div></div>
+            <div class="boost-stat"><div class="boost-stat-value">0g</div><div class="boost-stat-label">Açúcar</div></div>
+            <div class="boost-stat"><div class="boost-stat-value">15</div><div class="boost-stat-label">Kcal</div></div>
+            <div class="boost-stat"><div class="boost-stat-value">8</div><div class="boost-stat-label">Vitaminas</div></div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Sabores</div>
+          <div class="boost-flavors">
+            <div class="boost-flavor">
+              <img src="assets/images/boost-lata-original.png" alt="Original" onerror="this.src='assets/images/boostup-can-original.png'" />
+              <div class="boost-flavor-label">Original</div>
+            </div>
+            <div class="boost-flavor">
+              <img src="assets/images/boost-yellow-fruits-banner.png" alt="Yellow Fruits" onerror="this.src='assets/images/boostup-can-original.png'" />
+              <div class="boost-flavor-label">Yellow Fruits</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+            <button class="btn-primary" onclick="window.open('https://www.drinkboostup.com.br','_blank')">Comprar Agora</button>
+            <button class="btn-outline" onclick="showToast('📋 Cupom ZUNO10 copiado!')">Cupom ZUNO10</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="section-title">Outros Parceiros</div>
+        <div class="partner-card">
+          <div class="partner-avatar">💪</div>
+          <div class="partner-info">
+            <div class="partner-name">Smart Fit</div>
+            <div class="partner-cat">Academia · Em breve</div>
+            <div class="partner-desc">Rede de academias com desconto exclusivo para membros Zuno</div>
+          </div>
+          <span class="badge badge-green">EM BREVE</span>
+        </div>
+        <div class="partner-card">
+          <div class="partner-avatar">🏃</div>
+          <div class="partner-info">
+            <div class="partner-name">Asics</div>
+            <div class="partner-cat">Calçados Esportivos · Em breve</div>
+            <div class="partner-desc">Tênis de corrida com tecnologia de amortecimento</div>
+          </div>
+          <span class="badge badge-green">EM BREVE</span>
+        </div>
+        <div class="partner-card">
+          <div class="partner-avatar">🥗</div>
+          <div class="partner-info">
+            <div class="partner-name">GNC Brasil</div>
+            <div class="partner-cat">Suplementos · Em breve</div>
+            <div class="partner-desc">Suplementos esportivos de alta qualidade</div>
+          </div>
+          <span class="badge badge-green">EM BREVE</span>
+        </div>
+        <div style="background:var(--surface);border-radius:14px;padding:16px;border:1px solid var(--border);text-align:center;margin-top:8px">
+          <div style="font-size:20px;margin-bottom:8px">🤝</div>
+          <div style="font-size:14px;font-weight:800;margin-bottom:4px">Quer ser parceiro?</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Conecte sua marca com atletas apaixonados pelo esporte</div>
+          <button class="btn-outline" onclick="window.open('https://zunoglass.com/community','_blank')">Saiba mais</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profissionais Tab -->
+    <div id="community-profissionais" style="display:none;padding:0 20px">
+      <div class="pro-card">
+        <div class="pro-card-header">
+          <div class="pro-avatar">🏃</div>
+          <div>
+            <div class="pro-name">Carlos Mendes</div>
+            <div class="pro-specialty">Personal Trainer</div>
+            <div class="pro-city">📍 Fortaleza, CE · ⭐ 4.9</div>
+          </div>
+          <button class="btn-outline" style="padding:8px 14px;font-size:11px" onclick="showToast('📱 Abrindo Instagram...')">Ver Perfil</button>
+        </div>
+        <div class="pro-tags">
+          <span class="pro-tag">Corrida</span>
+          <span class="pro-tag">Funcional</span>
+          <span class="pro-tag">Beach Tennis</span>
+        </div>
+      </div>
+      <div class="pro-card">
+        <div class="pro-card-header">
+          <div class="pro-avatar">🥗</div>
+          <div>
+            <div class="pro-name">Ana Beatriz Lima</div>
+            <div class="pro-specialty">Nutricionista Esportiva</div>
+            <div class="pro-city">📍 São Paulo, SP · ⭐ 4.8</div>
+          </div>
+          <button class="btn-outline" style="padding:8px 14px;font-size:11px" onclick="showToast('📱 Abrindo Instagram...')">Ver Perfil</button>
+        </div>
+        <div class="pro-tags">
+          <span class="pro-tag">Nutrição</span>
+          <span class="pro-tag">Emagrecimento</span>
+          <span class="pro-tag">Performance</span>
+        </div>
+      </div>
+      <div class="pro-card">
+        <div class="pro-card-header">
+          <div class="pro-avatar">🚴</div>
+          <div>
+            <div class="pro-name">Rafael Souza</div>
+            <div class="pro-specialty">Coach de Ciclismo</div>
+            <div class="pro-city">📍 Belo Horizonte, MG · ⭐ 4.7</div>
+          </div>
+          <button class="btn-outline" style="padding:8px 14px;font-size:11px" onclick="showToast('📱 Abrindo Instagram...')">Ver Perfil</button>
+        </div>
+        <div class="pro-tags">
+          <span class="pro-tag">Ciclismo</span>
+          <span class="pro-tag">Triathlon</span>
+          <span class="pro-tag">Resistência</span>
+        </div>
+      </div>
+      <div class="pro-card">
+        <div class="pro-card-header">
+          <div class="pro-avatar">🎾</div>
+          <div>
+            <div class="pro-name">Fernanda Oliveira</div>
+            <div class="pro-specialty">Beach Tennis Pro</div>
+            <div class="pro-city">📍 Rio de Janeiro, RJ · ⭐ 5.0</div>
+          </div>
+          <button class="btn-outline" style="padding:8px 14px;font-size:11px" onclick="showToast('📱 Abrindo Instagram...')">Ver Perfil</button>
+        </div>
+        <div class="pro-tags">
+          <span class="pro-tag">Beach Tennis</span>
+          <span class="pro-tag">Técnica</span>
+          <span class="pro-tag">Competição</span>
+        </div>
+      </div>
+      <div style="background:var(--surface);border-radius:14px;padding:16px;border:1px solid var(--border);text-align:center;margin-top:8px;margin-bottom:20px">
+        <div style="font-size:20px;margin-bottom:8px">👤</div>
+        <div style="font-size:14px;font-weight:800;margin-bottom:4px">É profissional do esporte?</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Cadastre-se e conecte-se com atletas Zuno</div>
+        <button class="btn-outline" onclick="window.open('https://zunoglass.com/community','_blank')">Cadastrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="screen" id="screen-profile">
+    <div class="profile-header">
+      <div class="profile-avatar">😊</div>
+      <div class="profile-name">Atleta Zuno</div>
+      <div class="profile-handle">@atleta_zuno · Nível Atleta</div>
+      <div class="profile-stats">
+        <div>
+          <div class="profile-stat-value">12</div>
+          <div class="profile-stat-label">Treinos</div>
+        </div>
+        <div>
+          <div class="profile-stat-value">47km</div>
+          <div class="profile-stat-label">Distância</div>
+        </div>
+        <div>
+          <div class="profile-stat-value">3</div>
+          <div class="profile-stat-label">Desafios</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZP Card no Perfil -->
+    <div class="zp-card" style="margin:16px 20px" onclick="navigate('zuno-points')">
+      <div class="zp-card-top">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="zp-icon">⚡</div>
+          <div class="zp-info">
+            <div class="zp-label">Zuno Points</div>
+            <div class="zp-balance">1.3k ZP</div>
+          </div>
+        </div>
+        <span class="badge badge-primary">Atleta</span>
+      </div>
+      <div class="progress-bar" style="margin-top:10px">
+        <div class="progress-fill" style="width:52%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--muted)">
+        <span>1.300 / 2.500 ZP para Elite</span>
+        <span>52%</span>
+      </div>
+    </div>
+
+    <!-- Menu -->
+    <div class="menu-item" onclick="navigate('zuno-points')">
+      <div class="menu-item-icon">⚡</div>
+      <div class="menu-item-label">Zuno Points</div>
+      <div class="menu-item-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="navigate('log-workout')">
+      <div class="menu-item-icon">🏃</div>
+      <div class="menu-item-label">Registrar Treino</div>
+      <div class="menu-item-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="showTab('community')">
+      <div class="menu-item-icon">🤝</div>
+      <div class="menu-item-label">Comunidade & Parceiros</div>
+      <div class="menu-item-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="showTab('discover')">
+      <div class="menu-item-icon">🎬</div>
+      <div class="menu-item-label">Descobrir Conteúdos</div>
+      <div class="menu-item-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="showToast('⚙️ Configurações em breve')">
+      <div class="menu-item-icon">⚙️</div>
+      <div class="menu-item-label">Configurações</div>
+      <div class="menu-item-arrow">›</div>
+    </div>
+    <div class="menu-item" onclick="window.open('https://zunoglass.com','_blank')">
+      <div class="menu-item-icon">🌐</div>
+      <div class="menu-item-label">Site Zuno Glass</div>
+      <div class="menu-item-arrow">›</div>
+    </div>
+  </div>
+
+  <!-- SUB-SCREEN: ZUNO POINTS -->
+  <div class="screen" id="screen-zuno-points">
+    <div class="zp-screen-header">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <button onclick="goBack()" style="background:var(--surface2);border:none;color:var(--text);font-size:20px;width:40px;height:40px;border-radius:12px;cursor:pointer">‹</button>
+        <div class="screen-title">Zuno <span>Points</span></div>
+      </div>
+      <div class="zp-screen-label">Seu saldo atual</div>
+      <div class="zp-screen-balance">1.300 ZP</div>
+      <div class="zp-level-bar">
+        <div class="zp-level-info">
+          <span class="zp-level-name">⚡ Atleta</span>
+          <span class="zp-level-next">Elite em 1.200 ZP</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:52%"></div></div>
+      </div>
+    </div>
+
+    <div style="padding:20px">
+      <div class="section-title">Como Ganhar Pontos</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+        <div style="background:var(--surface);border-radius:12px;padding:12px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;margin-bottom:6px">🏃</div>
+          <div style="font-size:13px;font-weight:700">Registrar Treino</div>
+          <div style="font-size:12px;color:var(--primary);font-weight:800;margin-top:4px">+50 ZP</div>
+        </div>
+        <div style="background:var(--surface);border-radius:12px;padding:12px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;margin-bottom:6px">🏆</div>
+          <div style="font-size:13px;font-weight:700">Completar Desafio</div>
+          <div style="font-size:12px;color:var(--primary);font-weight:800;margin-top:4px">+500 ZP</div>
+        </div>
+        <div style="background:var(--surface);border-radius:12px;padding:12px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;margin-bottom:6px">🔥</div>
+          <div style="font-size:13px;font-weight:700">Sequência 7 dias</div>
+          <div style="font-size:12px;color:var(--primary);font-weight:800;margin-top:4px">+200 ZP</div>
+        </div>
+        <div style="background:var(--surface);border-radius:12px;padding:12px;border:1px solid var(--border);text-align:center">
+          <div style="font-size:24px;margin-bottom:6px">🤝</div>
+          <div style="font-size:13px;font-weight:700">Indicar Amigo</div>
+          <div style="font-size:12px;color:var(--primary);font-weight:800;margin-top:4px">+300 ZP</div>
+        </div>
+      </div>
+
+      <div class="section-title">Catálogo de Recompensas</div>
+      <div class="reward-card" onclick="showToast('🎟 Resgatando 10% OFF Zuno Glass...')">
+        <div class="reward-icon">🎟</div>
+        <div class="reward-info">
+          <div class="reward-name">10% OFF Zuno Glass</div>
+          <div class="reward-desc">Cupom de desconto em qualquer óculos</div>
+        </div>
+        <div>
+          <div class="reward-pts">500 ZP</div>
+          <button class="btn-primary" style="padding:8px 14px;font-size:11px;margin-top:6px">Resgatar</button>
+        </div>
+      </div>
+      <div class="reward-card" onclick="showToast('🎟 Resgatando 15% OFF Boost Up...')">
+        <div class="reward-icon" style="background:rgba(255,107,0,0.15)">⚡</div>
+        <div class="reward-info">
+          <div class="reward-name">15% OFF Boost Up</div>
+          <div class="reward-desc">Desconto exclusivo no site da Boost Up</div>
+        </div>
+        <div>
+          <div class="reward-pts" style="color:var(--boost)">300 ZP</div>
+          <button class="btn-primary" style="padding:8px 14px;font-size:11px;margin-top:6px;background:var(--boost)">Resgatar</button>
+        </div>
+      </div>
+      <div class="reward-card" onclick="showToast('🎁 Resgatando Kit Boost Up...')">
+        <div class="reward-icon" style="background:rgba(255,107,0,0.15)">🎁</div>
+        <div class="reward-info">
+          <div class="reward-name">Kit Boost Up (6 latas)</div>
+          <div class="reward-desc">Pack com 6 latas sortidas</div>
+        </div>
+        <div>
+          <div class="reward-pts" style="color:var(--boost)">800 ZP</div>
+          <button class="btn-primary" style="padding:8px 14px;font-size:11px;margin-top:6px;background:var(--boost)">Resgatar</button>
+        </div>
+      </div>
+      <div class="reward-card" onclick="showToast('🎁 Resgatando Óculos Zuno Altis...')">
+        <div class="reward-icon">🕶️</div>
+        <div class="reward-info">
+          <div class="reward-name">Óculos Zuno Altis</div>
+          <div class="reward-desc">Óculos de alta performance UV400</div>
+        </div>
+        <div>
+          <div class="reward-pts">2.500 ZP</div>
+          <button class="btn-primary" style="padding:8px 14px;font-size:11px;margin-top:6px">Resgatar</button>
+        </div>
+      </div>
+      <div class="reward-card" onclick="showToast('⭐ Resgatando corrida coletiva...')">
+        <div class="reward-icon">🏃</div>
+        <div class="reward-info">
+          <div class="reward-name">Corrida Coletiva Zuno</div>
+          <div class="reward-desc">Participe de um Squad Run exclusivo</div>
+        </div>
+        <div>
+          <div class="reward-pts">1.000 ZP</div>
+          <button class="btn-primary" style="padding:8px 14px;font-size:11px;margin-top:6px">Resgatar</button>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:8px">Histórico</div>
+      <div style="background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--border)">
+          <div style="font-size:20px">🏃</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700">Corrida registrada</div><div style="font-size:11px;color:var(--muted)">5.2 km · 32min · há 1 dia</div></div>
+          <div style="color:var(--primary);font-weight:800;font-size:13px">+50 ZP</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--border)">
+          <div style="font-size:20px">🔥</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700">Sequência de 7 dias</div><div style="font-size:11px;color:var(--muted)">há 2 dias</div></div>
+          <div style="color:var(--primary);font-weight:800;font-size:13px">+200 ZP</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px">
+          <div style="font-size:20px">🤝</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700">Post na comunidade</div><div style="font-size:11px;color:var(--muted)">há 4 dias</div></div>
+          <div style="color:var(--primary);font-weight:800;font-size:13px">+20 ZP</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUB-SCREEN: LOG WORKOUT -->
+  <div class="screen" id="screen-log-workout">
+    <div class="screen-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="goBack()" style="background:var(--surface2);border:none;color:var(--text);font-size:20px;width:40px;height:40px;border-radius:12px;cursor:pointer">‹</button>
+        <div class="screen-title">Registrar <span>Treino</span></div>
+      </div>
+    </div>
+
+    <div style="padding:0 20px;margin-bottom:16px">
+      <div class="input-label">Tipo de Atividade</div>
+    </div>
+    <div class="workout-type-grid" id="workout-types">
+      <div class="workout-type-card selected" onclick="selectWorkout(this,'Corrida',50)">
+        <div class="workout-type-icon">🏃</div>
+        <div class="workout-type-name">Corrida</div>
+        <div class="workout-type-pts">50 ZP base</div>
+      </div>
+      <div class="workout-type-card" onclick="selectWorkout(this,'Ciclismo',40)">
+        <div class="workout-type-icon">🚴</div>
+        <div class="workout-type-name">Ciclismo</div>
+        <div class="workout-type-pts">40 ZP base</div>
+      </div>
+      <div class="workout-type-card" onclick="selectWorkout(this,'Musculação',35)">
+        <div class="workout-type-icon">💪</div>
+        <div class="workout-type-name">Musculação</div>
+        <div class="workout-type-pts">35 ZP base</div>
+      </div>
+      <div class="workout-type-card" onclick="selectWorkout(this,'Beach Tennis',45)">
+        <div class="workout-type-icon">🎾</div>
+        <div class="workout-type-name">Beach Tennis</div>
+        <div class="workout-type-pts">45 ZP base</div>
+      </div>
+      <div class="workout-type-card" onclick="selectWorkout(this,'Natação',35)">
+        <div class="workout-type-icon">🏊</div>
+        <div class="workout-type-name">Natação</div>
+        <div class="workout-type-pts">35 ZP base</div>
+      </div>
+      <div class="workout-type-card" onclick="selectWorkout(this,'Caminhada',25)">
+        <div class="workout-type-icon">🚶</div>
+        <div class="workout-type-name">Caminhada</div>
+        <div class="workout-type-pts">25 ZP base</div>
+      </div>
+    </div>
+
+    <div style="padding:0 20px;margin-bottom:16px">
+      <div class="input-label">Distância (km)</div>
+      <input class="input-field" type="number" placeholder="Ex: 5.2" id="workout-km" oninput="updatePoints()" min="0" step="0.1" />
+    </div>
+    <div style="padding:0 20px;margin-bottom:16px">
+      <div class="input-label">Duração (minutos)</div>
+      <input class="input-field" type="number" placeholder="Ex: 35" id="workout-min" min="0" />
+    </div>
+
+    <div class="points-preview">
+      <div class="points-preview-label">Você vai ganhar</div>
+      <div class="points-preview-value" id="points-preview">50 ZP</div>
+    </div>
+
+    <div style="padding:0 20px 20px">
+      <button class="btn-primary" onclick="logWorkout()">⚡ REGISTRAR E GANHAR PONTOS</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="bottom-nav">
+    <div class="nav-item active" id="nav-home" onclick="showTab('home')">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Home</div>
+    </div>
+    <div class="nav-item" id="nav-discover" onclick="showTab('discover')">
+      <div class="nav-icon">▶</div>
+      <div class="nav-label">Descobrir</div>
+    </div>
+    <div class="nav-item" id="nav-challenges" onclick="showTab('challenges')">
+      <div class="nav-icon">🏆</div>
+      <div class="nav-label">Desafios</div>
+    </div>
+    <div class="nav-item" id="nav-shop" onclick="showTab('shop')">
+      <div class="nav-icon">🛍️</div>
+      <div class="nav-label">Loja</div>
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="showTab('profile')">
+      <div class="nav-icon">👤</div>
+      <div class="nav-label">Perfil</div>
+    </div>
+  </nav>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+</div>
+
+<script>
+  // Splash
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    splash.style.opacity = '0';
+    setTimeout(() => splash.style.display = 'none', 500);
+  }, 2000);
+
+  let currentTab = 'home';
+  let prevScreen = null;
+  let workoutBasePoints = 50;
+
+  const TABS = ['home','discover','challenges','shop','community','profile'];
+  const SUB_SCREENS = ['zuno-points','log-workout'];
+
+  function showTab(tab) {
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    // Show target
+    document.getElementById('screen-' + tab).classList.add('active');
+    // Update nav
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const navEl = document.getElementById('nav-' + tab);
+    if (navEl) navEl.classList.add('active');
+    // Show/hide bottom nav
+    document.getElementById('bottom-nav').style.display = 'flex';
+    currentTab = tab;
+    prevScreen = null;
+    window.scrollTo(0, 0);
+  }
+
+  function navigate(screen) {
+    prevScreen = currentTab;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + screen).classList.add('active');
+    document.getElementById('bottom-nav').style.display = 'none';
+    window.scrollTo(0, 0);
+  }
+
+  function goBack() {
+    if (prevScreen) {
+      showTab(prevScreen);
+    } else {
+      showTab('home');
+    }
+  }
+
+  function showCommunityTab(tab) {
+    document.getElementById('community-marcas').style.display = tab === 'marcas' ? 'block' : 'none';
+    document.getElementById('community-profissionais').style.display = tab === 'profissionais' ? 'block' : 'none';
+    document.getElementById('tab-marcas').className = 'tab-btn' + (tab === 'marcas' ? ' active' : '');
+    document.getElementById('tab-profissionais').className = 'tab-btn' + (tab === 'profissionais' ? ' active' : '');
+  }
+
+  function setChallengeTab(btn, tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('challenges-desafios').style.display = tab === 'desafios' ? 'block' : 'none';
+    document.getElementById('challenges-ranking').style.display = tab === 'ranking' ? 'block' : 'none';
+    document.getElementById('challenges-medalhas').style.display = tab === 'medalhas' ? 'block' : 'none';
+  }
+
+  function setFilter(btn, filter) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function selectWorkout(card, name, pts) {
+    document.querySelectorAll('.workout-type-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    workoutBasePoints = pts;
+    updatePoints();
+  }
+
+  function updatePoints() {
+    const km = parseFloat(document.getElementById('workout-km').value) || 0;
+    const extra = Math.max(0, Math.floor(km - 1)) * 10;
+    const total = workoutBasePoints + extra;
+    document.getElementById('points-preview').textContent = total + ' ZP';
+  }
+
+  function logWorkout() {
+    const km = document.getElementById('workout-km').value;
+    const min = document.getElementById('workout-min').value;
+    if (!km && !min) {
+      showToast('⚠️ Preencha a distância ou duração');
+      return;
+    }
+    const pts = parseInt(document.getElementById('points-preview').textContent);
+    showToast('⚡ +'+ pts +' ZP ganhos! Treino registrado!');
+    setTimeout(() => goBack(), 1500);
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>
