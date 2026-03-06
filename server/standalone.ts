@@ -696,17 +696,44 @@ app.get("/api/admin/orders", requireAuth, (req: any, res) => {
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
+// Buscar pedido por ID
+app.get("/api/admin/orders/:id", requireAuth, (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const orders = readJSON(ORDERS_FILE, []);
+    const order = orders.find((o: any) => o.id === id || String(o.id) === id);
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+    res.json(order);
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
 // Atualizar status de um pedido
 app.put("/api/admin/orders/:id/status", requireAuth, (req: any, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, note } = req.body;
     const orders = readJSON(ORDERS_FILE);
     const order = orders.find((o: any) => o.id === id || String(o.id) === id);
     if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+    const now = new Date().toISOString();
+    // Registrar hist\u00f3rico de etapas
+    if (!order.statusHistory) order.statusHistory = [];
+    order.statusHistory.push({ status, changedAt: now, note: note || '' });
     order.status = status;
-    order.updatedAt = new Date().toISOString();
+    order.updatedAt = now;
     writeJSON(ORDERS_FILE, orders);
+    // Notificar via WhatsApp
+    const STAGE_LABELS: Record<string, string> = {
+      em_separacao: 'APROVADO - EM SEPARA\u00c7\u00c3O',
+      preparando: 'EM PREPARA\u00c7\u00c3O',
+      pronto: 'PEDIDO PRONTO',
+      saiu_entrega: 'SAIU PARA ENTREGA',
+      entregue: 'ENTREGUE',
+      cancelado: 'CANCELADO',
+    };
+    if (STAGE_LABELS[status]) {
+      sendWhatsAppNotification(formatOrderNotification(order, STAGE_LABELS[status])).catch(() => {});
+    }
     res.json({ success: true, order });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });

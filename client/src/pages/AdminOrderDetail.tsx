@@ -5,114 +5,99 @@ import AdminLayout from '@/components/AdminLayout';
 import Admin from './Admin';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
-} from '@/components/ui/select';
-import {
-  ArrowLeft, Loader2, Package, MapPin, CreditCard,
-  Truck, CheckCircle, Clock, AlertCircle, XCircle
+  ArrowLeft, Loader2, Package, Scissors, CheckCheck,
+  Truck, PackageCheck, CheckCircle2, ArrowRight,
+  XCircle, User, MapPin, CreditCard, Clock
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Pendente',
-  confirmed: 'Confirmado',
-  processing: 'Em Preparo',
-  shipped: 'Enviado',
-  delivered: 'Entregue',
-  cancelled: 'Cancelado',
-};
+// ─── Pipeline de etapas ───────────────────────────────────────────────────────
+const PIPELINE = [
+  { key: 'em_separacao', label: 'Pedido Recebido',   icon: Package,      color: 'text-blue-400',   bg: 'bg-blue-400/10',   border: 'border-blue-400/30' },
+  { key: 'preparando',   label: 'Em Preparação',     icon: Scissors,     color: 'text-orange-400', bg: 'bg-orange-400/10', border: 'border-orange-400/30' },
+  { key: 'pronto',       label: 'Pedido Pronto',     icon: CheckCheck,   color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/30' },
+  { key: 'saiu_entrega', label: 'Saiu para Entrega', icon: Truck,        color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/30' },
+  { key: 'entregue',     label: 'Entregue',          icon: PackageCheck, color: 'text-green-400',  bg: 'bg-green-400/10',  border: 'border-green-400/30' },
+];
 
-const STATUS_ICONS: Record<string, any> = {
-  pending: Clock,
-  confirmed: CheckCircle,
-  processing: Package,
-  shipped: Truck,
-  delivered: CheckCircle,
-  cancelled: XCircle,
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: 'text-yellow-400',
-  confirmed: 'text-blue-400',
-  processing: 'text-orange-400',
-  shipped: 'text-purple-400',
-  delivered: 'text-green-400',
-  cancelled: 'text-red-400',
-};
-
-const PAYMENT_LABELS: Record<string, string> = {
-  stripe: 'Stripe (Cartão)',
-  mercadopago: 'Mercado Pago',
-};
-
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
-  stripe: 'Cartão de Crédito',
-  pix: 'PIX',
-  boleto: 'Boleto',
-  card: 'Cartão',
-};
+function getStageIndex(status: string) {
+  return PIPELINE.findIndex(s => s.key === status);
+}
+function getNextStage(status: string) {
+  const idx = getStageIndex(status);
+  if (idx === -1 || idx >= PIPELINE.length - 1) return null;
+  return PIPELINE[idx + 1];
+}
 
 export default function AdminOrderDetail() {
   const { authenticated, loading, getAuthHeaders } = useAdminAuth();
   const [, navigate] = useLocation();
   const params = useParams<{ id: string }>();
+  const orderId = params.id;
+
   const [order, setOrder] = useState<any>(null);
-  const [items, setItems] = useState<any[]>([]);
-  const [dataLoading, setDataLoading] = useState(false);
-  const [updating, setUpdating] = useState(false);
-  const [newStatus, setNewStatus] = useState('');
-  const [trackingCode, setTrackingCode] = useState('');
+  const [orderLoading, setOrderLoading] = useState(true);
+  const [advancing, setAdvancing] = useState(false);
 
   useEffect(() => {
-    if (authenticated && params.id) loadOrder();
-  }, [authenticated, params.id]);
+    if (!authenticated || !orderId) return;
+    setOrderLoading(true);
+    fetch(`/api/admin/orders/${orderId}`, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setOrder(data); })
+      .catch(() => toast.error('Erro ao carregar pedido'))
+      .finally(() => setOrderLoading(false));
+  }, [authenticated, orderId, getAuthHeaders]);
 
-  const loadOrder = async () => {
-    setDataLoading(true);
+  const handleAdvance = async (nextStatus: string) => {
+    setAdvancing(true);
     try {
-      const res = await fetch(`/api/admin/orders/${params.id}`, {
-        headers: getAuthHeaders(),
+      const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
         credentials: 'include',
       });
       if (res.ok) {
         const data = await res.json();
         setOrder(data.order);
-        setItems(data.items || []);
-        setNewStatus(data.order.status);
-        setTrackingCode(data.order.tracking_code || '');
-      } else if (res.status === 404) {
-        toast.error('Pedido não encontrado');
-        navigate('/admin/orders');
+        const stage = PIPELINE.find(s => s.key === nextStatus);
+        toast.success(`Pedido avançado para: ${stage?.label}`);
+      } else {
+        toast.error('Erro ao atualizar etapa');
       }
     } catch {
-      toast.error('Erro ao carregar pedido');
+      toast.error('Erro ao atualizar etapa');
     } finally {
-      setDataLoading(false);
+      setAdvancing(false);
     }
   };
 
-  const handleUpdateStatus = async () => {
-    setUpdating(true);
+  const handleCancel = async () => {
+    if (!confirm('Cancelar este pedido?')) return;
+    setAdvancing(true);
     try {
-      const res = await fetch(`/api/admin/orders/${params.id}/status`, {
-        method: 'PATCH',
+      const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+        method: 'PUT',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelado' }),
         credentials: 'include',
-        body: JSON.stringify({ status: newStatus, trackingCode: trackingCode || undefined }),
       });
       if (res.ok) {
-        toast.success('Status atualizado com sucesso');
-        await loadOrder();
+        const data = await res.json();
+        setOrder(data.order);
+        toast.success('Pedido cancelado');
       } else {
-        toast.error('Erro ao atualizar status');
+        toast.error('Erro ao cancelar');
       }
     } catch {
-      toast.error('Erro ao atualizar status');
+      toast.error('Erro ao cancelar');
     } finally {
-      setUpdating(false);
+      setAdvancing(false);
     }
   };
 
@@ -123,199 +108,308 @@ export default function AdminOrderDetail() {
       </div>
     );
   }
-
   if (!authenticated) return <Admin />;
 
-  if (dataLoading || !order) {
+  if (orderLoading) {
     return (
-      <AdminLayout title="Carregando..." subtitle="">
+      <AdminLayout title="Pedido" subtitle="Carregando...">
         <div className="flex items-center justify-center h-48">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <Loader2 className="w-6 h-6 text-primary animate-spin" />
         </div>
       </AdminLayout>
     );
   }
 
-  const StatusIcon = STATUS_ICONS[order.status] || Clock;
-  const fmt = (v: number | string) => {
-    const n = typeof v === 'string' ? parseFloat(v) : v;
-    return `R$ ${n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
-  };
+  if (!order) {
+    return (
+      <AdminLayout title="Pedido" subtitle="Não encontrado">
+        <div className="flex flex-col items-center justify-center h-48 text-gray-500">
+          <p>Pedido não encontrado</p>
+          <Button variant="ghost" onClick={() => navigate('/admin/orders')} className="mt-4 text-gray-400">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+          </Button>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  const currentIdx = getStageIndex(order.status);
+  const nextStage = getNextStage(order.status);
+  const customerName = order.customerName ||
+    (order.payer ? `${order.payer.first_name || ''} ${order.payer.last_name || ''}`.trim() : '') || '—';
+  const customerEmail = order.customerEmail || order.payer?.email || '—';
+  const customerPhone = order.customerPhone || order.payer?.phone || '—';
+  const total = parseFloat(order.total || order.amount || 0);
 
   return (
-    <AdminLayout title={`Pedido ${order.order_number}`} subtitle={`Criado em ${new Date(order.created_at).toLocaleDateString('pt-BR')}`}>
-      <div className="space-y-6">
-        {/* Back */}
+    <AdminLayout
+      title={`Pedido ${order.orderNumber || order.id}`}
+      subtitle={order.createdAt ? new Date(order.createdAt).toLocaleString('pt-BR') : ''}
+    >
+      <div className="space-y-4">
+        {/* Botão voltar */}
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate('/admin/orders')}
           className="text-gray-400 hover:text-white -ml-2"
         >
-          <ArrowLeft className="w-4 h-4 mr-1" /> Voltar aos Pedidos
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar para Pedidos
         </Button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Order Items */}
-            <Card className="bg-white/5 border-white/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="font-display font-bold text-sm text-white tracking-wider flex items-center gap-2">
-                  <Package className="w-4 h-4 text-primary" /> ITENS DO PEDIDO
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {items.map(item => (
-                  <div key={item.id} className="flex items-center gap-3 py-2 border-b border-white/5 last:border-0">
-                    {item.image_url && (
-                      <img src={item.image_url} alt={item.product_name} className="w-12 h-12 object-cover bg-white/10" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-display font-bold text-xs text-white truncate">{item.product_name}</p>
-                      {item.variant_color_name && (
-                        <p className="font-body text-[10px] text-gray-500">Cor: {item.variant_color_name}</p>
+        {/* Pipeline visual */}
+        <Card className="bg-white/3 border-white/8">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-sm text-white">Etapa do Pedido</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Barra de progresso com círculos */}
+            <div className="flex items-start gap-0 mb-6 overflow-x-auto pb-2">
+              {PIPELINE.map((stage, idx) => {
+                const done = currentIdx !== -1 && idx < currentIdx;
+                const active = idx === currentIdx;
+                const Icon = stage.icon;
+                // Buscar timestamp do histórico
+                const historyEntry = order.statusHistory
+                  ? [...(order.statusHistory as any[])].reverse().find(h => h.status === stage.key)
+                  : null;
+
+                return (
+                  <div key={stage.key} className="flex items-start flex-shrink-0">
+                    <div className="flex flex-col items-center gap-1 px-2 sm:px-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
+                        done   ? 'bg-green-400/20 border-green-400 text-green-400' :
+                        active ? `${stage.bg} ${stage.border} ${stage.color}` :
+                                 'bg-white/3 border-white/10 text-gray-600'
+                      }`}>
+                        {done ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                      </div>
+                      <p className={`font-body text-[10px] text-center leading-tight max-w-[72px] ${
+                        done ? 'text-green-400' : active ? stage.color : 'text-gray-600'
+                      }`}>{stage.label}</p>
+                      {historyEntry && (
+                        <p className="font-body text-[9px] text-gray-600 text-center">
+                          {new Date(historyEntry.changedAt).toLocaleString('pt-BR', {
+                            day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                          })}
+                        </p>
                       )}
-                      <p className="font-body text-[10px] text-gray-500">Qtd: {item.quantity}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-display font-bold text-sm text-primary">{fmt(item.total_price)}</p>
-                      <p className="font-body text-[10px] text-gray-500">{fmt(item.unit_price)} /un</p>
-                    </div>
+                    {idx < PIPELINE.length - 1 && (
+                      <div className={`h-0.5 w-6 sm:w-8 mt-5 flex-shrink-0 ${
+                        (currentIdx !== -1 && idx < currentIdx) ? 'bg-green-400/40' : 'bg-white/8'
+                      }`} />
+                    )}
                   </div>
-                ))}
-                <div className="pt-3 space-y-1">
-                  <div className="flex justify-between font-body text-xs text-gray-400">
-                    <span>Subtotal</span><span>{fmt(order.subtotal)}</span>
-                  </div>
-                  <div className="flex justify-between font-body text-xs text-gray-400">
-                    <span>Frete</span><span>{parseFloat(order.shipping_cost) === 0 ? 'Grátis' : fmt(order.shipping_cost)}</span>
-                  </div>
-                  {parseFloat(order.discount) > 0 && (
-                    <div className="flex justify-between font-body text-xs text-green-400">
-                      <span>Desconto</span><span>-{fmt(order.discount)}</span>
-                    </div>
+                );
+              })}
+            </div>
+
+            {/* Botões de ação */}
+            <div className="flex flex-wrap gap-3 items-center">
+              {order.status === 'cancelado' ? (
+                <span className="flex items-center gap-2 text-red-400 font-body text-sm">
+                  <XCircle className="w-4 h-4" /> Pedido Cancelado
+                </span>
+              ) : order.status === 'entregue' ? (
+                <span className="flex items-center gap-2 text-green-400 font-body text-sm">
+                  <CheckCircle2 className="w-4 h-4" /> Pedido Entregue — Concluído
+                </span>
+              ) : (
+                <>
+                  {nextStage && (
+                    <Button
+                      onClick={() => handleAdvance(nextStage.key)}
+                      disabled={advancing}
+                      className="bg-primary hover:bg-primary/90 text-black font-display font-bold"
+                    >
+                      {advancing
+                        ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        : <ArrowRight className="w-4 h-4 mr-2" />
+                      }
+                      Avançar para: {nextStage.label}
+                    </Button>
                   )}
-                  <div className="flex justify-between font-display font-bold text-sm text-white border-t border-white/10 pt-2 mt-2">
-                    <span>Total</span><span className="text-primary">{fmt(order.total)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  {order.status === 'pending' && (
+                    <Button
+                      onClick={() => handleAdvance('em_separacao')}
+                      disabled={advancing}
+                      className="bg-blue-500 hover:bg-blue-400 text-white font-display font-bold"
+                    >
+                      {advancing
+                        ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        : <Package className="w-4 h-4 mr-2" />
+                      }
+                      Confirmar Recebimento
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={advancing}
+                    className="border-red-400/30 text-red-400 hover:bg-red-400/10 hover:border-red-400"
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Cancelar Pedido
+                  </Button>
+                </>
+              )}
+            </div>
 
-            {/* Shipping Address */}
-            {order.shipping_zip && (
-              <Card className="bg-white/5 border-white/10">
-                <CardHeader className="pb-3">
-                  <CardTitle className="font-display font-bold text-sm text-white tracking-wider flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-primary" /> ENDEREÇO DE ENTREGA
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="font-body text-sm text-gray-300 space-y-0.5">
-                    <p>{order.shipping_street}{order.shipping_number ? `, ${order.shipping_number}` : ''}</p>
-                    {order.shipping_neighborhood && <p>{order.shipping_neighborhood}</p>}
-                    <p>{order.shipping_city}{order.shipping_state ? ` — ${order.shipping_state}` : ''}</p>
-                    <p className="text-gray-500">CEP: {order.shipping_zip}</p>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Histórico de etapas */}
+            {order.statusHistory && (order.statusHistory as any[]).length > 0 && (
+              <div className="mt-4 border-t border-white/5 pt-4">
+                <p className="font-display text-xs text-gray-500 mb-2 tracking-wider">HISTÓRICO DE ETAPAS</p>
+                <div className="space-y-1.5">
+                  {[...(order.statusHistory as any[])].reverse().map((entry: any, idx: number) => {
+                    const stage = PIPELINE.find(s => s.key === entry.status);
+                    return (
+                      <div key={idx} className="flex items-center gap-2 text-[11px] font-body">
+                        <Clock className="w-3 h-3 text-gray-600 flex-shrink-0" />
+                        <span className={stage?.color || 'text-gray-400'}>
+                          {stage?.label || entry.status}
+                        </span>
+                        <span className="text-gray-600">—</span>
+                        <span className="text-gray-500">
+                          {new Date(entry.changedAt).toLocaleString('pt-BR')}
+                        </span>
+                        {entry.note && (
+                          <span className="text-gray-600">· {entry.note}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             )}
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* Status */}
-            <Card className="bg-white/5 border-white/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="font-display font-bold text-sm text-white tracking-wider">STATUS DO PEDIDO</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className={`flex items-center gap-2 ${STATUS_COLORS[order.status]}`}>
-                  <StatusIcon className="w-5 h-5" />
-                  <span className="font-display font-bold text-sm">{STATUS_LABELS[order.status] || order.status}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Dados do cliente */}
+          <Card className="bg-white/3 border-white/8">
+            <CardHeader className="pb-3">
+              <CardTitle className="font-display text-sm text-white flex items-center gap-2">
+                <User className="w-4 h-4 text-primary" /> Cliente
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div>
+                <p className="font-body text-xs text-gray-500">Nome</p>
+                <p className="font-body text-sm text-white">{customerName}</p>
+              </div>
+              <div>
+                <p className="font-body text-xs text-gray-500">E-mail</p>
+                <p className="font-body text-sm text-white">{customerEmail}</p>
+              </div>
+              {customerPhone !== '—' && (
+                <div>
+                  <p className="font-body text-xs text-gray-500">Telefone</p>
+                  <p className="font-body text-sm text-white">{customerPhone}</p>
                 </div>
+              )}
+            </CardContent>
+          </Card>
 
-                <div className="space-y-2">
-                  <Label className="font-body text-xs text-gray-400">Atualizar Status</Label>
-                  <Select value={newStatus} onValueChange={setNewStatus}>
-                    <SelectTrigger className="bg-black/50 border-white/10 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#111] border-white/10">
-                      {Object.entries(STATUS_LABELS).map(([v, l]) => (
-                        <SelectItem key={v} value={v} className="text-white hover:bg-white/10">{l}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+          {/* Pagamento */}
+          <Card className="bg-white/3 border-white/8">
+            <CardHeader className="pb-3">
+              <CardTitle className="font-display text-sm text-white flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-primary" /> Pagamento
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div>
+                <p className="font-body text-xs text-gray-500">Total</p>
+                <p className="font-display font-bold text-lg text-primary">
+                  R$ {total.toFixed(2).replace('.', ',')}
+                </p>
+              </div>
+              {order.shippingCost > 0 && (
+                <div>
+                  <p className="font-body text-xs text-gray-500">Frete</p>
+                  <p className="font-body text-sm text-white">
+                    R$ {parseFloat(order.shippingCost).toFixed(2).replace('.', ',')}
+                  </p>
                 </div>
-
-                {(newStatus === 'shipped' || order.tracking_code) && (
-                  <div className="space-y-1">
-                    <Label className="font-body text-xs text-gray-400">Código de Rastreamento</Label>
-                    <Input
-                      value={trackingCode}
-                      onChange={e => setTrackingCode(e.target.value)}
-                      placeholder="Ex: BR123456789BR"
-                      className="bg-black/50 border-white/10 text-white placeholder:text-gray-600"
-                    />
-                  </div>
-                )}
-
-                <Button
-                  onClick={handleUpdateStatus}
-                  disabled={updating || (newStatus === order.status && trackingCode === (order.tracking_code || ''))}
-                  className="w-full bg-primary text-black hover:bg-white font-display font-bold tracking-wider"
-                >
-                  {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'SALVAR ALTERAÇÕES'}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Customer */}
-            <Card className="bg-white/5 border-white/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="font-display font-bold text-sm text-white tracking-wider">CLIENTE</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-1.5">
-                {order.customer_name && <p className="font-body text-sm text-white">{order.customer_name}</p>}
-                <p className="font-body text-xs text-gray-400">{order.customer_email}</p>
-                {order.customer_phone && <p className="font-body text-xs text-gray-400">{order.customer_phone}</p>}
-                {order.customer_cpf && <p className="font-body text-xs text-gray-500">CPF: {order.customer_cpf}</p>}
-              </CardContent>
-            </Card>
-
-            {/* Payment */}
-            <Card className="bg-white/5 border-white/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="font-display font-bold text-sm text-white tracking-wider flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-primary" /> PAGAMENTO
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-1.5">
-                <div className="flex justify-between">
-                  <span className="font-body text-xs text-gray-400">Gateway</span>
-                  <span className="font-body text-xs text-white">{PAYMENT_LABELS[order.payment_gateway] || order.payment_gateway}</span>
+              )}
+              {order.paymentMethod && (
+                <div>
+                  <p className="font-body text-xs text-gray-500">Método</p>
+                  <p className="font-body text-sm text-white capitalize">{order.paymentMethod}</p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="font-body text-xs text-gray-400">Método</span>
-                  <span className="font-body text-xs text-white">{PAYMENT_METHOD_LABELS[order.payment_method] || order.payment_method}</span>
+              )}
+              {order.paymentId && (
+                <div>
+                  <p className="font-body text-xs text-gray-500">ID Pagamento</p>
+                  <p className="font-body text-xs text-gray-400 break-all">{order.paymentId}</p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="font-body text-xs text-gray-400">Status</span>
-                  <span className={`font-body text-xs font-bold ${order.payment_status === 'paid' ? 'text-green-400' : order.payment_status === 'failed' ? 'text-red-400' : 'text-yellow-400'}`}>
-                    {order.payment_status === 'paid' ? 'Pago' : order.payment_status === 'failed' ? 'Falhou' : order.payment_status === 'refunded' ? 'Reembolsado' : 'Pendente'}
-                  </span>
-                </div>
-                {order.payment_id && (
-                  <div className="pt-1">
-                    <p className="font-body text-[10px] text-gray-600 break-all">{order.payment_id}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Itens do pedido */}
+        <Card className="bg-white/3 border-white/8">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-sm text-white flex items-center gap-2">
+              <Package className="w-4 h-4 text-primary" /> Itens do Pedido
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {(order.items || []).map((item: any, idx: number) => (
+                <div key={idx} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                  <div>
+                    <p className="font-body text-sm text-white">
+                      {item.title || item.name || item.productId}
+                    </p>
+                    {item.variantColor && (
+                      <p className="font-body text-xs text-gray-500">Cor: {item.variantColor}</p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="font-body text-xs text-gray-400">Qtd: {item.quantity}</p>
+                    {(item.unit_price || item.price) && (
+                      <p className="font-body text-sm text-white">
+                        R$ {((item.unit_price || item.price) * item.quantity).toFixed(2).replace('.', ',')}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Endereço de entrega */}
+        {(order.shippingAddress || order.address || order.payer?.address) && (
+          <Card className="bg-white/3 border-white/8">
+            <CardHeader className="pb-3">
+              <CardTitle className="font-display text-sm text-white flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" /> Endereço de Entrega
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const addr = order.shippingAddress || order.address || order.payer?.address || {};
+                const parts = [
+                  addr.street || addr.logradouro,
+                  addr.number || addr.numero,
+                  addr.complement || addr.complemento,
+                  addr.neighborhood || addr.bairro,
+                  addr.city || addr.cidade,
+                  addr.state || addr.estado,
+                  addr.zipCode || addr.cep,
+                ].filter(Boolean);
+                return (
+                  <p className="font-body text-sm text-gray-300">{parts.join(', ')}</p>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </AdminLayout>
   );
