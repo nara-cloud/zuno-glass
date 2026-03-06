@@ -193,7 +193,7 @@ app.post("/api/payment/confirm", async (req, res) => {
       (paymentId && (o.paymentId === String(paymentId))) ||
       (externalReference && (o.id === externalReference || o.preferenceId === externalReference))
     );
-    if (order && order.status === 'pending') {
+    if (order && (order.status === 'pending' || order.status === 'paid')) {
       // Verificar o pagamento no MP para confirmar
       if (paymentId) {
         try {
@@ -668,6 +668,38 @@ app.put("/api/admin/stock/:productId", async (req, res) => {
 // ─── Admin routes ─────────────────────────────────────────────────────────────
 app.get("/api/admin/orders", requireAuth, (_req, res) => {
   res.json(readJSON(ORDERS_FILE));
+});
+
+// Atualizar status de um pedido
+app.put("/api/admin/orders/:id/status", requireAuth, (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const orders = readJSON(ORDERS_FILE);
+    const order = orders.find((o: any) => o.id === id || String(o.id) === id);
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+    order.status = status;
+    order.updatedAt = new Date().toISOString();
+    writeJSON(ORDERS_FILE, orders);
+    res.json({ success: true, order });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+// Migrar pedidos paid -> em_separacao
+app.post("/api/admin/migrate/paid-to-em-separacao", requireAuth, (_req, res) => {
+  try {
+    const orders = readJSON(ORDERS_FILE);
+    let count = 0;
+    for (const order of orders) {
+      if (order.status === 'paid') {
+        order.status = 'em_separacao';
+        order.updatedAt = new Date().toISOString();
+        count++;
+      }
+    }
+    writeJSON(ORDERS_FILE, orders);
+    res.json({ success: true, updated: count });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 app.get("/api/admin/waitlist", requireAuth, (_req, res) => {
