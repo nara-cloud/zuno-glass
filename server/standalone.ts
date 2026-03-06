@@ -157,6 +157,15 @@ app.put("/api/auth/profile", requireAuth, (req: any, res) => {
   res.json({ success: true, user });
 });
 
+// ─── PATCH /api/auth/profile (also accepts PATCH) ───────────────────────────
+app.patch("/api/auth/profile", requireAuth, (req: any, res) => {
+  const user = users.find((u: any) => u.id === req.authUser.userId);
+  if (!user) return res.status(404).json({ error: "Usuário não encontrado." });
+  Object.assign(user, req.body);
+  saveUsers(users);
+  res.json({ success: true, user });
+});
+
 // ─── GET /api/auth/my-orders ──────────────────────────────────────────────────
 app.get("/api/auth/my-orders", requireAuth, (req: any, res) => {
   try {
@@ -165,8 +174,71 @@ app.get("/api/auth/my-orders", requireAuth, (req: any, res) => {
     const myOrders = orders.filter((o: any) =>
       o.customerEmail && o.customerEmail.toLowerCase() === email.toLowerCase()
     );
+    // Ordenar por data mais recente
+    myOrders.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     res.json({ orders: myOrders });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── POST /api/payment/confirm - Confirmar pagamento via back_url do MP ──────
+// O Mercado Pago envia payment_id, collection_id, external_reference na URL de sucesso
+// Esta rota processa esses dados e atualiza o pedido
+app.post("/api/payment/confirm", async (req, res) => {
+  try {
+    const { paymentId, externalReference, collectionStatus } = req.body;
+    console.log(`[PaymentConfirm] paymentId=${paymentId} extRef=${externalReference} status=${collectionStatus}`);
+    if (!paymentId && !externalReference) return res.status(400).json({ error: "Dados insuficientes" });
+    const orders = readJSON(ORDERS_FILE);
+    const order = orders.find((o: any) =>
+      (paymentId && (o.paymentId === String(paymentId))) ||
+      (externalReference && (o.id === externalReference || o.preferenceId === externalReference))
+    );
+    if (order && order.status === 'pending') {
+      // Verificar o pagamento no MP para confirmar
+      if (paymentId) {
+        try {
+          const { MercadoPagoConfig, Payment } = await import("mercadopago");
+          const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
+          const payment = new Payment(client);
+          const result = await payment.get({ id: paymentId });
+          if (result.status === 'approved') {
+            order.status = 'em_separacao';
+            order.paymentStatus = 'paid';
+            order.paymentId = String(paymentId);
+            order.paidAt = new Date().toISOString();
+            writeJSON(ORDERS_FILE, orders);
+            deductStock(order.items || []);
+            sendWhatsAppNotification(formatOrderNotification(order, "PAGAMENTO APROVADO - EM SEPARAÇÃO")).catch(() => {});
+            console.log(`[PaymentConfirm] Pedido ${order.id} atualizado para em_separacao`);
+          }
+        } catch (mpErr: any) {
+          console.error('[PaymentConfirm] Erro ao verificar MP:', mpErr.message);
+          // Se não conseguir verificar, atualizar baseado no collectionStatus
+          if (collectionStatus === 'approved') {
+            order.status = 'em_separacao';
+            order.paymentStatus = 'paid';
+            order.paymentId = String(paymentId);
+            order.paidAt = new Date().toISOString();
+            writeJSON(ORDERS_FILE, orders);
+          }
+        }
+      } else if (collectionStatus === 'approved') {
+        order.status = 'em_separacao';
+        order.paymentStatus = 'paid';
+        order.paidAt = new Date().toISOString();
+        writeJSON(ORDERS_FILE, orders);
+      }
+    }
+    const updatedOrders = readJSON(ORDERS_FILE);
+    const updatedOrder = updatedOrders.find((o: any) =>
+      (paymentId && o.paymentId === String(paymentId)) ||
+      (externalReference && (o.id === externalReference || o.preferenceId === externalReference))
+    );
+    res.json({ success: true, order: updatedOrder || null });
+  } catch (e: any) {
+    console.error('[PaymentConfirm] Error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // // ─── Catalog & Stock (persistent) ────────────────────────────────────────────
@@ -792,24 +864,29 @@ function deductStock(orderItems: any[]): void {
 // ─── Webhook ──────────────────────────────────────────────────────────────────────────────────
 app.post("/api/webhooks/mercadopago", async (req, res) => {
   try {
+    console.log(`[Webhook MP] Recebido: type=${req.body?.type} id=${req.body?.data?.id}`);
     const { type, data } = req.body;
-    if (type === "payment" && data?.id) {
+    // Suportar também o formato antigo do MP (action=payment.updated)
+    const paymentId = data?.id || req.query['data.id'];
+    const eventType = type || req.query['type'];
+    if ((eventType === "payment" || eventType === "payment.updated") && paymentId) {
       const { MercadoPagoConfig, Payment } = await import("mercadopago");
       const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
       const payment = new Payment(client);
-      const result = await payment.get({ id: data.id });
+      const result = await payment.get({ id: paymentId });
       if (result.status === "approved") {
         const orders = readJSON(ORDERS_FILE);
         const extRef = result.external_reference;
         const order = orders.find((o: any) =>
-          o.paymentId === data.id ||
-          o.paymentId === String(data.id) ||
+          o.paymentId === paymentId ||
+          o.paymentId === String(paymentId) ||
           (extRef && (o.id === extRef || o.preferenceId === extRef))
         );
+        console.log(`[Webhook MP] extRef=${extRef} order encontrado=${!!order} status=${order?.status}`);
         if (order) {
           order.status = "em_separacao";
           order.paymentStatus = "paid";
-          order.paymentId = String(data.id);
+          order.paymentId = String(paymentId);
           order.paidAt = new Date().toISOString();
           writeJSON(ORDERS_FILE, orders);
           // Dar baixa no estoque
@@ -826,7 +903,7 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
             total: result.transaction_amount || 0,
             status: 'em_separacao',
             paymentStatus: 'paid',
-            paymentId: String(data.id),
+            paymentId: String(paymentId),
             preferenceId: extRef || '',
             paidAt: new Date().toISOString(),
             createdAt: new Date().toISOString(),

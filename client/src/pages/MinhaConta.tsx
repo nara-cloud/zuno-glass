@@ -69,6 +69,7 @@ export default function MinhaConta() {
     zip: '', street: '', number: '', complement: '', neighborhood: '', city: '', state: ''
   });
   const [savingProfile, setSavingProfile] = useState(false);
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -97,6 +98,26 @@ export default function MinhaConta() {
       });
     }
   }, [user]);
+
+  // Processar retorno do Mercado Pago e confirmar pagamento
+  useEffect(() => {
+    const paymentId = urlParams.get('payment_id') || urlParams.get('collection_id');
+    const collectionStatus = urlParams.get('collection_status') || urlParams.get('status');
+    const externalReference = urlParams.get('external_reference');
+    if ((paymentId || externalReference) && isAuthenticated && accessToken) {
+      // Confirmar pagamento no servidor
+      fetch('/api/payment/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ paymentId, externalReference, collectionStatus }),
+      }).then(r => r.json()).then(data => {
+        if (data.success) {
+          setPaymentConfirmed(true);
+          fetchOrders();
+        }
+      }).catch(() => {});
+    }
+  }, [isAuthenticated, accessToken]);
 
   // Fetch orders when tab changes or on mount if tab=pedidos
   useEffect(() => {
@@ -346,7 +367,7 @@ export default function MinhaConta() {
               <div>
                 <h2 className="font-display font-bold text-lg tracking-tight mb-6">MEUS PEDIDOS</h2>
                 {/* Banner de sucesso quando redirecionado do pagamento */}
-                {urlParams.get('tab') === 'pedidos' && (
+                {(paymentConfirmed || (urlParams.get('collection_status') === 'approved') || (urlParams.get('status') === 'approved')) && (
                   <div className="border border-green-500/30 bg-green-500/10 p-4 mb-6 flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                     <div>
