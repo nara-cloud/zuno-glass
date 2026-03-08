@@ -53,6 +53,33 @@ export default function CartDrawer() {
     estado: '',
   });
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof CustomerForm, string>>>({});
+  // Cupom de desconto
+  const [couponCode, setCouponCode] = useState('');
+  const [couponApplied, setCouponApplied] = useState<{ code: string; discount: number; type: string } | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
+  const shippingCostForCoupon = shippingQuote ? shippingQuote.price : 0;
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setIsApplyingCoupon(true);
+    setCouponError('');
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponCode.trim().toUpperCase(), orderTotal: totalPrice + shippingCostForCoupon }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setCouponError(data.error || 'Cupom inválido'); return; }
+      setCouponApplied({ code: data.coupon.code, discount: data.discount, type: data.coupon.discount_type });
+      toast.success(`Cupom ${data.coupon.code} aplicado! Desconto de R$ ${data.discount.toFixed(2).replace('.', ',')}`);
+    } catch { setCouponError('Erro ao validar cupom'); }
+    finally { setIsApplyingCoupon(false); }
+  };
+
+  const removeCoupon = () => { setCouponApplied(null); setCouponCode(''); setCouponError(''); };
 
   // Carregar CEP salvo do localStorage
   useEffect(() => {
@@ -328,7 +355,8 @@ export default function CartDrawer() {
 
   const installmentValue = totalPrice > 0 ? (totalPrice / 3) : 0;
   const shippingCost = shippingQuote ? shippingQuote.price : 0;
-  const grandTotal = totalPrice + shippingCost;
+  const couponDiscount = couponApplied ? couponApplied.discount : 0;
+  const grandTotal = Math.max(0, totalPrice + shippingCost - couponDiscount);
   const grandTotalPix = grandTotal * 0.95;
   const installmentGrandTotal = grandTotal > 0 ? (grandTotal / 3) : 0;
 
@@ -508,6 +536,15 @@ export default function CartDrawer() {
                       </span>
                     </div>
                   )}
+                  {couponApplied && (
+                    <div className="flex justify-between items-center">
+                      <span className="font-body text-sm text-green-400">Cupom {couponApplied.code}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-body text-sm font-bold text-green-400">- R$ {couponApplied.discount.toFixed(2).replace('.', ',')}</span>
+                        <button onClick={removeCoupon} className="text-gray-500 hover:text-red-400 transition-colors"><X className="w-3 h-3" /></button>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex justify-between pt-2 border-t border-white/10">
                     <span className="font-display font-bold text-sm text-white tracking-wider">TOTAL</span>
                     <span className="font-display font-bold text-sm text-primary">R$ {grandTotal.toFixed(2).replace('.', ',')}</span>
@@ -526,12 +563,39 @@ export default function CartDrawer() {
                   </div>
                 </div>
 
+                {/* Campo de cupom */}
+                <div className="space-y-1">
+                  {!couponApplied ? (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                        onKeyDown={e => e.key === 'Enter' && applyCoupon()}
+                        placeholder="CÓDIGO DO CUPOM"
+                        className="flex-1 bg-black/50 border border-white/10 px-3 py-2 font-body text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 transition-colors uppercase"
+                      />
+                      <button
+                        onClick={applyCoupon}
+                        disabled={isApplyingCoupon || !couponCode.trim()}
+                        className="bg-white/10 text-white px-3 py-2 font-display font-bold text-xs tracking-wider hover:bg-white/20 transition-colors disabled:opacity-50"
+                      >
+                        {isApplyingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : 'APLICAR'}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between bg-green-500/10 border border-green-500/30 px-3 py-2">
+                      <span className="font-body text-xs text-green-400">Cupom <strong>{couponApplied.code}</strong> aplicado!</span>
+                      <button onClick={removeCoupon} className="text-gray-500 hover:text-red-400 transition-colors"><X className="w-3.5 h-3.5" /></button>
+                    </div>
+                  )}
+                  {couponError && <p className="font-body text-xs text-red-400">{couponError}</p>}
+                </div>
                 {!shippingQuote && (
                   <p className="font-body text-xs text-gray-600 text-center">Informe seu CEP acima para calcular o frete.</p>
                 )}
-
                 <Button
-                  onClick={() => setStep('form')}
+                  onClick={() => setStep('form')}}
                   className="w-full bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider"
                 >
                   FINALIZAR COMPRA <ArrowRight className="w-5 h-5 ml-2" />

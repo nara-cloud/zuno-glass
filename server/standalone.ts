@@ -59,6 +59,7 @@ const WAITLIST_FILE = path.join(DATA_DIR, "waitlist.json");
 const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
 const STOCK_FILE = path.join(DATA_DIR, "stock.json");
 const CUSTOMERS_FILE = path.join(DATA_DIR, "customers.json");
+const COUPONS_FILE = path.join(DATA_DIR, "coupons.json");
 
 function readJSON(file: string, def: any = []) {
   try { return JSON.parse(fs.readFileSync(file, "utf-8")); } catch { return def; }
@@ -1003,6 +1004,73 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
     }
     res.sendStatus(200);
   } catch (e: any) { console.error("[Webhook] Error:", e.message); res.sendStatus(200); }
+});
+
+// ─── Cupons de desconto ──────────────────────────────────────────────────────
+app.get('/api/admin/gestao/coupons', requireAuth, (_req, res) => {
+  res.json(readJSON(COUPONS_FILE, []));
+});
+
+app.post('/api/admin/gestao/coupons', requireAuth, (req, res) => {
+  const coupons = readJSON(COUPONS_FILE, []);
+  const { code, discountType, discountValue, minOrderValue, maxUses, expiresAt } = req.body;
+  if (!code || !discountType || discountValue === undefined) {
+    return res.status(400).json({ error: 'Campos obrigatórios: code, discountType, discountValue' });
+  }
+  const existing = coupons.find((c: any) => c.code.toUpperCase() === code.toUpperCase());
+  if (existing) return res.status(400).json({ error: 'Cupom com este código já existe' });
+  const coupon = {
+    id: Date.now(),
+    code: code.toUpperCase(),
+    discount_type: discountType,
+    discount_value: parseFloat(discountValue),
+    min_order_value: minOrderValue ? parseFloat(minOrderValue) : null,
+    max_uses: maxUses ? parseInt(maxUses) : null,
+    used_count: 0,
+    is_active: true,
+    expires_at: expiresAt || null,
+    created_at: new Date().toISOString(),
+  };
+  coupons.push(coupon);
+  writeJSON(COUPONS_FILE, coupons);
+  res.json(coupon);
+});
+
+app.patch('/api/admin/gestao/coupons/:id/toggle', requireAuth, (req, res) => {
+  const coupons = readJSON(COUPONS_FILE, []);
+  const idx = coupons.findIndex((c: any) => c.id === parseInt(req.params.id));
+  if (idx === -1) return res.status(404).json({ error: 'Cupom não encontrado' });
+  coupons[idx].is_active = !coupons[idx].is_active;
+  writeJSON(COUPONS_FILE, coupons);
+  res.json(coupons[idx]);
+});
+
+app.delete('/api/admin/gestao/coupons/:id', requireAuth, (req, res) => {
+  let coupons = readJSON(COUPONS_FILE, []);
+  const before = coupons.length;
+  coupons = coupons.filter((c: any) => c.id !== parseInt(req.params.id));
+  if (coupons.length === before) return res.status(404).json({ error: 'Cupom não encontrado' });
+  writeJSON(COUPONS_FILE, coupons);
+  res.json({ success: true });
+});
+
+// Rota pública para validar cupom no checkout
+app.post('/api/coupons/validate', (req, res) => {
+  const { code, orderTotal } = req.body;
+  if (!code) return res.status(400).json({ error: 'Código obrigatório' });
+  const coupons = readJSON(COUPONS_FILE, []);
+  const coupon = coupons.find((c: any) => c.code.toUpperCase() === code.toUpperCase());
+  if (!coupon) return res.status(404).json({ error: 'Cupom não encontrado' });
+  if (!coupon.is_active) return res.status(400).json({ error: 'Cupom inativo' });
+  if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) return res.status(400).json({ error: 'Cupom expirado' });
+  if (coupon.max_uses && coupon.used_count >= coupon.max_uses) return res.status(400).json({ error: 'Cupom esgotado' });
+  if (coupon.min_order_value && orderTotal < coupon.min_order_value) {
+    return res.status(400).json({ error: `Pedido mínimo de R$ ${coupon.min_order_value.toFixed(2)} para este cupom` });
+  }
+  const discount = coupon.discount_type === 'percentual'
+    ? (orderTotal * coupon.discount_value) / 100
+    : coupon.discount_value;
+  res.json({ valid: true, coupon, discount: Math.min(discount, orderTotal) });
 });
 
 // ─── Static files ─────────────────────────────────────────────────────────────
