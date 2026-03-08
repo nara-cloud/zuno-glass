@@ -323,6 +323,7 @@ export default function CartDrawer() {
           },
         },
         shippingAddress,
+        coupon: couponApplied ? { code: couponApplied.code, discount: couponApplied.discount } : null,
         externalReference: orderId,
         backUrls: {
           success: `${window.location.origin}/minha-conta?tab=pedidos&order=${orderId}`,

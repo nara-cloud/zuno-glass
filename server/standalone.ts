@@ -401,21 +401,31 @@ app.post("/api/checkout", async (req, res) => {
 // ─── Checkout / Mercado Pago (advanced) ──────────────────────────────────────────────────
 app.post("/api/checkout/preference", async (req, res) => {
   try {
-    const { items, payer, backUrls, externalReference, shippingAddress } = req.body;
+    const { items, payer, backUrls, externalReference, shippingAddress, coupon } = req.body;
     const { MercadoPagoConfig, Preference } = await import("mercadopago");
     const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
     const preference = new Preference(client);
     const orderId = externalReference || `order-${Date.now()}`;
     const origin = (req.headers.origin as string) || "https://zuno-glass-production.up.railway.app";
+    // Aplicar desconto do cupom distribuindo proporcionalmente entre os itens
+    let mpItems = items.map((item: any) => ({
+      id: item.id,
+      title: item.title,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      currency_id: "BRL",
+    }));
+    if (coupon && coupon.discount > 0) {
+      const subtotal = items.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0);
+      const discountRatio = Math.min(coupon.discount / subtotal, 1);
+      mpItems = mpItems.map((item: any) => ({
+        ...item,
+        unit_price: Math.max(0.01, parseFloat((item.unit_price * (1 - discountRatio)).toFixed(2))),
+      }));
+    }
     const result = await preference.create({
       body: {
-        items: items.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          currency_id: "BRL",
-        })),
+        items: mpItems,
         payer: payer || {},
         back_urls: backUrls || {
           success: `${origin}/minha-conta?tab=pedidos`,
@@ -446,7 +456,9 @@ app.post("/api/checkout/preference", async (req, res) => {
       customerCpf: payer?.identification?.number || '',
       shippingAddress: shippingAddress || null,
       shippingCost: 0,
-      total: items.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0),
+      coupon: coupon || null,
+      total: mpItems.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0),
+      originalTotal: items.reduce((s: number, i: any) => s + i.unit_price * i.quantity, 0),
       status: 'pending',
       preferenceId: result.id,
       createdAt: new Date().toISOString(),
