@@ -595,7 +595,7 @@ export default function CartDrawer() {
                   <p className="font-body text-xs text-gray-600 text-center">Informe seu CEP acima para calcular o frete.</p>
                 )}
                 <Button
-                  onClick={() => setStep('form')}}
+                  onClick={() => setStep('form')}
                   className="w-full bg-primary text-black hover:bg-white font-display font-bold text-lg h-14 clip-corner tracking-wider"
                 >
                   FINALIZAR COMPRA <ArrowRight className="w-5 h-5 ml-2" />
