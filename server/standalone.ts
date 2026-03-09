@@ -287,17 +287,49 @@ async function getProducts(): Promise<any[]> {
 }
 
 // Carrega estoque: do JSON persistente ou inicializa com 99
+// Valida IDs contra o catálogo atual e reinicializa se desatualizado
 async function getStock(): Promise<any> {
   if (_stockCache) return _stockCache;
+  const products = await getProducts();
+  const catalogIds = new Set(products.map((p: any) => p.id));
   if (fs.existsSync(STOCK_FILE)) {
     const saved = readJSON(STOCK_FILE, null);
     if (saved && typeof saved === 'object' && Object.keys(saved).length > 0) {
-      _stockCache = saved;
-      return _stockCache;
+      const stockIds = Object.keys(saved);
+      // Verificar quantos IDs do catálogo existem no estoque salvo
+      const matchCount = stockIds.filter((id: string) => catalogIds.has(id)).length;
+      const catalogMatchRatio = matchCount / catalogIds.size;
+      if (catalogMatchRatio >= 0.5) {
+        // IDs razoavelmente válidos: usar o salvo, adicionando produtos novos
+        const stock: any = {};
+        for (const p of products) {
+          if (saved[p.id]) {
+            // Garantir formato correto {total, variants}
+            const entry = saved[p.id];
+            if (entry.variants !== undefined) {
+              stock[p.id] = entry;
+            } else {
+              // Formato antigo {colorName: qty} — converter
+              const variants: any = entry;
+              const total = Object.values(variants as Record<string, number>).reduce((s: number, v: any) => s + Number(v), 0);
+              stock[p.id] = { total, variants };
+            }
+          } else {
+            // Produto novo sem estoque — inicializar com 99
+            const variants: any = {};
+            if (p.variants) { for (const v of p.variants) { variants[v.colorName || v.color] = 99; } }
+            stock[p.id] = { total: 99, variants };
+          }
+        }
+        _stockCache = stock;
+        writeJSON(STOCK_FILE, _stockCache);
+        return _stockCache;
+      }
+      // IDs inválidos (estoque desatualizado): reinicializar
+      console.log('[WARN] stock.json com IDs inválidos/desatualizados, reinicializando do catálogo');
     }
   }
-  // Inicializar estoque padrão
-  const products = await getProducts();
+  // Inicializar estoque padrão com 99 unidades
   const stock: any = {};
   for (const p of products) {
     const variants: any = {};
@@ -414,6 +446,23 @@ app.post("/api/checkout", async (req, res) => {
 app.post("/api/checkout/preference", async (req, res) => {
   try {
     const { items, payer, backUrls, externalReference, shippingAddress, coupon } = req.body;
+    // Validar estoque antes de criar preferência
+    const stock = await getStock();
+    for (const item of items) {
+      const productId = item.id;
+      const variantColor = item.variantColor || item.variantColorName || null;
+      const productStock = stock[productId];
+      if (productStock) {
+        // Verificar estoque da variante específica
+        if (variantColor && productStock.variants && productStock.variants[variantColor] !== undefined) {
+          if (productStock.variants[variantColor] <= 0) {
+            return res.status(400).json({ error: `Produto "${item.title}" (${variantColor}) está esgotado.` });
+          }
+        } else if (productStock.total !== undefined && productStock.total <= 0) {
+          return res.status(400).json({ error: `Produto "${item.title}" está esgotado.` });
+        }
+      }
+    }
     const { MercadoPagoConfig, Preference } = await import("mercadopago");
     const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
     const preference = new Preference(client);
@@ -674,9 +723,19 @@ app.delete("/api/admin/products/:id", async (req, res) => {
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
-// ─── Admin: Estoque ───────────────────────────────────────────────────────────
+// ─── Admin: Estoque ──────────────────────────────────────────────────────────────────────────────────────
 app.get("/api/admin/stock", async (_req, res) => {
   try { res.json(await getStock()); } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
+// Reset total do estoque: reinicializa todos os produtos com 99 unidades
+app.post("/api/admin/stock/reset", requireAuth, async (_req, res) => {
+  try {
+    _stockCache = null; // Limpar cache
+    if (fs.existsSync(STOCK_FILE)) fs.unlinkSync(STOCK_FILE); // Apagar arquivo
+    const stock = await getStock(); // Reinicializa com 99 para todos
+    res.json({ success: true, message: `Estoque reinicializado com 99 unidades para ${Object.keys(stock).length} produtos.` });
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
 app.put("/api/admin/stock/:productId", async (req, res) => {
