@@ -681,6 +681,8 @@ var ORDERS_FILE = path.join(DATA_DIR, "orders.json");
 var WAITLIST_FILE = path.join(DATA_DIR, "waitlist.json");
 var PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
 var STOCK_FILE = path.join(DATA_DIR, "stock.json");
+var CUSTOMERS_FILE = path.join(DATA_DIR, "customers.json");
+var COUPONS_FILE = path.join(DATA_DIR, "coupons.json");
 function readJSON(file, def = []) {
   try {
     return JSON.parse(fs.readFileSync(file, "utf-8"));
@@ -691,10 +693,24 @@ function readJSON(file, def = []) {
 function writeJSON(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
-var users = [];
+function loadUsers() {
+  try {
+    const saved = readJSON(CUSTOMERS_FILE, null);
+    if (Array.isArray(saved) && saved.length > 0) return saved;
+  } catch {
+  }
+  return [];
+}
+function saveUsers(userList) {
+  writeJSON(CUSTOMERS_FILE, userList);
+}
+var users = loadUsers();
 (async () => {
-  const hash = await bcrypt.hash("admin123", 10);
-  users.push({ id: 1, email: "admin@zunoglass.com", passwordHash: hash, name: "Admin ZUNO", roles: ["admin", "ops"], isActive: true });
+  if (!users.find((u) => u.email === "admin@zunoglass.com")) {
+    const hash = await bcrypt.hash("admin123", 10);
+    users.push({ id: 1, email: "admin@zunoglass.com", passwordHash: hash, name: "Admin ZUNO", roles: ["admin", "ops"], isActive: true });
+    saveUsers(users);
+  }
 })();
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -718,12 +734,15 @@ function requireAuth(req, res, next) {
 }
 app.post("/api/auth/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, address } = req.body;
     if (!name || !email || !password) return res.status(400).json({ error: "Nome, e-mail e senha s\xE3o obrigat\xF3rios." });
     if (users.find((u) => u.email === email.toLowerCase())) return res.status(409).json({ error: "E-mail j\xE1 cadastrado." });
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = { id: users.length + 1, email: email.toLowerCase(), passwordHash, name, roles: ["customer"], isActive: true };
+    const newId = users.length > 0 ? Math.max(...users.map((u) => u.id || 0)) + 1 : 1;
+    const user = { id: newId, email: email.toLowerCase(), passwordHash, name, roles: ["customer"], isActive: true, createdAt: (/* @__PURE__ */ new Date()).toISOString() };
+    if (address) user.address = address;
     users.push(user);
+    saveUsers(users);
     const accessToken = jwt.sign({ userId: user.id, email: user.email, roles: user.roles }, JWT_SECRET, { expiresIn: "7d" });
     res.status(201).json({ accessToken, user: { id: user.id, name: user.name, email: user.email, roles: user.roles } });
   } catch (e) {
@@ -747,15 +766,90 @@ app.post("/api/auth/logout", (_req, res) => res.json({ success: true }));
 app.post("/api/auth/refresh", (_req, res) => res.status(401).json({ error: "Not supported" }));
 app.post("/api/auth/forgot-password", (_req, res) => res.json({ success: true, message: "Se o e-mail existir, voc\xEA receber\xE1 as instru\xE7\xF5es." }));
 app.get("/api/auth/me", requireAuth, (req, res) => {
-  const user = users.find((u) => u.id === req.authUser.userId);
+  const user = users.find((u) => u.id === req.authUser.userId) || users.find((u) => u.email === req.authUser.email);
   if (!user) return res.status(404).json({ error: "Usu\xE1rio n\xE3o encontrado." });
-  res.json({ user: { id: user.id, name: user.name, email: user.email, roles: user.roles, address: {} } });
+  res.json({ user: { id: user.id, name: user.name, email: user.email, roles: user.roles, phone: user.phone, cpf: user.cpf, address: user.address || {} } });
 });
 app.put("/api/auth/profile", requireAuth, (req, res) => {
   const user = users.find((u) => u.id === req.authUser.userId);
   if (!user) return res.status(404).json({ error: "Usu\xE1rio n\xE3o encontrado." });
   Object.assign(user, req.body);
+  saveUsers(users);
   res.json({ success: true, user });
+});
+app.patch("/api/auth/profile", requireAuth, (req, res) => {
+  const user = users.find((u) => u.id === req.authUser.userId);
+  if (!user) return res.status(404).json({ error: "Usu\xE1rio n\xE3o encontrado." });
+  Object.assign(user, req.body);
+  saveUsers(users);
+  res.json({ success: true, user });
+});
+app.get("/api/auth/my-orders", requireAuth, (req, res) => {
+  try {
+    const email = req.authUser.email;
+    const orders = readJSON(ORDERS_FILE, []);
+    const myOrders = orders.filter(
+      (o) => o.customerEmail && o.customerEmail.toLowerCase() === email.toLowerCase()
+    );
+    myOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    res.json({ orders: myOrders });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+app.post("/api/payment/confirm", async (req, res) => {
+  try {
+    const { paymentId, externalReference, collectionStatus } = req.body;
+    console.log(`[PaymentConfirm] paymentId=${paymentId} extRef=${externalReference} status=${collectionStatus}`);
+    if (!paymentId && !externalReference) return res.status(400).json({ error: "Dados insuficientes" });
+    const orders = readJSON(ORDERS_FILE);
+    const order = orders.find(
+      (o) => paymentId && o.paymentId === String(paymentId) || externalReference && (o.id === externalReference || o.preferenceId === externalReference)
+    );
+    if (order && (order.status === "pending" || order.status === "paid")) {
+      if (paymentId) {
+        try {
+          const { MercadoPagoConfig, Payment } = await import("mercadopago");
+          const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
+          const payment = new Payment(client);
+          const result = await payment.get({ id: paymentId });
+          if (result.status === "approved") {
+            order.status = "em_separacao";
+            order.paymentStatus = "paid";
+            order.paymentId = String(paymentId);
+            order.paidAt = (/* @__PURE__ */ new Date()).toISOString();
+            writeJSON(ORDERS_FILE, orders);
+            deductStock(order.items || []);
+            sendWhatsAppNotification(formatOrderNotification(order, "PAGAMENTO APROVADO - EM SEPARA\xC7\xC3O")).catch(() => {
+            });
+            console.log(`[PaymentConfirm] Pedido ${order.id} atualizado para em_separacao`);
+          }
+        } catch (mpErr) {
+          console.error("[PaymentConfirm] Erro ao verificar MP:", mpErr.message);
+          if (collectionStatus === "approved") {
+            order.status = "em_separacao";
+            order.paymentStatus = "paid";
+            order.paymentId = String(paymentId);
+            order.paidAt = (/* @__PURE__ */ new Date()).toISOString();
+            writeJSON(ORDERS_FILE, orders);
+          }
+        }
+      } else if (collectionStatus === "approved") {
+        order.status = "em_separacao";
+        order.paymentStatus = "paid";
+        order.paidAt = (/* @__PURE__ */ new Date()).toISOString();
+        writeJSON(ORDERS_FILE, orders);
+      }
+    }
+    const updatedOrders = readJSON(ORDERS_FILE);
+    const updatedOrder = updatedOrders.find(
+      (o) => paymentId && o.paymentId === String(paymentId) || externalReference && (o.id === externalReference || o.preferenceId === externalReference)
+    );
+    res.json({ success: true, order: updatedOrder || null });
+  } catch (e) {
+    console.error("[PaymentConfirm] Error:", e.message);
+    res.status(500).json({ error: e.message });
+  }
 });
 var _catalogCache = null;
 var _stockCache = null;
@@ -764,32 +858,69 @@ function slugify(name) {
 }
 async function getProducts() {
   if (_catalogCache) return _catalogCache;
+  let baseCatalog = [];
+  try {
+    const { catalog: catalog2 } = await Promise.resolve().then(() => (init_catalog(), catalog_exports));
+    baseCatalog = catalog2;
+  } catch {
+    baseCatalog = [];
+  }
+  const catalogIds = new Set(baseCatalog.map((p) => p.id));
   if (fs.existsSync(PRODUCTS_FILE)) {
     const saved = readJSON(PRODUCTS_FILE, null);
     if (Array.isArray(saved) && saved.length > 0) {
-      _catalogCache = saved;
-      return _catalogCache;
+      const savedIds = saved.map((p) => p.id);
+      const idsValid = savedIds.every((id) => catalogIds.has(id));
+      if (idsValid) {
+        _catalogCache = saved;
+        return _catalogCache;
+      }
+      console.log("[WARN] products.json com IDs inv\xE1lidos, reinicializando do cat\xE1logo est\xE1tico");
     }
   }
-  try {
-    const { catalog: catalog2 } = await Promise.resolve().then(() => (init_catalog(), catalog_exports));
-    _catalogCache = catalog2;
-    writeJSON(PRODUCTS_FILE, _catalogCache);
-  } catch {
-    _catalogCache = [];
-  }
+  _catalogCache = baseCatalog;
+  writeJSON(PRODUCTS_FILE, _catalogCache);
   return _catalogCache;
 }
 async function getStock() {
   if (_stockCache) return _stockCache;
+  const products = await getProducts();
+  const catalogIds = new Set(products.map((p) => p.id));
   if (fs.existsSync(STOCK_FILE)) {
     const saved = readJSON(STOCK_FILE, null);
     if (saved && typeof saved === "object" && Object.keys(saved).length > 0) {
-      _stockCache = saved;
-      return _stockCache;
+      const stockIds = Object.keys(saved);
+      const matchCount = stockIds.filter((id) => catalogIds.has(id)).length;
+      const catalogMatchRatio = matchCount / catalogIds.size;
+      if (catalogMatchRatio >= 0.5) {
+        const stock2 = {};
+        for (const p of products) {
+          if (saved[p.id]) {
+            const entry = saved[p.id];
+            if (entry.variants !== void 0) {
+              stock2[p.id] = entry;
+            } else {
+              const variants = entry;
+              const total = Object.values(variants).reduce((s, v) => s + Number(v), 0);
+              stock2[p.id] = { total, variants };
+            }
+          } else {
+            const variants = {};
+            if (p.variants) {
+              for (const v of p.variants) {
+                variants[v.colorName || v.color] = 99;
+              }
+            }
+            stock2[p.id] = { total: 99, variants };
+          }
+        }
+        _stockCache = stock2;
+        writeJSON(STOCK_FILE, _stockCache);
+        return _stockCache;
+      }
+      console.log("[WARN] stock.json com IDs inv\xE1lidos/desatualizados, reinicializando do cat\xE1logo");
     }
   }
-  const products = await getProducts();
   const stock = {};
   for (const p of products) {
     const variants = {};
@@ -899,29 +1030,84 @@ app.post("/api/checkout", async (req, res) => {
 });
 app.post("/api/checkout/preference", async (req, res) => {
   try {
-    const { items, payer, backUrls, externalReference } = req.body;
+    const { items, payer, backUrls, externalReference, shippingAddress, coupon } = req.body;
+    const stock = await getStock();
+    for (const item of items) {
+      const productId = item.id;
+      const variantColor = item.variantColor || item.variantColorName || null;
+      const productStock = stock[productId];
+      if (productStock) {
+        if (variantColor && productStock.variants && productStock.variants[variantColor] !== void 0) {
+          if (productStock.variants[variantColor] <= 0) {
+            return res.status(400).json({ error: `Produto "${item.title}" (${variantColor}) est\xE1 esgotado.` });
+          }
+        } else if (productStock.total !== void 0 && productStock.total <= 0) {
+          return res.status(400).json({ error: `Produto "${item.title}" est\xE1 esgotado.` });
+        }
+      }
+    }
     const { MercadoPagoConfig, Preference } = await import("mercadopago");
     const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
     const preference = new Preference(client);
+    const orderId = externalReference || `order-${Date.now()}`;
+    const origin = req.headers.origin || "https://zuno-glass-production.up.railway.app";
+    let mpItems = items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      currency_id: "BRL"
+    }));
+    if (coupon && coupon.discount > 0) {
+      const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0);
+      const discountRatio = Math.min(coupon.discount / subtotal, 1);
+      mpItems = mpItems.map((item) => ({
+        ...item,
+        unit_price: Math.max(0.01, parseFloat((item.unit_price * (1 - discountRatio)).toFixed(2)))
+      }));
+    }
     const result = await preference.create({
       body: {
-        items: items.map((item) => ({
-          id: item.id,
-          title: item.title,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          currency_id: "BRL"
-        })),
+        items: mpItems,
         payer: payer || {},
         back_urls: backUrls || {
-          success: `${req.headers.origin || "http://localhost:3000"}/checkout/success`,
-          failure: `${req.headers.origin || "http://localhost:3000"}/checkout`,
-          pending: `${req.headers.origin || "http://localhost:3000"}/checkout`
+          success: `${origin}/minha-conta?tab=pedidos`,
+          failure: `${origin}/checkout`,
+          pending: `${origin}/minha-conta?tab=pedidos`
         },
         auto_approve: false,
-        external_reference: externalReference || `order-${Date.now()}`,
-        payment_methods: { installments: 3 }
+        external_reference: orderId,
+        payment_methods: { installments: 3 },
+        notification_url: `https://zuno-glass-production.up.railway.app/api/webhooks/mercadopago`
       }
+    });
+    const orders = readJSON(ORDERS_FILE);
+    const fullName = payer ? `${payer.first_name || ""} ${payer.last_name || ""}`.trim() : "";
+    const newOrder = {
+      id: orderId,
+      items: items.map((item) => ({
+        productId: item.id,
+        name: item.title,
+        quantity: item.quantity,
+        price: item.unit_price,
+        variantColor: item.variantColor || "Padr\xE3o"
+      })),
+      customerName: fullName,
+      customerEmail: payer?.email || "",
+      customerPhone: payer?.phone ? `${payer.phone.area_code}${payer.phone.number}` : "",
+      customerCpf: payer?.identification?.number || "",
+      shippingAddress: shippingAddress || null,
+      shippingCost: 0,
+      coupon: coupon || null,
+      total: mpItems.reduce((s, i) => s + i.unit_price * i.quantity, 0),
+      originalTotal: items.reduce((s, i) => s + i.unit_price * i.quantity, 0),
+      status: "pending",
+      preferenceId: result.id,
+      createdAt: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    orders.push(newOrder);
+    writeJSON(ORDERS_FILE, orders);
+    sendWhatsAppNotification(formatOrderNotification(newOrder, "NOVO PEDIDO")).catch(() => {
     });
     res.json({ preferenceId: result.id, initPoint: result.init_point, sandboxInitPoint: result.sandbox_init_point });
   } catch (e) {
@@ -1131,6 +1317,16 @@ app.get("/api/admin/stock", async (_req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+app.post("/api/admin/stock/reset", requireAuth, async (_req, res) => {
+  try {
+    _stockCache = null;
+    if (fs.existsSync(STOCK_FILE)) fs.unlinkSync(STOCK_FILE);
+    const stock = await getStock();
+    res.json({ success: true, message: `Estoque reinicializado com 99 unidades para ${Object.keys(stock).length} produtos.` });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 app.put("/api/admin/stock/:productId", async (req, res) => {
   try {
     const stock = await getStock();
@@ -1145,8 +1341,86 @@ app.put("/api/admin/stock/:productId", async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-app.get("/api/admin/orders", requireAuth, (_req, res) => {
-  res.json(readJSON(ORDERS_FILE));
+app.get("/api/admin/orders", requireAuth, (req, res) => {
+  try {
+    const { page = "1", limit = "50", search = "", status = "" } = req.query;
+    let orders = readJSON(ORDERS_FILE, []);
+    orders = orders.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    if (status && status !== "all") {
+      orders = orders.filter((o) => o.status === status);
+    }
+    if (search) {
+      const s = String(search).toLowerCase();
+      orders = orders.filter(
+        (o) => o.id && String(o.id).toLowerCase().includes(s) || o.customerEmail && o.customerEmail.toLowerCase().includes(s) || o.customerName && o.customerName.toLowerCase().includes(s) || o.email && o.email.toLowerCase().includes(s) || o.payer && o.payer.email && o.payer.email.toLowerCase().includes(s) || o.payer && o.payer.first_name && (o.payer.first_name + " " + (o.payer.last_name || "")).toLowerCase().includes(s)
+      );
+    }
+    const total = orders.length;
+    const pageNum = parseInt(String(page), 10) || 1;
+    const limitNum = parseInt(String(limit), 10) || 50;
+    const paginated = orders.slice((pageNum - 1) * limitNum, pageNum * limitNum);
+    res.json({ orders: paginated, total });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+app.get("/api/admin/orders/:id", requireAuth, (req, res) => {
+  try {
+    const { id } = req.params;
+    const orders = readJSON(ORDERS_FILE, []);
+    const order = orders.find((o) => o.id === id || String(o.id) === id);
+    if (!order) return res.status(404).json({ error: "Pedido n\xE3o encontrado." });
+    res.json(order);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+app.put("/api/admin/orders/:id/status", requireAuth, (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, note } = req.body;
+    const orders = readJSON(ORDERS_FILE);
+    const order = orders.find((o) => o.id === id || String(o.id) === id);
+    if (!order) return res.status(404).json({ error: "Pedido n\xE3o encontrado." });
+    const now = (/* @__PURE__ */ new Date()).toISOString();
+    if (!order.statusHistory) order.statusHistory = [];
+    order.statusHistory.push({ status, changedAt: now, note: note || "" });
+    order.status = status;
+    order.updatedAt = now;
+    writeJSON(ORDERS_FILE, orders);
+    const STAGE_LABELS = {
+      em_separacao: "APROVADO - EM SEPARA\xC7\xC3O",
+      preparando: "EM PREPARA\xC7\xC3O",
+      pronto: "PEDIDO PRONTO",
+      saiu_entrega: "SAIU PARA ENTREGA",
+      entregue: "ENTREGUE",
+      cancelado: "CANCELADO"
+    };
+    if (STAGE_LABELS[status]) {
+      sendWhatsAppNotification(formatOrderNotification(order, STAGE_LABELS[status])).catch(() => {
+      });
+    }
+    res.json({ success: true, order });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+app.post("/api/admin/migrate/paid-to-em-separacao", requireAuth, (_req, res) => {
+  try {
+    const orders = readJSON(ORDERS_FILE);
+    let count = 0;
+    for (const order of orders) {
+      if (order.status === "paid") {
+        order.status = "em_separacao";
+        order.updatedAt = (/* @__PURE__ */ new Date()).toISOString();
+        count++;
+      }
+    }
+    writeJSON(ORDERS_FILE, orders);
+    res.json({ success: true, updated: count });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 app.get("/api/admin/waitlist", requireAuth, (_req, res) => {
   res.json(readJSON(WAITLIST_FILE));
@@ -1278,21 +1552,81 @@ app.post("/api/admin/gestao/partners", requireAuth, (req, res) => {
   writeJSON(path.join(DATA_DIR, "partners.json"), items);
   res.json(item);
 });
+function deductStock(orderItems) {
+  try {
+    const stock = readJSON(STOCK_FILE, {});
+    let changed = false;
+    for (const item of orderItems) {
+      const productId = item.productId || item.id;
+      const variantColor = item.variantColor || "default";
+      const qty = Number(item.quantity) || 1;
+      if (!productId || !stock[productId]) continue;
+      const productStock = stock[productId];
+      if (productStock.variants && productStock.variants[variantColor] !== void 0) {
+        productStock.variants[variantColor] = Math.max(0, (productStock.variants[variantColor] || 0) - qty);
+      } else if (productStock.variants && productStock.variants["default"] !== void 0) {
+        productStock.variants["default"] = Math.max(0, (productStock.variants["default"] || 0) - qty);
+      }
+      if (productStock.variants) {
+        productStock.total = Object.values(productStock.variants).reduce((sum, v) => sum + Number(v), 0);
+      } else {
+        productStock.total = Math.max(0, (productStock.total || 0) - qty);
+      }
+      changed = true;
+    }
+    if (changed) {
+      writeJSON(STOCK_FILE, stock);
+      _stockCache = stock;
+      console.log("[Stock] Estoque atualizado ap\xF3s pagamento aprovado");
+    }
+  } catch (e) {
+    console.error("[Stock] Erro ao dar baixa no estoque:", e.message);
+  }
+}
 app.post("/api/webhooks/mercadopago", async (req, res) => {
   try {
+    console.log(`[Webhook MP] Recebido: type=${req.body?.type} id=${req.body?.data?.id}`);
     const { type, data } = req.body;
-    if (type === "payment" && data?.id) {
+    const paymentId = data?.id || req.query["data.id"];
+    const eventType = type || req.query["type"];
+    if ((eventType === "payment" || eventType === "payment.updated") && paymentId) {
       const { MercadoPagoConfig, Payment } = await import("mercadopago");
       const client = new MercadoPagoConfig({ accessToken: MP_ACCESS_TOKEN });
       const payment = new Payment(client);
-      const result = await payment.get({ id: data.id });
+      const result = await payment.get({ id: paymentId });
       if (result.status === "approved") {
         const orders = readJSON(ORDERS_FILE);
-        const order = orders.find((o) => o.paymentId === data.id || o.paymentId === String(data.id));
+        const extRef = result.external_reference;
+        const order = orders.find(
+          (o) => o.paymentId === paymentId || o.paymentId === String(paymentId) || extRef && (o.id === extRef || o.preferenceId === extRef)
+        );
+        console.log(`[Webhook MP] extRef=${extRef} order encontrado=${!!order} status=${order?.status}`);
         if (order) {
-          order.status = "paid";
+          order.status = "em_separacao";
+          order.paymentStatus = "paid";
+          order.paymentId = String(paymentId);
+          order.paidAt = (/* @__PURE__ */ new Date()).toISOString();
           writeJSON(ORDERS_FILE, orders);
-          sendWhatsAppNotification(formatOrderNotification(order, "PAGAMENTO APROVADO")).catch(() => {
+          deductStock(order.items || []);
+          sendWhatsAppNotification(formatOrderNotification(order, "PAGAMENTO APROVADO - EM SEPARA\xC7\xC3O")).catch(() => {
+          });
+        } else {
+          const fallbackOrder = {
+            id: extRef || `order-mp-${data.id}`,
+            items: [],
+            customerName: result.payer?.first_name ? `${result.payer.first_name} ${result.payer.last_name || ""}`.trim() : "Cliente",
+            customerEmail: result.payer?.email || "",
+            total: result.transaction_amount || 0,
+            status: "em_separacao",
+            paymentStatus: "paid",
+            paymentId: String(paymentId),
+            preferenceId: extRef || "",
+            paidAt: (/* @__PURE__ */ new Date()).toISOString(),
+            createdAt: (/* @__PURE__ */ new Date()).toISOString()
+          };
+          orders.push(fallbackOrder);
+          writeJSON(ORDERS_FILE, orders);
+          sendWhatsAppNotification(formatOrderNotification(fallbackOrder, "PAGAMENTO APROVADO - EM SEPARA\xC7\xC3O")).catch(() => {
           });
         }
       }
@@ -1302,6 +1636,64 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
     console.error("[Webhook] Error:", e.message);
     res.sendStatus(200);
   }
+});
+app.get("/api/admin/gestao/coupons", requireAuth, (_req, res) => {
+  res.json(readJSON(COUPONS_FILE, []));
+});
+app.post("/api/admin/gestao/coupons", requireAuth, (req, res) => {
+  const coupons = readJSON(COUPONS_FILE, []);
+  const { code, discountType, discountValue, minOrderValue, maxUses, expiresAt } = req.body;
+  if (!code || !discountType || discountValue === void 0) {
+    return res.status(400).json({ error: "Campos obrigat\xF3rios: code, discountType, discountValue" });
+  }
+  const existing = coupons.find((c) => c.code.toUpperCase() === code.toUpperCase());
+  if (existing) return res.status(400).json({ error: "Cupom com este c\xF3digo j\xE1 existe" });
+  const coupon = {
+    id: Date.now(),
+    code: code.toUpperCase(),
+    discount_type: discountType,
+    discount_value: parseFloat(discountValue),
+    min_order_value: minOrderValue ? parseFloat(minOrderValue) : null,
+    max_uses: maxUses ? parseInt(maxUses) : null,
+    used_count: 0,
+    is_active: true,
+    expires_at: expiresAt || null,
+    created_at: (/* @__PURE__ */ new Date()).toISOString()
+  };
+  coupons.push(coupon);
+  writeJSON(COUPONS_FILE, coupons);
+  res.json(coupon);
+});
+app.patch("/api/admin/gestao/coupons/:id/toggle", requireAuth, (req, res) => {
+  const coupons = readJSON(COUPONS_FILE, []);
+  const idx = coupons.findIndex((c) => c.id === parseInt(req.params.id));
+  if (idx === -1) return res.status(404).json({ error: "Cupom n\xE3o encontrado" });
+  coupons[idx].is_active = !coupons[idx].is_active;
+  writeJSON(COUPONS_FILE, coupons);
+  res.json(coupons[idx]);
+});
+app.delete("/api/admin/gestao/coupons/:id", requireAuth, (req, res) => {
+  let coupons = readJSON(COUPONS_FILE, []);
+  const before = coupons.length;
+  coupons = coupons.filter((c) => c.id !== parseInt(req.params.id));
+  if (coupons.length === before) return res.status(404).json({ error: "Cupom n\xE3o encontrado" });
+  writeJSON(COUPONS_FILE, coupons);
+  res.json({ success: true });
+});
+app.post("/api/coupons/validate", (req, res) => {
+  const { code, orderTotal } = req.body;
+  if (!code) return res.status(400).json({ error: "C\xF3digo obrigat\xF3rio" });
+  const coupons = readJSON(COUPONS_FILE, []);
+  const coupon = coupons.find((c) => c.code.toUpperCase() === code.toUpperCase());
+  if (!coupon) return res.status(404).json({ error: "Cupom n\xE3o encontrado" });
+  if (!coupon.is_active) return res.status(400).json({ error: "Cupom inativo" });
+  if (coupon.expires_at && new Date(coupon.expires_at) < /* @__PURE__ */ new Date()) return res.status(400).json({ error: "Cupom expirado" });
+  if (coupon.max_uses && coupon.used_count >= coupon.max_uses) return res.status(400).json({ error: "Cupom esgotado" });
+  if (coupon.min_order_value && orderTotal < coupon.min_order_value) {
+    return res.status(400).json({ error: `Pedido m\xEDnimo de R$ ${coupon.min_order_value.toFixed(2)} para este cupom` });
+  }
+  const discount = coupon.discount_type === "percentual" ? orderTotal * coupon.discount_value / 100 : coupon.discount_value;
+  res.json({ valid: true, coupon, discount: Math.min(discount, orderTotal) });
 });
 var distPath = path.join(__dirname, "../dist/public");
 if (fs.existsSync(distPath)) {
