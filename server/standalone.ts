@@ -257,20 +257,32 @@ function slugify(name: string): string {
 // Carrega produtos: primeiro do JSON persistente, depois do catálogo estático
 async function getProducts(): Promise<any[]> {
   if (_catalogCache) return _catalogCache;
-  // Se já existe products.json, usar ele
+  // Sempre carregar o catálogo estático como fonte de verdade para IDs
+  let baseCatalog: any[] = [];
+  try {
+    const { catalog } = await import("../shared/catalog.js");
+    baseCatalog = catalog as any[];
+  } catch { baseCatalog = []; }
+  const catalogIds = new Set(baseCatalog.map((p: any) => p.id));
+  
+  // Se existe products.json, verificar se os IDs são válidos
   if (fs.existsSync(PRODUCTS_FILE)) {
     const saved = readJSON(PRODUCTS_FILE, null);
     if (Array.isArray(saved) && saved.length > 0) {
-      _catalogCache = saved;
-      return _catalogCache;
+      const savedIds = saved.map((p: any) => p.id);
+      const idsValid = savedIds.every((id: string) => catalogIds.has(id));
+      if (idsValid) {
+        // IDs corretos: usar o JSON salvo (pode ter preços/descrições editadas)
+        _catalogCache = saved;
+        return _catalogCache!;
+      }
+      // IDs inválidos: products.json está corrompido
+      console.log('[WARN] products.json com IDs inválidos, reinicializando do catálogo estático');
     }
   }
-  // Primeira vez: inicializar do catálogo estático
-  try {
-    const { catalog } = await import("../shared/catalog.js");
-    _catalogCache = catalog as any[];
-    writeJSON(PRODUCTS_FILE, _catalogCache);
-  } catch { _catalogCache = []; }
+  // Inicializar do catálogo estático
+  _catalogCache = baseCatalog;
+  writeJSON(PRODUCTS_FILE, _catalogCache);
   return _catalogCache!;
 }
 
